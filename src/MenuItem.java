@@ -1,0 +1,83 @@
+import java.io.File;
+import java.util.ArrayList;
+
+public class MenuItem {
+    private String itemID, itemName,itemPrice;
+    private Vendor vendor;
+    private ArrayList<MenuItem> vendorItems;
+
+    public MenuItem(String itemID, String itemName,String itemPrice, Vendor vendor){
+        this.itemID = itemID;
+        this.itemName = itemName;
+        this.itemPrice = itemPrice;
+        this.vendor = vendor;
+    }
+
+    public MenuItem(String itemName){
+        FileOperation file = new FileOperation("MenuItem.txt");
+        ArrayList<String> orderData = file.search(itemName);
+        if (orderData.size() == 1) {
+            String[] itemDetail = orderData.get(0).split(";");
+            itemID = itemDetail[0];
+            this.itemName = itemDetail[1];
+            itemPrice = itemDetail[2];
+            vendor = new Vendor(itemDetail[3]);
+        }
+    }
+
+    public MenuItem(Vendor vendor){
+        setMenu(vendor);
+    }//to view specify vendor's menu
+
+    public String getItemID(){
+        return itemID;
+    }
+    public String getItemName(){
+        return itemName;
+    }
+
+    public double getItemPrice(){
+        return Double.parseDouble(itemPrice);
+    }
+
+    public Vendor getVendor(){
+        return vendor;
+    }
+
+    public MenuItem getDetail(int row){
+        int index = row-1;
+        return vendorItems.get(index);
+    }
+
+    public String toString(){
+        return String.format("%s;%s;%s;%s", itemID, itemName, itemPrice,vendor.getID());
+    }
+
+    public void write2file(String input){
+        FileOperation file = new FileOperation("MenuItem.txt");
+        file.writeToFile(input);
+    }
+
+    public void setMenu(Vendor vendor){
+        vendorItems = new ArrayList<>();
+        FileOperation file = new FileOperation("MenuItem.txt");
+        ArrayList<String> items = file.search(vendor.getID());
+        for(String line:items) {
+            String[] itemDetail = line.split(",");
+            MenuItem item = new MenuItem(itemDetail[0], itemDetail[1], itemDetail[2], vendor);
+            vendorItems.add(item);
+        }
+    }
+
+    public void printMenu(){
+        int counter = 0;
+        System.out.println("-----------------------------------------------------------------------------------------------");
+        System.out.println(String.format("%-5s", "No.")+String.format("%-30s", "Item ID")+String.format("%-30s", "Item Name")+String.format("%-30s", "Price"));
+        System.out.println("------------------------------------------------------------------------------------------");
+        for(MenuItem item:vendorItems){
+            counter++;
+            System.out.println(String.format(String.format("%-5s", counter)+"%-30s", item.getItemID())+String.format("%-30s", item.getItemName())+String.format("%-30s", item.getItemPrice()));
+        }
+        System.out.println("------------------------------------------------------------------------------------------");
+    }
+}

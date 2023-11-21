@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 // Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
 // then press Enter. You can now see whitespace characters in your code.
 public class Main {
@@ -6,6 +8,12 @@ public class Main {
         // IntelliJ IDEA suggests fixing it.
         System.out.println("Hello and welcome!");
 
-    System.out.println("====================================");
+        System.out.println("==============================");//30
+    System.out.println("============================================================");
+    System.out.println(String.format("%-30s", "Spaghetti")+String.format("%-30s", "Food"));
+    System.out.println("============================================================");
+
+
+    //System.out.println(String.format("%-30s", "Spaghetti")+String.format("%-30s", "Food"));
     }
 }
