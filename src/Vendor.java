@@ -72,9 +72,9 @@ public class Vendor {
         return String.format("%s;%s;%s;%s;%s", ID, password, vendorName,category,address);
     }
 
-    public void write2file(String input){
-        FileOperation file = new FileOperation("Vendor.txt");
-        file.writeToFile(input);
+    public void write2file(Vendor vendor){
+        SerializationOperation operatioin = new SerializationOperation("Vendor.ser");
+        operatioin.addObject(vendor);
     }
 
     public void receiveOrder(Order order) {

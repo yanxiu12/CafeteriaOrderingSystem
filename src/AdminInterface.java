@@ -94,7 +94,7 @@ public class AdminInterface extends MainInterface {
         System.out.println("------------------------------------------------");
         System.out.println();
         IDGenerator generator = new IDGenerator("Customer.ser","CA");
-        id = generator.generateID();
+        id = generator.generateSerializedID();
         while(status = true){
             System.out.print("Customer Name:");
             name = input.nextLine();
@@ -325,6 +325,57 @@ public class AdminInterface extends MainInterface {
             System.out.println("(No Customer Record Exist.)");
         System.out.println();
         System.out.println("Back to Main Menu......");
+        System.out.println();
+    }
+
+    public void createVendor() {
+        Scanner input = new Scanner(System.in);
+        boolean status = true;
+        String id=null,name=null,category=null,password=null,address=null;
+
+        System.out.println("------------------------------------------------");
+        System.out.println("|                 CREATE VENDOR                |");
+        System.out.println("------------------------------------------------");
+        System.out.println();
+        IDGenerator generator = new IDGenerator("Vendor.ser","VA");
+        id = generator.generateSerializedID();
+        while(status = true){
+            System.out.print("Vendor Name:");
+            name = input.nextLine();
+            if(name.matches("[a-zA-Z\\s]+")){
+                status = false;
+            }else{
+                System.out.println("Please enter a valid name.");
+            }
+        }
+        while(status = true){
+            System.out.print("Vendor Category:");
+            category = input.nextLine();
+            if(category.isEmpty())
+                status = false;
+            else
+                System.out.println("Please enter a valid date.");
+        }
+        while(status = true){
+            System.out.print("Vendor Address:");
+            address = input.nextLine();
+            if(address.isEmpty())
+                status = false;
+            else
+                System.out.println("Please enter a valid address.");
+        }
+        while(status = true){
+            System.out.print("Vendor Password:");
+            password = input.nextLine();
+            if(password.isEmpty())
+                status = false;
+            else
+                System.out.println("Please enter a valid password.");
+        }
+        Vendor newVendor = new Vendor(id,password,name,category,address);
+        newVendor.write2file(newVendor);
+        System.out.println();
+        System.out.println("Successfully created the user.");
         System.out.println();
     }
 }
