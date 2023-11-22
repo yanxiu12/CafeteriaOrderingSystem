@@ -11,7 +11,7 @@ public class Credit {
         this.currentDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
     }
 
-    public void addAmount(double amount,int type){
+    public void addAmount(double amount,int type){//1=topUp 2=refund
         IDGenerator generator = new IDGenerator("creditRecord.txt", "CT");
         ID = generator.generateID();
         transaction = "+"+amount;

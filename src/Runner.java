@@ -85,9 +85,9 @@ public class Runner {
         return String.format("%s;%s;%s;%s;%s", ID, password,runnerName,contact,status);
     }
 
-    public void write2file(String input){
-        FileOperation file = new FileOperation("Runner.txt");
-        file.writeToFile(input);
+    public void write2file(Runner runner){
+        SerializationOperation operation = new SerializationOperation("Runner.ser");
+        operation.addObject(runner);
     }
 
     public void write2TaskFile(String input){

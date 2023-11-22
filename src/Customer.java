@@ -1,6 +1,7 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Customer {
+public class Customer implements Serializable {
     private String ID,name,dob,contact,password,address;
     private double walletBalance;
 

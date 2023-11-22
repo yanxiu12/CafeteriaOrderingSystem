@@ -10,39 +10,44 @@ public class SerializationOperation implements java.io.Serializable{
     }
 
     // Serialize a generic object
-    public void serializeObject(Object obj) {
+    public <T> void serializeObject(ArrayList<T> objList) {
         try (ObjectOutputStream objectOut = new ObjectOutputStream(new FileOutputStream(filename))) {
-            objectOut.writeObject(obj);
-            objectOut.close();
+            for (T obj : objList) {
+                objectOut.writeObject(obj);
+            }
         } catch (IOException e) {
             System.out.println("Error serializing object: " + e.getMessage());
         }
     }
 
     // Deserialize an object
-    public Object deserializeObject() {
-        Object deserializedObject = null;
+    public <T> ArrayList<T> deserializeObjects() {
+        ArrayList<T> deserializedObjects = new ArrayList<>();
         try (ObjectInputStream objectIn = new ObjectInputStream(new FileInputStream(filename))) {
-            deserializedObject = objectIn.readObject();
+            Object obj;
+            while ((obj = objectIn.readObject()) != null) {
+                deserializedObjects.add((T) obj);
+            }
+        } catch (EOFException e) {
+            // End of file reached
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Error deserializing object: " + e.getMessage());
+            System.out.println("Error deserializing objects: " + e.getMessage());
         }
-        return deserializedObject;
+        return deserializedObjects;
     }
 
     public <T> ArrayList<T> readAllObjects(Class<T> objectType) {
         ArrayList<T> allObjects = new ArrayList<>();
-        Object existingData = deserializeObject();
-        if (existingData instanceof ArrayList) {
-            ArrayList<Object> dataList = (ArrayList<Object>) existingData;
-            for (Object obj : dataList) {
-                if (objectType.isInstance(obj)) {
-                    allObjects.add(objectType.cast(obj));
-                }
+        ArrayList<T> deserializedObjects = deserializeObjects(); // Using the updated method
+
+        for (T obj : deserializedObjects) {
+            if (objectType.isInstance(obj)) {
+                allObjects.add(obj);
             }
         }
         return allObjects;
     }
+
 
     // Add a new object to the file
     public <T> void addObject(T obj) {
@@ -54,29 +59,26 @@ public class SerializationOperation implements java.io.Serializable{
     // Search for an object based on some criteria
     public <T> ArrayList<T> searchObjects(String searchKey, Class<T> objectType) {
         ArrayList<T> foundObjects = new ArrayList<>();
-        Object existingData = deserializeObject();
-        if (existingData instanceof ArrayList) {
-            ArrayList<Object> dataList = (ArrayList<Object>) existingData;
-            for (Object obj : dataList) {
-                // Implement search logic based on your object structure
-                if (objectType.isInstance(obj)) {
-                    // Check if the object is of the specified type
-                    String id;
-                    if (obj instanceof Customer) {
-                        id = ((Customer) obj).getID();
-                    } else if (obj instanceof Vendor) {
-                        id = ((Vendor) obj).getID();
-                    } else if (obj instanceof Runner) {
-                        id = ((Runner) obj).getID();
-                    } else {
-                        // Add additional checks for other types if needed
-                        continue; // Skip if not the expected type
-                    }
+        ArrayList<T> deserializedObjects = deserializeObjects();
 
-                    // Perform the search based on the provided search key
-                    if (id.contains(searchKey)) {
-                        foundObjects.add(objectType.cast(obj));
-                    }
+        for (T obj : deserializedObjects) {
+            if (objectType.isInstance(obj)) {
+                // Implement search logic based on your object structure
+                String id;
+                if (obj instanceof Customer) {
+                    id = ((Customer) obj).getID();
+                } else if (obj instanceof Vendor) {
+                    id = ((Vendor) obj).getID();
+                } else if (obj instanceof Runner) {
+                    id = ((Runner) obj).getID();
+                } else {
+                    // Add additional checks for other types if needed
+                    continue; // Skip if not the expected type
+                }
+
+                // Perform the search based on the provided search key
+                if (id.contains(searchKey)) {
+                    foundObjects.add(obj);
                 }
             }
         }
