@@ -225,13 +225,18 @@ public class AdminInterface extends MainInterface {
                             case 1:
                                 status = true;
                                 while (status) {
-                                    System.out.print("Customer Name:");
-                                    name = input.nextLine();
-                                    if (name.isEmpty()) {
+                                    System.out.println("Customer Name:"+name);
+                                    System.out.print("New Customer Name:");
+                                    String newName = input.nextLine();
+                                    if (newName.isEmpty()) {
                                         System.out.println("Input cannot be empty.");
-                                    } else if (name.matches("[a-zA-Z\\s]+")) {
+                                    }else if (newName.equals(name)) {
+                                        System.out.println("The update was not processed. The new value matches the existing value.");
+                                    }else if (newName.matches("[a-zA-Z\\s]+")) {
                                         status = false; // Exit loop if name format is valid
-                                    } else {
+                                        name = newName;
+                                        System.out.println("The updated information has been stored.");
+                                    }else {
                                         System.out.println("Please enter a valid name.");
                                     }
                                 }
@@ -239,45 +244,67 @@ public class AdminInterface extends MainInterface {
                             case 2:
                                 status = true;
                                 while(status){
-                                    System.out.print("Customer Date of Birth:");
-                                    dob = input.nextLine();
-                                    if(dob.isEmpty())
+                                    System.out.print("Customer Date of Birth (yyyy-MM-dd):"+dob);
+                                    System.out.print("New Customer Date of Birth (yyyy-MM-dd):");
+                                    String newDob = input.nextLine();
+                                    if (newDob.equals(dob))
+                                        System.out.println("The update was not processed. The new value matches the existing value.");
+                                    else if(newDob.matches("\\d{4}-\\d{2}-\\d{2}")) {
                                         status = false;
-                                    else
+                                        dob = newDob;
+                                        System.out.println("The updated information has been stored.");
+                                    }else
                                         System.out.println("Please enter a valid date.");
                                 }
                                 break;
                             case 3:
                                 status = true;
                                 while(status){
-                                    System.out.print("Customer Contact:");
-                                    contact = input.nextLine();
-                                    if(contact.matches("(^01\\d{8}$|^011\\d{8}$)"))
+                                    System.out.print("Customer Contact:"+contact);
+                                    System.out.print("New Customer Contact:");
+                                    String newContact = input.nextLine();
+                                    if (newContact.equals(contact))
+                                        System.out.println("The update was not processed. The new value matches the existing value.");
+                                    else if(newContact.matches("(^01\\d{8}$|^011\\d{8}$)")) {
                                         status = false;
-                                    else
+                                        contact = newContact;
+                                        System.out.println("The updated information has been stored.");
+                                    } else
                                         System.out.println("Please enter a valid contact.");
                                 }
                                 break;
                             case 4:
                                 status = true;
                                 while(status){
-                                    System.out.print("Customer Address:");
-                                    address = input.nextLine();
-                                    if(address.isEmpty())
+                                    System.out.print("Customer Address:"+address);
+                                    System.out.print("New Customer Address:");
+                                    String newAddress = input.nextLine();
+                                    if(newAddress.isEmpty())
                                         System.out.println("Please enter a valid address.");
-                                    else
+                                    else if (newAddress.equals(address))
+                                        System.out.println("The update was not processed. The new value matches the existing value.");
+                                    else {
                                         status = false;
+                                        address = newAddress;
+                                        System.out.println("The updated information has been stored.");
+                                    }
                                 }
                                 break;
                             case 5:
                                 status = true;
                                 while(status){
-                                    System.out.print("Customer Password:");
-                                    password = input.nextLine();
-                                    if(password.isEmpty())
+                                    System.out.print("Customer Password:"+password);
+                                    System.out.print("New Customer Password:");
+                                    String newPassword = input.nextLine();
+                                    if(newPassword.isEmpty())
                                         System.out.println("Please enter a valid password.");
-                                    else
+                                    else if (newPassword.equals(password))
+                                        System.out.println("The update was not processed. The new value matches the existing value.");
+                                    else {
                                         status = false;
+                                        password = newPassword;
+                                        System.out.println("The updated information has been stored.");
+                                    }
                                 }
                                 break;
                         }
@@ -611,42 +638,62 @@ public class AdminInterface extends MainInterface {
                             case 1:
                                 status = true;
                                 while(status){
-                                    System.out.print("Vendor Name:");
-                                    name = input.nextLine();
-                                    if(name.matches("[a-zA-Z\\s]+")){
+                                    System.out.print("Vendor Name:"+name);
+                                    System.out.print("New Vendor Name:");
+                                    String newName = input.nextLine();
+                                    if (newName.equals(name)) {
+                                        System.out.println("The update was not processed. The new value matches the existing value.");
+                                    } else if(newName.matches("[a-zA-Z\\s]+")){
                                         status = false;
-                                    }else{
+                                        name = newName;
+                                        System.out.println("The updated information has been stored.");
+                                    } else{
                                         System.out.println("Please enter a valid name.");
                                     }
                                 }
                             case 2:
                                 status = true;
                                 while(status){
-                                    System.out.print("Vendor Category:");
-                                    category = input.nextLine();
-                                    if(category.matches("[a-zA-Z\\s]+"))
+                                    System.out.print("Vendor Category:"+category);
+                                    System.out.print("New Vendor Category:");
+                                    String newCategory = input.nextLine();
+                                    if (newCategory.equals(category)) {
+                                        System.out.println("The update was not processed. The new value matches the existing value.");
+                                    }else if(newCategory.matches("[a-zA-Z\\s]+")) {
                                         status = false;
-                                    else
+                                        category = newCategory;
+                                        System.out.println("The updated information has been stored.");
+                                    }else
                                         System.out.println("Please enter a valid category.");
                                 }
                             case 3:
                                 status = true;
                                 while(status){
-                                    System.out.print("Vendor Password:");
-                                    password = input.nextLine();
-                                    if(!password.isEmpty())
+                                    System.out.print("Vendor Password:"+password);
+                                    System.out.print("New Vendor Password:");
+                                    String newPassword = input.nextLine();
+                                    if (newPassword.equals(password)) {
+                                        System.out.println("The update was not processed. The new value matches the existing value.");
+                                    } else if(!newPassword.isEmpty()){
                                         status = false;
-                                    else
+                                        password = newPassword;
+                                        System.out.println("The updated information has been stored.");
+                                    } else
                                         System.out.println("Please enter a valid password.");
                                 }
                             case 4:
                                 status = true;
                                 while(status){
-                                    System.out.print("Vendor Address:");
-                                    address = input.nextLine();
-                                    if(!address.isEmpty())
+                                    System.out.print("Vendor Address:"+address);
+                                    System.out.print("New Vendor Address:");
+                                    String newAddress = input.nextLine();
+                                    if (newAddress.equals(address)) {
+                                        System.out.println("The update was not processed. The new value matches the existing value.");
+                                    } else if(!newAddress.isEmpty()) {
                                         status = false;
-                                    else
+                                        address = newAddress;
+                                        System.out.println("The updated information has been stored.");
+                                    }else
                                         System.out.println("Please enter a valid address.");
                                 }
                         }
@@ -897,10 +944,15 @@ public class AdminInterface extends MainInterface {
                             case 1:
                                 status = true;
                                 while(status){
-                                    System.out.print("Runner Name:");
-                                    name = input.nextLine();
-                                    if(name.matches("[a-zA-Z\\s]+")){
+                                    System.out.print("Runner Name:"+name);
+                                    System.out.print("New Runner Name:");
+                                    String newName = input.nextLine();
+                                    if (newName.equals(name)) {
+                                        System.out.println("The update was not processed. The new value matches the existing value.");
+                                    }else if(newName.matches("[a-zA-Z\\s]+")){
                                         status = false;
+                                        name = newName;
+                                        System.out.println("The updated information has been stored.");
                                     }else{
                                         System.out.println("Please enter a valid name.");
                                     }
@@ -908,21 +960,31 @@ public class AdminInterface extends MainInterface {
                             case 2:
                                 status = true;
                                 while(status){
-                                    System.out.print("Runner Contact:");
-                                    contact = input.nextLine();
-                                    if(contact.matches("(^01\\d{8}$|^011\\d{8}$)"))
+                                    System.out.print("Runner Contact:"+contact);
+                                    System.out.print("New Runner Contact:");
+                                    String newContact = input.nextLine();
+                                    if (newContact.equals(contact)) {
+                                        System.out.println("The update was not processed. The new value matches the existing value.");
+                                    }else if(contact.matches("(^01\\d{8}$|^011\\d{8}$)")) {
                                         status = false;
-                                    else
+                                        contact = newContact;
+                                        System.out.println("The updated information has been stored.");
+                                    } else
                                         System.out.println("Please enter a valid contact.");
                                 }
                             case 3:
                                 status = true;
                                 while(status){
-                                    System.out.print("Runner Password:");
-                                    password = input.nextLine();
-                                    if(!password.isEmpty())
+                                    System.out.print("Runner Password:"+password);
+                                    System.out.print("New Runner Password:");
+                                    String newPassword = input.nextLine();
+                                    if (newPassword.equals(password)) {
+                                        System.out.println("The update was not processed. The new value matches the existing value.");
+                                    }else if(!password.isEmpty()) {
                                         status = false;
-                                    else
+                                        password = newPassword;
+                                        System.out.println("The updated information has been stored.");
+                                    }else
                                         System.out.println("Please enter a valid password.");
                                 }
                         }

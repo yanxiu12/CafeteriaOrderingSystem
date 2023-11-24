@@ -14,18 +14,19 @@ public class Customer implements Serializable {
         setDetails(userID);
     }//for credit use (Customer CA = new Customer("CA1"); Credit userCredit = new Credit(CA); userCredit.addAmount();CA.write2file();userCredit.write2file();
 
-    public Customer(String userID,String password){
-        FileOperation file = new FileOperation("Customer.txt");
-        if(file.checkUserCredential(userID,password)){
-            setDetails(userID);
-        }
-        this.orders = new ArrayList<>();
-        this.cartItems = new ArrayList<>();
-        this.notifications = new ArrayList<>();
-    }//for login
+//    public Customer(String userID,String password){
+//        FileOperation file = new FileOperation("Customer.txt");
+//        if(file.checkUserCredential(userID,password)){
+//            setDetails(userID);
+//        }
+//        this.orders = new ArrayList<>();
+//        this.cartItems = new ArrayList<>();
+//        this.notifications = new ArrayList<>();
+//    }//for login
 
     public Customer(String ID,String password,String name,String dob,String contact,String address,String walletBalance){
         setID(ID);setPassword(password);setName(name);setDob(dob);setContact(contact);setAddress(address);setWalletBalance(walletBalance);
+        this.notifications = new ArrayList<>();
     }//for register //obj.write2file(obj.toString());
 
     public String getID() {return ID;}

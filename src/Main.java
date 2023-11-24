@@ -4,8 +4,6 @@
 public class Main {
     public static void main(String[] args) {
 
-    //IDGenerator g = new IDGenerator("Customer.ser","CA");
-    //System.out.println(g.generateSerializedID());
         try {
             while (true) {
                 int choice;
@@ -53,44 +51,56 @@ public class Main {
                                         }
                                         break;
                                     case 2://access vendor
-                                        int vend;
-                                        AdminInterface.accessVendor();
-                                        vend = AdminInterface.userInput();
-                                        switch (vend) {
-                                            case 1:
-                                                AdminInterface.createVendor();
-                                                break;
-                                            case 2:
-                                                AdminInterface.updateVendor();
-                                                break;
-                                            case 3:
-                                                AdminInterface.deleteVendor();
-                                                break;
-                                            case 0:
-                                                break;
-                                            default:
-                                                System.out.println("Invalid choice. Please try again");
+                                        boolean returnToVendor = false;
+                                        while(true) {
+                                            int vend;
+                                            AdminInterface.accessVendor();
+                                            vend = AdminInterface.userInput();
+                                            switch (vend) {
+                                                case 1:
+                                                    AdminInterface.createVendor();
+                                                    break;
+                                                case 2:
+                                                    AdminInterface.updateVendor();
+                                                    break;
+                                                case 3:
+                                                    AdminInterface.deleteVendor();
+                                                    break;
+                                                case 0:
+                                                    returnToVendor = true;
+                                                    break;
+                                                default:
+                                                    System.out.println("Invalid choice. Please try again");
+                                                    break;
+                                            }
+                                            if (returnToVendor)
                                                 break;
                                         }
                                         break;
                                     case 3:
-                                        int run;
-                                        AdminInterface.accessRunner();
-                                        run = AdminInterface.userInput();
-                                        switch (run) {
-                                            case 1:
-                                                AdminInterface.createRunner();
-                                                break;
-                                            case 2:
-                                                AdminInterface.updateRunner();
-                                                break;
-                                            case 3:
-                                                AdminInterface.deleteRunner();
-                                                break;
-                                            case 0:
-                                                break;
-                                            default:
-                                                System.out.println("Invalid choice. Please try again");
+                                        boolean returnToRunner = false;
+                                        while(true) {
+                                            int run;
+                                            AdminInterface.accessRunner();
+                                            run = AdminInterface.userInput();
+                                            switch (run) {
+                                                case 1:
+                                                    AdminInterface.createRunner();
+                                                    break;
+                                                case 2:
+                                                    AdminInterface.updateRunner();
+                                                    break;
+                                                case 3:
+                                                    AdminInterface.deleteRunner();
+                                                    break;
+                                                case 0:
+                                                    returnToRunner = true;
+                                                    break;
+                                                default:
+                                                    System.out.println("Invalid choice. Please try again");
+                                                    break;
+                                            }
+                                            if (returnToRunner)
                                                 break;
                                         }
                                         break;
@@ -118,8 +128,6 @@ public class Main {
                     default:
                         System.out.println("Invalid choice. Please try again");
                         break;
-
-
                 }
             }
         }finally {
