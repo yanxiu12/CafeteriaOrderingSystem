@@ -88,6 +88,11 @@ public class Customer implements Serializable {
         file.writeToFile(input);
     }
 
+    public void modifyFile(Customer customer){
+        SerializationOperation operation = new SerializationOperation("Customer.ser");
+        operation.updateObject(customer.getID(),customer);
+    }
+
     public void addToCart(MenuItem item,int quantity){
         for(Cart cartItem:cartItems){
             if(cartItem.equals(item)){

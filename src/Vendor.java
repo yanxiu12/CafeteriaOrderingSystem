@@ -1,8 +1,9 @@
 import jdk.jfr.Category;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Vendor {
+public class Vendor implements Serializable {
     private String ID, vendorName, category, password,address;
     private ArrayList<Order> receivedOrders;
     private ArrayList<Notification> notifications;
@@ -73,8 +74,8 @@ public class Vendor {
     }
 
     public void write2file(Vendor vendor){
-        SerializationOperation operatioin = new SerializationOperation("Vendor.ser");
-        operatioin.addObject(vendor);
+        SerializationOperation operation = new SerializationOperation("Vendor.ser");
+        operation.addObject(vendor);
     }
 
     public void receiveOrder(Order order) {

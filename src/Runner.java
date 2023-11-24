@@ -1,7 +1,7 @@
-import java.lang.reflect.Array;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Runner {
+public class Runner implements Serializable {
 
     private String ID, runnerName, contact, password;
     private boolean status = false;

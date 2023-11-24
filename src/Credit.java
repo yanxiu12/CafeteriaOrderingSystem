@@ -21,6 +21,7 @@ public class Credit {
             transactionType = "Refund";
         customer.setWalletBalance(String.valueOf(customer.getWalletBalance()+amount));
         write2file();
+        customer.modifyFile(customer);
     }
 
     public void deductAmount(double amount){

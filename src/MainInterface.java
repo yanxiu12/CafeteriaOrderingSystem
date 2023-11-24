@@ -32,9 +32,9 @@ public class MainInterface {
             } catch (InputMismatchException e) {
                 System.out.println("Please enter a valid input.");
                 input.nextLine();
-                status = true;
             }
         }
+        System.out.println();
         return choice;
     }
 

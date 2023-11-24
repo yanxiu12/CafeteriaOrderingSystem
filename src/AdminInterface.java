@@ -69,6 +69,8 @@ public class AdminInterface extends MainInterface {
         System.out.println();
         System.out.println(String.format("%-30s", "1. Access Customer") + String.format("%-30s", "2. Access Vendor") + String.format("%-30s", "3. Access Runner"));
         System.out.println();
+        System.out.println("(Enter 0 to log out.)");
+        System.out.println();
     }
 
     public static void accessCustomer() {
@@ -78,13 +80,12 @@ public class AdminInterface extends MainInterface {
         System.out.println();
         SerializationOperation operation = new SerializationOperation("Customer.ser");
         ArrayList<Customer> customerData = operation.readAllObjects(Customer.class);
-        System.out.println(customerData);
-        System.out.println("====================================================================================================================================================================================");
-        System.out.println(String.format("%-30s", "ID") + String.format("%-30s", "NAME") + String.format("%-30s", "DATE OF BIRTH") + String.format("%-30s", "CONTACT") + String.format("%-30s", "PASSWORD") + String.format("%-30s", "ADDRESS"));
-        System.out.println("====================================================================================================================================================================================");
-        if (customerData != null) {
+        System.out.println("==================================================================================================================================================================================================================");
+        System.out.println(String.format("%-30s", "ID") + String.format("%-30s", "NAME") + String.format("%-30s", "DATE OF BIRTH") + String.format("%-30s", "CONTACT") + String.format("%-30s", "PASSWORD") + String.format("%-30s", "ADDRESS")+String.format("%-30s", "WALLET BALANCE"));
+        System.out.println("==================================================================================================================================================================================================================");
+        if (!customerData.isEmpty()) {
             for (Customer customer : customerData) {
-                System.out.println(String.format("%-30s", customer.getID()) + String.format("%-30s", customer.getName()) + String.format("%-30s", customer.getDob()) + String.format("%-30s", customer.getContact()) + String.format("%-30s", customer.getPassword()) + String.format("%-30s", customer.getAddress()));
+                System.out.println(String.format("%-30s", customer.getID()) + String.format("%-30s", customer.getName()) + String.format("%-30s", customer.getDob()) + String.format("%-30s", customer.getContact()) + String.format("%-30s", customer.getPassword()) + String.format("%-30s", customer.getAddress())+String.format("%-30s", customer.getWalletBalance()));
             }
         } else {
             System.out.println("(No Customer Record Exist.)");
@@ -94,14 +95,14 @@ public class AdminInterface extends MainInterface {
         System.out.println();
         System.out.println(String.format("%-15s", "1. Create") + String.format("%-15s", "2. Update") + String.format("%-15s", "3. Delete") + String.format("%-15s", "4. Top-Up Credit"));
         System.out.println();
-        System.out.println("(Enter 0 to exit.)");
+        System.out.println("(Enter 0 to Main Menu.)");
         System.out.println();
     }
 
     public static void createCustomer() {
         Scanner input = new Scanner(System.in);
         boolean status;
-        String id=null,name=null,dob=null,contact=null,password=null,address=null;
+        String id,name=null,dob=null,contact=null,password=null,address=null;
 
         System.out.println("------------------------------------------------");
         System.out.println("|                CREATE CUSTOMER               |");
@@ -161,242 +162,313 @@ public class AdminInterface extends MainInterface {
         System.out.println();
         System.out.println("Successfully created the user.");
         System.out.println();
+        System.out.println("Back to previous page......");
+        System.out.println();
     }
 
     public static void updateCustomer(){
         Scanner input = new Scanner(System.in);
-        boolean status = true,repeat = true;
+        boolean status,repeat,update=true;
         int choice=0;
-        String idToUpdate=null;
+        String idToUpdate;
         String id=null,name=null,dob=null,contact=null,password=null,address=null,wallet=null;
 
         System.out.println("------------------------------------------------");
         System.out.println("|                UPDATE CUSTOMER               |");
         System.out.println("------------------------------------------------");
         System.out.println();
-        while(status = true){
+        while(update){
             System.out.print("Enter Customer ID:");
             idToUpdate = input.nextLine();
             if(idToUpdate.isEmpty())
-                status = false;
-            else
                 System.out.println("Input cannot be null.");
-        }
-        System.out.println();
-        SerializationOperation operation = new SerializationOperation("Customer.ser");
-        ArrayList<Customer> foundCustomer = operation.searchObjects(idToUpdate,Customer.class);
-        System.out.println("====================================================================================================================================================================================");
-        System.out.println(String.format("%-30s", "ID") + String.format("%-30s", "NAME") + String.format("%-30s", "DATE OF BIRTH") + String.format("%-30s", "CONTACT") + String.format("%-30s", "PASSWORD") + String.format("%-30s", "ADDRESS"));
-        System.out.println("====================================================================================================================================================================================");
-        if (foundCustomer != null) {
-            for (Customer customer : foundCustomer) {
-                System.out.println(String.format("%-30s", customer.getID()) + String.format("%-30s", customer.getName()) + String.format("%-30s", customer.getDob()) + String.format("%-30s", customer.getContact()) + String.format("%-30s", customer.getPassword()) + String.format("%-30s", customer.getAddress()));
-                id= customer.getID();name=customer.getName();dob= customer.getDob();contact= customer.getContact();address= customer.getAddress();password=customer.getPassword();wallet=String.valueOf(customer.getWalletBalance());
-            }
-            System.out.println();
-            while(repeat = true){
-                System.out.println("Which would you like to update?");
+            else {
                 System.out.println();
-                System.out.println(String.format("%-20s", "1. Name")+String.format("%-20s", "2. Date of Birth"));
-                System.out.println(String.format("%-20s", "3. Contact")+String.format("%-20s", "4. Address"));
-                System.out.println(String.format("%-20s", "5. Password"));
-                System.out.println();
-                while(status = true){
-                    System.out.print("Enter the number:");
-                    try {
-                        choice = input.nextInt();
-                        if(choice==1 || choice==2 || choice==3 || choice==4 || choice==5)
-                            status = false;
-                        else {
-                            System.out.println("Please enter a valid input.");
-                            status = true;
-                        }
-                    } catch (InputMismatchException e) {
-                        System.out.println("Please enter a valid input.");
-                        status = true;
-                        input.nextLine();//clear the scanner's buffer
+                SerializationOperation operation = new SerializationOperation("Customer.ser");
+                ArrayList<Customer> foundCustomer = operation.searchObjects(idToUpdate,Customer.class);
+                System.out.println("====================================================================================================================================================================================");
+                System.out.println(String.format("%-30s", "ID") + String.format("%-30s", "NAME") + String.format("%-30s", "DATE OF BIRTH") + String.format("%-30s", "CONTACT") + String.format("%-30s", "PASSWORD") + String.format("%-30s", "ADDRESS"));
+                System.out.println("====================================================================================================================================================================================");
+                if (!foundCustomer.isEmpty()) {
+                    for (Customer customer : foundCustomer) {
+                        System.out.println(String.format("%-30s", customer.getID()) + String.format("%-30s", customer.getName()) + String.format("%-30s", customer.getDob()) + String.format("%-30s", customer.getContact()) + String.format("%-30s", customer.getPassword()) + String.format("%-30s", customer.getAddress()));
+                        id= customer.getID();name=customer.getName();dob= customer.getDob();contact= customer.getContact();address= customer.getAddress();password=customer.getPassword();wallet=String.valueOf(customer.getWalletBalance());
                     }
-                }
-                System.out.println();
-                switch(choice){
-                    case 1:
-                        while(status = true){
-                            System.out.print("Customer Name:");
-                            name = input.nextLine();
-                            if(name.matches("[a-zA-Z\\s]+")){
-                                status = false;
-                            }else{
-                                System.out.println("Please enter a valid name.");
+                    System.out.println();
+                    repeat = true;
+                    while(repeat){
+                        System.out.println("Which would you like to update?");
+                        System.out.println();
+                        System.out.println(String.format("%-20s", "1. Name")+String.format("%-20s", "2. Date of Birth"));
+                        System.out.println(String.format("%-20s", "3. Contact")+String.format("%-20s", "4. Address"));
+                        System.out.println("5. Password");
+                        System.out.println();
+                        status=true;
+                        while(status){
+                            System.out.print("Enter the number:");
+                            try {
+                                choice = input.nextInt();
+                                if(choice==1 || choice==2 || choice==3 || choice==4 || choice==5) {
+                                    input.nextLine();
+                                    status = false;
+                                }else {
+                                    System.out.println("Please enter a valid input.");
+                                    input.nextLine();
+                                }
+                            } catch (InputMismatchException e) {
+                                System.out.println("Please enter a valid input.");
+                                input.nextLine();//clear the scanner's buffer
                             }
                         }
-                    case 2:
-                        while(status = true){
-                            System.out.print("Customer Date of Birth:");
-                            dob = input.nextLine();
-                            if(dob.isEmpty())
-                                status = false;
-                            else
-                                System.out.println("Please enter a valid date.");
+                        System.out.println();
+                        switch(choice){
+                            case 1:
+                                status = true;
+                                while (status) {
+                                    System.out.print("Customer Name:");
+                                    name = input.nextLine();
+                                    if (name.isEmpty()) {
+                                        System.out.println("Input cannot be empty.");
+                                    } else if (name.matches("[a-zA-Z\\s]+")) {
+                                        status = false; // Exit loop if name format is valid
+                                    } else {
+                                        System.out.println("Please enter a valid name.");
+                                    }
+                                }
+                                break;
+                            case 2:
+                                status = true;
+                                while(status){
+                                    System.out.print("Customer Date of Birth:");
+                                    dob = input.nextLine();
+                                    if(dob.isEmpty())
+                                        status = false;
+                                    else
+                                        System.out.println("Please enter a valid date.");
+                                }
+                                break;
+                            case 3:
+                                status = true;
+                                while(status){
+                                    System.out.print("Customer Contact:");
+                                    contact = input.nextLine();
+                                    if(contact.matches("(^01\\d{8}$|^011\\d{8}$)"))
+                                        status = false;
+                                    else
+                                        System.out.println("Please enter a valid contact.");
+                                }
+                                break;
+                            case 4:
+                                status = true;
+                                while(status){
+                                    System.out.print("Customer Address:");
+                                    address = input.nextLine();
+                                    if(address.isEmpty())
+                                        System.out.println("Please enter a valid address.");
+                                    else
+                                        status = false;
+                                }
+                                break;
+                            case 5:
+                                status = true;
+                                while(status){
+                                    System.out.print("Customer Password:");
+                                    password = input.nextLine();
+                                    if(password.isEmpty())
+                                        System.out.println("Please enter a valid password.");
+                                    else
+                                        status = false;
+                                }
+                                break;
                         }
-                    case 3:
-                        while(status = true){
-                            System.out.print("Customer Contact:");
-                            contact = input.nextLine();
-                            if(contact.matches("(^01\\d{8}$|^011\\d{8}$)"))
-                                status = false;
-                            else
-                                System.out.println("Please enter a valid contact.");
+                        System.out.println();
+                        System.out.print("Do you have anything more to update? Enter 1 to proceed.");
+                        try {
+                            int more = input.nextInt();
+                            if(more != 1)
+                                repeat = false;
+                        } catch (InputMismatchException e) {
+                            repeat = false;
+                            input.nextLine();//clear the scanner's buffer
                         }
-                    case 4:
-                        while(status = true){
-                            System.out.print("Customer Address:");
-                            address = input.nextLine();
-                            if(address.isEmpty())
-                                status = false;
-                            else
-                                System.out.println("Please enter a valid address.");
-                        }
-                    case 5:
-                        while(status = true){
-                            System.out.print("Customer Password:");
-                            password = input.nextLine();
-                            if(password.isEmpty())
-                                status = false;
-                            else
-                                System.out.println("Please enter a valid password.");
-                        }
-                }
-                System.out.println();
-                System.out.println("Do you have anything more to update? Enter 1 to proceed.");
-                try {
-                    int more = input.nextInt();
-                    if(more == 1)
-                        repeat = true;
-                } catch (InputMismatchException e) {
-                    repeat = true;
-                    input.nextLine();//clear the scanner's buffer
+                        System.out.println();
+                    }
+                    operation.updateObject(idToUpdate,new Customer(id,password, name, dob, contact,address,wallet));
+                    System.out.println("Successfully updated the user.");
+                    update=false;
+                } else {
+                    System.out.println("(No Customer Record Exist.)");
+                    System.out.println();
+                    System.out.print("Enter 1 to re-try again.");
+                    try {
+                        int retry=input.nextInt();
+                        if (retry!=1)
+                            update=false;
+                    } catch (InputMismatchException e) {
+                        update = false;
+                        input.nextLine();//clear the scanner's buffer
+                    }
+                    System.out.println();
                 }
             }
-            operation.updateObject(idToUpdate,new Customer(id,password, name, dob, contact,address,wallet));
-            System.out.println("Successfully updated the user.");
-        } else {
-            System.out.println("(No Customer Record Exist.)");
         }
         System.out.println();
-        System.out.println("Back to Main Menu......");
+        System.out.println("Back to previous page......");
         System.out.println();
     }
 
     public static void deleteCustomer(){
         Scanner input = new Scanner(System.in);
-        boolean status = true;
-        int choice=0;
-        String idToDelete=null;
+        boolean status,repeat;
+        int choice;
+        String idToDelete;
 
         System.out.println("------------------------------------------------");
         System.out.println("|                DELETE CUSTOMER               |");
         System.out.println("------------------------------------------------");
         System.out.println();
-        while(status = true){
+        repeat = true;
+        while(repeat){
             System.out.print("Enter Customer ID to delete:");
             idToDelete = input.nextLine();
             if(idToDelete.isEmpty())
-                status = false;
-            else
                 System.out.println("Input cannot be null.");
-        }
-        System.out.println();
-        SerializationOperation operation = new SerializationOperation("Customer.ser");
-        ArrayList<Customer> foundCustomer = operation.searchObjects(idToDelete,Customer.class);
-        System.out.println("====================================================================================================================================================================================");
-        System.out.println(String.format("%-30s", "ID") + String.format("%-30s", "NAME") + String.format("%-30s", "DATE OF BIRTH") + String.format("%-30s", "CONTACT") + String.format("%-30s", "PASSWORD") + String.format("%-30s", "ADDRESS"));
-        System.out.println("====================================================================================================================================================================================");
-        if (foundCustomer != null) {
-            for (Customer customer : foundCustomer) {
-                System.out.println(String.format("%-30s", customer.getID()) + String.format("%-30s", customer.getName()) + String.format("%-30s", customer.getDob()) + String.format("%-30s", customer.getContact()) + String.format("%-30s", customer.getPassword()) + String.format("%-30s", customer.getAddress()));
-            }
-            System.out.println();
-            System.out.println("Are you sure you want to delete?");
-            System.out.println("1. Yes\n2. No");
-            System.out.println();
-            while(status = true){
-                System.out.print("Enter the number:");
-                try {
-                    choice = input.nextInt();
-                    if(choice==1){
-                        status = false;
-                        operation.deleteObject(idToDelete,Customer.class);
-                        System.out.println("Successfully deleted the user.");
+            else{
+                System.out.println();
+                SerializationOperation operation = new SerializationOperation("Customer.ser");
+                ArrayList<Customer> foundCustomer = operation.searchObjects(idToDelete,Customer.class);
+                System.out.println("====================================================================================================================================================================================");
+                System.out.println(String.format("%-30s", "ID") + String.format("%-30s", "NAME") + String.format("%-30s", "DATE OF BIRTH") + String.format("%-30s", "CONTACT") + String.format("%-30s", "PASSWORD") + String.format("%-30s", "ADDRESS"));
+                System.out.println("====================================================================================================================================================================================");
+                if (!foundCustomer.isEmpty()) {
+                    for (Customer customer : foundCustomer) {
+                        System.out.println(String.format("%-30s", customer.getID()) + String.format("%-30s", customer.getName()) + String.format("%-30s", customer.getDob()) + String.format("%-30s", customer.getContact()) + String.format("%-30s", customer.getPassword()) + String.format("%-30s", customer.getAddress()));
                     }
-                    else if(choice==2){
-                        status = false;
-                    }
-                    else {
-                        System.out.println("Please enter a valid input.");
-                        status = true;
-                    }
-                } catch (InputMismatchException e) {
-                    System.out.println("Please enter a valid input.");
+                    System.out.println();
+                    System.out.println("Are you sure you want to delete?");
+                    System.out.println("1. Yes\n2. No");
+                    System.out.println();
                     status = true;
-                    input.nextLine();//clear the scanner's buffer
+                    while(status){
+                        System.out.print("Enter the number:");
+                        try {
+                            choice = input.nextInt();
+                            System.out.println();
+                            if(choice==1){
+                                status = false;
+                                operation.deleteObject(idToDelete,Customer.class);
+                                System.out.println("Successfully deleted the user.");
+                                repeat=false;
+                            }
+                            else if(choice==2){
+                                status = false;
+                                System.out.print("Do you want to delete other customer? Enter 1 to re-try.");
+                                try {
+                                    int retry=input.nextInt();
+                                    if (retry!=1)
+                                        repeat=false;
+                                } catch (InputMismatchException e) {
+                                    repeat = false;
+                                }
+                                input.nextLine();
+                            }
+                            else {
+                                System.out.println("Please enter a valid input.");
+                                input.nextLine();
+                                System.out.println();
+                            }
+                        } catch (InputMismatchException e) {
+                            System.out.println("Please enter a valid input.");
+                            input.nextLine();//clear the scanner's buffer
+                            System.out.println();
+                        }
+                    }
+                }else {
+                    System.out.println("(No Customer Record Exist.)");
+                    System.out.println();
+                    System.out.print("Do you want to delete other customer? Enter 1 to re-try.");
+                    try {
+                        int retry=input.nextInt();
+                        if (retry!=1)
+                            repeat=false;
+                    } catch (InputMismatchException e) {
+                        repeat = false;
+                    }
+                    input.nextLine();
+                    System.out.println();
                 }
             }
-        }else
-            System.out.println("(No Customer Record Exist.)");
+        }
         System.out.println();
-        System.out.println("Back to Main Menu......");
+        System.out.println("Back to previous page......");
         System.out.println();
     }
 
     public static void topUpCustomer(){
         Scanner input = new Scanner(System.in);
-        boolean status = true;
-        double amount=0.00;
-        String idToReload=null;
-        Customer cust = null;
+        boolean status,repeat;
+        double amount;
+        String idToReload;
+        Customer cus = null;
 
         System.out.println("------------------------------------------------");
         System.out.println("|                 TOP-UP CREDIT                |");
         System.out.println("------------------------------------------------");
         System.out.println();
-        while(status = true){
+        repeat=true;
+        while(repeat){
             System.out.print("Enter Customer ID to top-up:");
             idToReload = input.nextLine();
             if(idToReload.isEmpty())
-                status = false;
-            else
                 System.out.println("Input cannot be null.");
-        }
-        System.out.println();
-        SerializationOperation operation = new SerializationOperation("Customer.ser");
-        ArrayList<Customer> foundCustomer = operation.searchObjects(idToReload,Customer.class);
-        System.out.println("==========================================================================================");
-        System.out.println(String.format("%-30s", "ID") + String.format("%-30s", "NAME") + String.format("%-30s", "WALLET BALANCE"));
-        System.out.println("==========================================================================================");
-        if (foundCustomer != null) {
-            for (Customer customer : foundCustomer) {
-                System.out.println(String.format("%-30s", customer.getID()) + String.format("%-30s", customer.getName()) + String.format("%-30s", customer.getWalletBalance()) );
-                cust = customer;
-            }
-            System.out.println();
-            while(status = true){
-                System.out.print("Enter the amount to top-up:");
-                try {
-                    amount = input.nextDouble();
-                    Credit credit = new Credit(cust);
-                    credit.addAmount(amount,1);
-                    status = false;
-                    System.out.println("Successfully top-up the amount.");
-                } catch (InputMismatchException e) {
-                    System.out.println("Please enter a valid input.");
+            else {
+                System.out.println();
+                SerializationOperation operation = new SerializationOperation("Customer.ser");
+                ArrayList<Customer> foundCustomer = operation.searchObjects(idToReload,Customer.class);
+                System.out.println("==========================================================================================");
+                System.out.println(String.format("%-30s", "ID") + String.format("%-30s", "NAME") + String.format("%-30s", "WALLET BALANCE"));
+                System.out.println("==========================================================================================");
+                if (!foundCustomer.isEmpty()) {
+                    for (Customer customer : foundCustomer) {
+                        System.out.println(String.format("%-30s", customer.getID()) + String.format("%-30s", customer.getName()) + String.format("%-30s", customer.getWalletBalance()) );
+                        cus = customer;
+                    }
+                    System.out.println();
                     status = true;
-                    input.nextLine();//clear the scanner's buffer
+                    while(status){
+                        System.out.print("Enter the amount to top-up:");
+                        try {
+                            amount = input.nextDouble();
+                            System.out.println();
+                            Credit credit = new Credit(cus);
+                            credit.addAmount(amount,1);
+                            status = false;
+                            System.out.println("Successfully top-up the amount.");
+                            repeat = false;
+                        } catch (InputMismatchException e) {
+                            System.out.println("Please enter a valid input.");
+                            status = true;
+                            input.nextLine();//clear the scanner's buffer
+                        }
+                    }
+                }else {
+                    System.out.println("(No Customer Record Exist.)");
+                    System.out.println();
+                    System.out.print("Enter 1 to re-try again.");
+                    try {
+                        int retry=input.nextInt();
+                        if (retry!=1)
+                            repeat=false;
+                    } catch (InputMismatchException e) {
+                        repeat = false;
+                    }
+                    input.nextLine();
+                    System.out.println();
                 }
             }
-        }else
-            System.out.println("(No Customer Record Exist.)");
+        }
         System.out.println();
-        System.out.println("Back to Main Menu......");
+        System.out.println("Back to previous page......");
         System.out.println();
     }
 
@@ -410,7 +482,7 @@ public class AdminInterface extends MainInterface {
         System.out.println("======================================================================================================================================================");
         System.out.println(String.format("%-30s", "ID") + String.format("%-30s", "NAME") + String.format("%-30s", "CATEGORY") + String.format("%-30s", "PASSWORD") + String.format("%-30s", "ADDRESS"));
         System.out.println("======================================================================================================================================================");
-        if (vendorData != null) {
+        if (!vendorData.isEmpty()) {
             for (Vendor vendor : vendorData) {
                 System.out.println(String.format("%-30s", vendor.getID()) + String.format("%-30s", vendor.getVendorName()) + String.format("%-30s", vendor.getCategory()) +  String.format("%-30s", vendor.getPassword()) + String.format("%-30s", vendor.getAddress()));
             }
@@ -427,7 +499,7 @@ public class AdminInterface extends MainInterface {
     public static void createVendor() {
         Scanner input = new Scanner(System.in);
         boolean status = true;
-        String id=null,name=null,category=null,password=null,address=null;
+        String id,name=null,category=null,password=null,address=null;
 
         System.out.println("------------------------------------------------");
         System.out.println("|                 CREATE VENDOR                |");
@@ -435,7 +507,8 @@ public class AdminInterface extends MainInterface {
         System.out.println();
         IDGenerator generator = new IDGenerator("Vendor.ser","VA");
         id = generator.generateSerializedID();
-        while(status = true){
+        System.out.println("Vendor ID:"+id);
+        while(status){
             System.out.print("Vendor Name:");
             name = input.nextLine();
             if(name.matches("[a-zA-Z\\s]+")){
@@ -444,26 +517,29 @@ public class AdminInterface extends MainInterface {
                 System.out.println("Please enter a valid name.");
             }
         }
-        while(status = true){
+        status = true;
+        while(status){
             System.out.print("Vendor Category:");
             category = input.nextLine();
-            if(category.isEmpty())
+            if(category.matches("[a-zA-Z\\s]+"))
                 status = false;
             else
-                System.out.println("Please enter a valid date.");
+                System.out.println("Please enter a valid category.");
         }
-        while(status = true){
+        status = true;
+        while(status){
             System.out.print("Vendor Address:");
             address = input.nextLine();
-            if(address.isEmpty())
+            if(!address.isEmpty())
                 status = false;
             else
                 System.out.println("Please enter a valid address.");
         }
-        while(status = true){
+        status = true;
+        while(status){
             System.out.print("Vendor Password:");
             password = input.nextLine();
-            if(password.isEmpty())
+            if(!password.isEmpty())
                 status = false;
             else
                 System.out.println("Please enter a valid password.");
@@ -473,180 +549,218 @@ public class AdminInterface extends MainInterface {
         System.out.println();
         System.out.println("Successfully created the user.");
         System.out.println();
+        System.out.println("Back to previous page......");
+        System.out.println();
     }
 
     public static void updateVendor(){
         Scanner input = new Scanner(System.in);
-        boolean status = true,repeat = true;
+        boolean status = true,repeat = true, update = true;
         int choice=0;
-        String idToUpdate=null;
+        String idToUpdate;
         String id=null,name=null,category=null,password=null,address=null;
 
         System.out.println("------------------------------------------------");
         System.out.println("|                 UPDATE VENDOR                |");
         System.out.println("------------------------------------------------");
         System.out.println();
-        while(status = true){
+        while(update){
             System.out.print("Enter Vendor ID:");
             idToUpdate = input.nextLine();
             if(idToUpdate.isEmpty())
-                status = false;
-            else
                 System.out.println("Input cannot be null.");
-        }
-        System.out.println();
-        SerializationOperation operation = new SerializationOperation("Vendor.ser");
-        ArrayList<Vendor> foundVendor = operation.searchObjects(idToUpdate,Vendor.class);
-        System.out.println("======================================================================================================================================================");
-        System.out.println(String.format("%-30s", "ID") + String.format("%-30s", "NAME") + String.format("%-30s", "CATEGORY") + String.format("%-30s", "PASSWORD") + String.format("%-30s", "ADDRESS"));
-        System.out.println("======================================================================================================================================================");
-        if (foundVendor != null) {
-            for (Vendor vendor : foundVendor) {
-                System.out.println(String.format("%-30s", vendor.getID()) + String.format("%-30s", vendor.getVendorName()) + String.format("%-30s", vendor.getCategory()) +  String.format("%-30s", vendor.getPassword()) + String.format("%-30s", vendor.getAddress()));
-                id= vendor.getID();name=vendor.getVendorName();category=vendor.getCategory();address= vendor.getAddress();password=vendor.getPassword();
-            }
-            System.out.println();
-            while(repeat = true){
-                System.out.println("Which would you like to update?");
+            else{
                 System.out.println();
-                System.out.println(String.format("%-20s", "1. Name")+String.format("%-20s", "2. Category"));
-                System.out.println(String.format("%-20s", "3. Password")+String.format("%-20s", "4. Address"));
-                System.out.println();
-                while(status = true){
-                    System.out.print("Enter the number:");
-                    try {
-                        choice = input.nextInt();
-                        if(choice==1 || choice==2 || choice==3 || choice==4)
-                            status = false;
-                        else {
-                            System.out.println("Please enter a valid input.");
-                            status = true;
-                        }
-                    } catch (InputMismatchException e) {
-                        System.out.println("Please enter a valid input.");
-                        status = true;
-                        input.nextLine();//clear the scanner's buffer
+                SerializationOperation operation = new SerializationOperation("Vendor.ser");
+                ArrayList<Vendor> foundVendor = operation.searchObjects(idToUpdate,Vendor.class);
+                System.out.println("======================================================================================================================================================");
+                System.out.println(String.format("%-30s", "ID") + String.format("%-30s", "NAME") + String.format("%-30s", "CATEGORY") + String.format("%-30s", "PASSWORD") + String.format("%-30s", "ADDRESS"));
+                System.out.println("======================================================================================================================================================");
+                if (!foundVendor.isEmpty()) {
+                    for (Vendor vendor : foundVendor) {
+                        System.out.println(String.format("%-30s", vendor.getID()) + String.format("%-30s", vendor.getVendorName()) + String.format("%-30s", vendor.getCategory()) +  String.format("%-30s", vendor.getPassword()) + String.format("%-30s", vendor.getAddress()));
+                        id= vendor.getID();name=vendor.getVendorName();category=vendor.getCategory();address= vendor.getAddress();password=vendor.getPassword();
                     }
-                }
-                System.out.println();
-                switch(choice){
-                    case 1:
-                        while(status = true){
-                            System.out.print("Vendor Name:");
-                            name = input.nextLine();
-                            if(name.matches("[a-zA-Z\\s]+")){
-                                status = false;
-                            }else{
-                                System.out.println("Please enter a valid name.");
+                    System.out.println();
+                    while(repeat){
+                        System.out.println("Which would you like to update?");
+                        System.out.println();
+                        System.out.println(String.format("%-20s", "1. Name")+String.format("%-20s", "2. Category"));
+                        System.out.println(String.format("%-20s", "3. Password")+String.format("%-20s", "4. Address"));
+                        System.out.println();
+                        while(status){
+                            System.out.print("Enter the number:");
+                            try {
+                                choice = input.nextInt();
+                                if(choice==1 || choice==2 || choice==3 || choice==4)
+                                    status = false;
+                                else {
+                                    System.out.println("Please enter a valid input.");
+                                }
+                            } catch (InputMismatchException e) {
+                                System.out.println("Please enter a valid input.");
+                                input.nextLine();//clear the scanner's buffer
                             }
                         }
-                    case 2:
-                        while(status = true){
-                            System.out.print("Vendor Category:");
-                            category = input.nextLine();
-                            if(category.isEmpty())
-                                status = false;
-                            else
-                                System.out.println("Please enter a valid category.");
+                        System.out.println();
+                        switch(choice){
+                            case 1:
+                                status = true;
+                                while(status){
+                                    System.out.print("Vendor Name:");
+                                    name = input.nextLine();
+                                    if(name.matches("[a-zA-Z\\s]+")){
+                                        status = false;
+                                    }else{
+                                        System.out.println("Please enter a valid name.");
+                                    }
+                                }
+                            case 2:
+                                status = true;
+                                while(status){
+                                    System.out.print("Vendor Category:");
+                                    category = input.nextLine();
+                                    if(category.matches("[a-zA-Z\\s]+"))
+                                        status = false;
+                                    else
+                                        System.out.println("Please enter a valid category.");
+                                }
+                            case 3:
+                                status = true;
+                                while(status){
+                                    System.out.print("Vendor Password:");
+                                    password = input.nextLine();
+                                    if(!password.isEmpty())
+                                        status = false;
+                                    else
+                                        System.out.println("Please enter a valid password.");
+                                }
+                            case 4:
+                                status = true;
+                                while(status){
+                                    System.out.print("Vendor Address:");
+                                    address = input.nextLine();
+                                    if(!address.isEmpty())
+                                        status = false;
+                                    else
+                                        System.out.println("Please enter a valid address.");
+                                }
                         }
-                    case 3:
-                        while(status = true){
-                            System.out.print("Vendor Password:");
-                            password = input.nextLine();
-                            if(password.isEmpty())
-                                status = false;
-                            else
-                                System.out.println("Please enter a valid password.");
+                        System.out.println();
+                        System.out.println("Do you have anything more to update? Enter 1 to proceed.");
+                        try {
+                            int more = input.nextInt();
+                            if(more != 1)
+                                repeat = false;
+                        } catch (InputMismatchException e) {
+                            repeat = false;
+                            input.nextLine();//clear the scanner's buffer
                         }
-                    case 4:
-                        while(status = true){
-                            System.out.print("Vendor Address:");
-                            address = input.nextLine();
-                            if(address.isEmpty())
-                                status = false;
-                            else
-                                System.out.println("Please enter a valid address.");
-                        }
-                }
-                System.out.println();
-                System.out.println("Do you have anything more to update? Enter 1 to proceed.");
-                try {
-                    int more = input.nextInt();
-                    if(more == 1)
-                        repeat = true;
-                } catch (InputMismatchException e) {
-                    repeat = true;
-                    input.nextLine();//clear the scanner's buffer
+                    }
+                    operation.updateObject(idToUpdate,new Vendor(id,password,name,category,address));
+                    System.out.println("Successfully updated the user.");
+                    update = false;
+                } else {
+                    System.out.println("(No Vendor Record Exist.)");
+                    System.out.println();
+                    System.out.print("Enter 1 to re-try again.");
+                    try {
+                        int retry=input.nextInt();
+                        if (retry!=1)
+                            update=false;
+                    } catch (InputMismatchException e) {
+                        update = false;
+                        input.nextLine();//clear the scanner's buffer
+                    }
+                    System.out.println();
                 }
             }
-            operation.updateObject(idToUpdate,new Vendor(id,password,name,category,address));
-            System.out.println("Successfully updated the user.");
-        } else {
-            System.out.println("(No Vendor Record Exist.)");
         }
         System.out.println();
-        System.out.println("Back to Main Menu......");
+        System.out.println("Back to previous page......");
         System.out.println();
     }
 
     public static void deleteVendor(){
         Scanner input = new Scanner(System.in);
-        boolean status = true;
-        int choice=0;
-        String idToDelete=null;
+        boolean status = true,repeat = true;
+        int choice;
+        String idToDelete;
 
         System.out.println("------------------------------------------------");
         System.out.println("|                 DELETE VENDOR                |");
         System.out.println("------------------------------------------------");
         System.out.println();
-        while(status = true){
+        while(repeat){
             System.out.print("Enter Vendor ID to delete:");
             idToDelete = input.nextLine();
             if(idToDelete.isEmpty())
-                status = false;
-            else
                 System.out.println("Input cannot be null.");
-        }
-        System.out.println();
-        SerializationOperation operation = new SerializationOperation("Vendor.ser");
-        ArrayList<Vendor> foundVendor = operation.searchObjects(idToDelete,Vendor.class);
-        System.out.println("======================================================================================================================================================");
-        System.out.println(String.format("%-30s", "ID") + String.format("%-30s", "NAME") + String.format("%-30s", "CATEGORY") + String.format("%-30s", "PASSWORD") + String.format("%-30s", "ADDRESS"));
-        System.out.println("======================================================================================================================================================");
-        if (foundVendor != null) {
-            for (Vendor vendor : foundVendor) {
-                System.out.println(String.format("%-30s", vendor.getID()) + String.format("%-30s", vendor.getVendorName()) + String.format("%-30s", vendor.getCategory()) +  String.format("%-30s", vendor.getPassword()) + String.format("%-30s", vendor.getAddress()));
-            }
-            System.out.println();
-            System.out.println("Are you sure you want to delete?");
-            System.out.println("1. Yes\n2. No");
-            System.out.println();
-            while(status = true){
-                System.out.print("Enter the number:");
-                try {
-                    choice = input.nextInt();
-                    if(choice==1){
-                        status = false;
-                        operation.deleteObject(idToDelete,Vendor.class);
-                        System.out.println("Successfully deleted the user.");
+            else{
+                System.out.println();
+                SerializationOperation operation = new SerializationOperation("Vendor.ser");
+                ArrayList<Vendor> foundVendor = operation.searchObjects(idToDelete,Vendor.class);
+                System.out.println("======================================================================================================================================================");
+                System.out.println(String.format("%-30s", "ID") + String.format("%-30s", "NAME") + String.format("%-30s", "CATEGORY") + String.format("%-30s", "PASSWORD") + String.format("%-30s", "ADDRESS"));
+                System.out.println("======================================================================================================================================================");
+                if (!foundVendor.isEmpty()) {
+                    for (Vendor vendor : foundVendor) {
+                        System.out.println(String.format("%-30s", vendor.getID()) + String.format("%-30s", vendor.getVendorName()) + String.format("%-30s", vendor.getCategory()) +  String.format("%-30s", vendor.getPassword()) + String.format("%-30s", vendor.getAddress()));
                     }
-                    else if(choice==2){
-                        status = false;
+                    System.out.println();
+                    System.out.println("Are you sure you want to delete?");
+                    System.out.println("1. Yes\n2. No");
+                    System.out.println();
+                    while(status){
+                        System.out.print("Enter the number:");
+                        try {
+                            choice = input.nextInt();
+                            if(choice==1){
+                                status = false;
+                                operation.deleteObject(idToDelete,Vendor.class);
+                                System.out.println("Successfully deleted the user.");
+                                repeat = false;
+                            }
+                            else if(choice==2){
+                                status = false;
+                                System.out.print("Do you want to delete other vendors? Enter 1 to re-try.");
+                                try {
+                                    int retry = input.nextInt();
+                                    if (retry!=1)
+                                        repeat=false;
+                                    input.nextLine();
+                                } catch (InputMismatchException e) {
+                                    repeat = false;
+                                }
+                                input.nextLine();
+                            }
+                            else {
+                                System.out.println("Please enter a valid input.");
+                                input.nextLine();
+                                System.out.println();
+                            }
+                        } catch (InputMismatchException e) {
+                            System.out.println("Please enter a valid input.");
+                            input.nextLine();//clear the scanner's buffer
+                            System.out.println();
+                        }
                     }
-                    else {
-                        System.out.println("Please enter a valid input.");
-                        status = true;
+                }else {
+                    System.out.println("(No Vendor Record Exist.)");
+                    System.out.print("Do you want to delete other vendors? Enter 1 to re-try.");
+                    try {
+                        int retry=input.nextInt();
+                        if (retry!=1)
+                            repeat=false;
+                    } catch (InputMismatchException e) {
+                        repeat = false;
                     }
-                } catch (InputMismatchException e) {
-                    System.out.println("Please enter a valid input.");
-                    status = true;
-                    input.nextLine();//clear the scanner's buffer
+                    input.nextLine();
                 }
             }
-        }else
-            System.out.println("(No Vendor Record Exist.)");
+        }
         System.out.println();
-        System.out.println("Back to Main Menu......");
+        System.out.println("Back to previous page......");
         System.out.println();
     }
 
@@ -660,7 +774,7 @@ public class AdminInterface extends MainInterface {
         System.out.println("========================================================================================================================");
         System.out.println(String.format("%-30s", "ID") + String.format("%-30s", "NAME") + String.format("%-30s", "CONTACT") + String.format("%-30s", "PASSWORD"));
         System.out.println("========================================================================================================================");
-        if (runnerData != null) {
+        if (!runnerData.isEmpty()) {
             for (Runner runner : runnerData) {
                 System.out.println(String.format("%-30s", runner.getID()) + String.format("%-30s", runner.getRunnerName()) + String.format("%-30s", runner.getContact()) +  String.format("%-30s", runner.getPassword()));
             }
@@ -677,7 +791,7 @@ public class AdminInterface extends MainInterface {
     public static void createRunner() {
         Scanner input = new Scanner(System.in);
         boolean status = true;
-        String id=null,name=null,contact=null,password=null;
+        String id,name=null,contact=null,password=null;
 
         System.out.println("------------------------------------------------");
         System.out.println("|                 CREATE RUNNER                |");
@@ -685,7 +799,7 @@ public class AdminInterface extends MainInterface {
         System.out.println();
         IDGenerator generator = new IDGenerator("Runner.ser","RA");
         id = generator.generateSerializedID();
-        while(status = true){
+        while(status){
             System.out.print("Runner Name:");
             name = input.nextLine();
             if(name.matches("[a-zA-Z\\s]+")){
@@ -694,7 +808,8 @@ public class AdminInterface extends MainInterface {
                 System.out.println("Please enter a valid name.");
             }
         }
-        while(status = true){
+        status = true;
+        while(status){
             System.out.print("Runner Contact:");
             contact = input.nextLine();
             if(contact.matches("(^01\\d{8}$|^011\\d{8}$)"))
@@ -702,10 +817,11 @@ public class AdminInterface extends MainInterface {
             else
                 System.out.println("Please enter a valid contact.");
         }
-        while(status = true){
+        status = true;
+        while(status){
             System.out.print("Runner Password:");
             password = input.nextLine();
-            if(password.isEmpty())
+            if(!password.isEmpty())
                 status = false;
             else
                 System.out.println("Please enter a valid password.");
@@ -715,171 +831,209 @@ public class AdminInterface extends MainInterface {
         System.out.println();
         System.out.println("Successfully created the user.");
         System.out.println();
+        System.out.println("Back to previous page......");
+        System.out.println();
     }
 
     public static void updateRunner(){
         Scanner input = new Scanner(System.in);
-        boolean status = true,repeat = true;
+        boolean status = true,repeat = true, update = true;
         int choice=0;
-        String idToUpdate=null;
+        String idToUpdate;
         String id=null,name=null,contact=null,password=null;
 
         System.out.println("------------------------------------------------");
         System.out.println("|                 UPDATE RUNNER                |");
         System.out.println("------------------------------------------------");
         System.out.println();
-        while(status = true){
+        while(update){
             System.out.print("Enter Runner ID:");
             idToUpdate = input.nextLine();
             if(idToUpdate.isEmpty())
-                status = false;
-            else
                 System.out.println("Input cannot be null.");
-        }
-        System.out.println();
-        SerializationOperation operation = new SerializationOperation("Runner.ser");
-        ArrayList<Runner> foundRunner = operation.searchObjects(idToUpdate,Runner.class);
-        System.out.println("========================================================================================================================");
-        System.out.println(String.format("%-30s", "ID") + String.format("%-30s", "NAME") + String.format("%-30s", "CONTACT") + String.format("%-30s", "PASSWORD"));
-        System.out.println("========================================================================================================================");
-        if (foundRunner != null) {
-            for (Runner runner : foundRunner) {
-                System.out.println(String.format("%-30s", runner.getID()) + String.format("%-30s", runner.getRunnerName()) + String.format("%-30s", runner.getContact()) +  String.format("%-30s", runner.getPassword()));
-                id= runner.getID();name=runner.getRunnerName();contact=runner.getContact();;password=runner.getPassword();
-            }
-            System.out.println();
-            while(repeat = true){
-                System.out.println("Which would you like to update?");
+
+            else{
                 System.out.println();
-                System.out.println(String.format("%-20s", "1. Name")+String.format("%-20s", "2. Contact"));
-                System.out.println(String.format("%-20s", "3. Password"));
-                System.out.println();
-                while(status = true){
-                    System.out.print("Enter the number:");
-                    try {
-                        choice = input.nextInt();
-                        if(choice==1 || choice==2 || choice==3)
-                            status = false;
-                        else {
-                            System.out.println("Please enter a valid input.");
-                            status = true;
-                        }
-                    } catch (InputMismatchException e) {
-                        System.out.println("Please enter a valid input.");
-                        status = true;
-                        input.nextLine();//clear the scanner's buffer
+                SerializationOperation operation = new SerializationOperation("Runner.ser");
+                ArrayList<Runner> foundRunner = operation.searchObjects(idToUpdate,Runner.class);
+                System.out.println("========================================================================================================================");
+                System.out.println(String.format("%-30s", "ID") + String.format("%-30s", "NAME") + String.format("%-30s", "CONTACT") + String.format("%-30s", "PASSWORD"));
+                System.out.println("========================================================================================================================");
+                if (!foundRunner.isEmpty()) {
+                    for (Runner runner : foundRunner) {
+                        System.out.println(String.format("%-30s", runner.getID()) + String.format("%-30s", runner.getRunnerName()) + String.format("%-30s", runner.getContact()) +  String.format("%-30s", runner.getPassword()));
+                        id= runner.getID();name=runner.getRunnerName();contact=runner.getContact();password=runner.getPassword();
                     }
-                }
-                System.out.println();
-                switch(choice){
-                    case 1:
-                        while(status = true){
-                            System.out.print("Runner Name:");
-                            name = input.nextLine();
-                            if(name.matches("[a-zA-Z\\s]+")){
-                                status = false;
-                            }else{
-                                System.out.println("Please enter a valid name.");
+                    System.out.println();
+                    while(repeat){
+                        System.out.println("Which would you like to update?");
+                        System.out.println();
+                        System.out.println(String.format("%-20s", "1. Name")+String.format("%-20s", "2. Contact"));
+                        System.out.println("3. Password");
+                        System.out.println();
+                        while(status){
+                            System.out.print("Enter the number:");
+                            try {
+                                choice = input.nextInt();
+                                if(choice==1 || choice==2 || choice==3)
+                                    status = false;
+                                else {
+                                    System.out.println("Please enter a valid input.");
+                                }
+                            } catch (InputMismatchException e) {
+                                System.out.println("Please enter a valid input.");
+                                input.nextLine();//clear the scanner's buffer
                             }
                         }
-                    case 2:
-                        while(status = true){
-                            System.out.print("Runner Contact:");
-                            contact = input.nextLine();
-                            if(contact.matches("(^01\\d{8}$|^011\\d{8}$)"))
-                                status = false;
-                            else
-                                System.out.println("Please enter a valid contact.");
+                        System.out.println();
+                        switch(choice){
+                            case 1:
+                                status = true;
+                                while(status){
+                                    System.out.print("Runner Name:");
+                                    name = input.nextLine();
+                                    if(name.matches("[a-zA-Z\\s]+")){
+                                        status = false;
+                                    }else{
+                                        System.out.println("Please enter a valid name.");
+                                    }
+                                }
+                            case 2:
+                                status = true;
+                                while(status){
+                                    System.out.print("Runner Contact:");
+                                    contact = input.nextLine();
+                                    if(contact.matches("(^01\\d{8}$|^011\\d{8}$)"))
+                                        status = false;
+                                    else
+                                        System.out.println("Please enter a valid contact.");
+                                }
+                            case 3:
+                                status = true;
+                                while(status){
+                                    System.out.print("Runner Password:");
+                                    password = input.nextLine();
+                                    if(!password.isEmpty())
+                                        status = false;
+                                    else
+                                        System.out.println("Please enter a valid password.");
+                                }
                         }
-                    case 3:
-                        while(status = true){
-                            System.out.print("Runner Password:");
-                            password = input.nextLine();
-                            if(password.isEmpty())
-                                status = false;
-                            else
-                                System.out.println("Please enter a valid password.");
+                        System.out.println();
+                        System.out.println("Do you have anything more to update? Enter 1 to proceed.");
+                        try {
+                            int more = input.nextInt();
+                            if(more != 1)
+                                repeat = false;
+                        } catch (InputMismatchException e) {
+                            repeat = false;
+                            input.nextLine();//clear the scanner's buffer
                         }
-                }
-                System.out.println();
-                System.out.println("Do you have anything more to update? Enter 1 to proceed.");
-                try {
-                    int more = input.nextInt();
-                    if(more == 1)
-                        repeat = true;
-                } catch (InputMismatchException e) {
-                    repeat = true;
-                    input.nextLine();//clear the scanner's buffer
+                    }
+                    operation.updateObject(idToUpdate,new Runner(id,password,name,contact));
+                    System.out.println("Successfully updated the user.");
+                    update = false;
+                } else {
+                    System.out.println("(No Runner Record Exist.)");
+                    System.out.println();
+                    System.out.print("Enter 1 to re-try again.");
+                    try {
+                        int retry=input.nextInt();
+                        if (retry!=1)
+                            update=false;
+                    } catch (InputMismatchException e) {
+                        update = false;
+                        input.nextLine();//clear the scanner's buffer
+                    }
+                    System.out.println();
                 }
             }
-            operation.updateObject(idToUpdate,new Runner(id,password,name,contact));
-            System.out.println("Successfully updated the user.");
-        } else {
-            System.out.println("(No Runner Record Exist.)");
         }
         System.out.println();
-        System.out.println("Back to Main Menu......");
+        System.out.println("Back to previous page......");
         System.out.println();
     }
 
     public static void deleteRunner(){
         Scanner input = new Scanner(System.in);
-        boolean status = true;
-        int choice=0;
-        String idToDelete=null;
+        boolean status = true, repeat = true;
+        int choice;
+        String idToDelete;
 
         System.out.println("------------------------------------------------");
         System.out.println("|                 DELETE RUNNER                |");
         System.out.println("------------------------------------------------");
         System.out.println();
-        while(status = true){
+        while(repeat){
             System.out.print("Enter Runner ID to delete:");
             idToDelete = input.nextLine();
             if(idToDelete.isEmpty())
-                status = false;
-            else
                 System.out.println("Input cannot be null.");
-        }
-        System.out.println();
-        SerializationOperation operation = new SerializationOperation("Runner.ser");
-        ArrayList<Runner> foundRunner = operation.searchObjects(idToDelete,Runner.class);
-        System.out.println("========================================================================================================================");
-        System.out.println(String.format("%-30s", "ID") + String.format("%-30s", "NAME") + String.format("%-30s", "CONTACT") + String.format("%-30s", "PASSWORD"));
-        System.out.println("========================================================================================================================");
-        if (foundRunner != null) {
-            for (Runner runner : foundRunner) {
-                System.out.println(String.format("%-30s", runner.getID()) + String.format("%-30s", runner.getRunnerName()) + String.format("%-30s", runner.getContact()) +  String.format("%-30s", runner.getPassword()));
-            }
-            System.out.println();
-            System.out.println("Are you sure you want to delete?");
-            System.out.println("1. Yes\n2. No");
-            System.out.println();
-            while(status = true){
-                System.out.print("Enter the number:");
-                try {
-                    choice = input.nextInt();
-                    if(choice==1){
-                        status = false;
-                        operation.deleteObject(idToDelete,Runner.class);
-                        System.out.println("Successfully deleted the user.");
+            else{
+                System.out.println();
+                SerializationOperation operation = new SerializationOperation("Runner.ser");
+                ArrayList<Runner> foundRunner = operation.searchObjects(idToDelete,Runner.class);
+                System.out.println("========================================================================================================================");
+                System.out.println(String.format("%-30s", "ID") + String.format("%-30s", "NAME") + String.format("%-30s", "CONTACT") + String.format("%-30s", "PASSWORD"));
+                System.out.println("========================================================================================================================");
+                if (!foundRunner.isEmpty()) {
+                    for (Runner runner : foundRunner) {
+                        System.out.println(String.format("%-30s", runner.getID()) + String.format("%-30s", runner.getRunnerName()) + String.format("%-30s", runner.getContact()) +  String.format("%-30s", runner.getPassword()));
                     }
-                    else if(choice==2){
-                        status = false;
+                    System.out.println();
+                    System.out.println("Are you sure you want to delete?");
+                    System.out.println("1. Yes\n2. No");
+                    System.out.println();
+                    while(status){
+                        System.out.print("Enter the number:");
+                        try {
+                            choice = input.nextInt();
+                            if(choice==1){
+                                status = false;
+                                operation.deleteObject(idToDelete,Runner.class);
+                                System.out.println("Successfully deleted the user.");
+                                repeat = false;
+                            }
+                            else if(choice==2){
+                                status = false;
+                                System.out.print("Do you want to delete other vendors? Enter 1 to re-try.");
+                                try {
+                                    int retry = input.nextInt();
+                                    if (retry!=1)
+                                        repeat=false;
+                                    input.nextLine();
+                                } catch (InputMismatchException e) {
+                                    repeat = false;
+                                }
+                                input.nextLine();
+                            }
+                            else {
+                                System.out.println("Please enter a valid input.");
+                                input.nextLine();
+                                System.out.println();
+                            }
+                        } catch (InputMismatchException e) {
+                            System.out.println("Please enter a valid input.");
+                            input.nextLine();//clear the scanner's buffer
+                            System.out.println();
+                        }
                     }
-                    else {
-                        System.out.println("Please enter a valid input.");
-                        status = true;
+                }else {
+                    System.out.println("(No Runner Record Exist.)");
+                    System.out.print("Do you want to delete other vendors? Enter 1 to re-try.");
+                    try {
+                        int retry=input.nextInt();
+                        if (retry!=1)
+                            repeat=false;
+                    } catch (InputMismatchException e) {
+                        repeat = false;
                     }
-                } catch (InputMismatchException e) {
-                    System.out.println("Please enter a valid input.");
-                    status = true;
-                    input.nextLine();//clear the scanner's buffer
+                    input.nextLine();
                 }
             }
-        }else
-            System.out.println("(No Runner Record Exist.)");
+        }
         System.out.println();
-        System.out.println("Back to Main Menu......");
+        System.out.println("Back to previous page......");
         System.out.println();
     }
 }
