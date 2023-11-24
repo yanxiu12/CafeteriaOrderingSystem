@@ -442,8 +442,10 @@ public class AdminInterface extends MainInterface {
                             System.out.println();
                             Credit credit = new Credit(cus);
                             credit.addAmount(amount,1);
+                            CustomerNotification notification = new CustomerNotification("Successfully top up credit!",cus,3);
+                            notification.saveNotification();
                             status = false;
-                            System.out.println("Successfully top-up the amount.");
+                            System.out.println("Successfully top-up the amount. \nThe transaction receipt has been sent to customer account.");
                             repeat = false;
                         } catch (InputMismatchException e) {
                             System.out.println("Please enter a valid input.");
@@ -493,6 +495,8 @@ public class AdminInterface extends MainInterface {
         System.out.println("Please choose which you would like to proceed.");
         System.out.println();
         System.out.println(String.format("%-15s", "1. Create") + String.format("%-15s", "2. Update") + String.format("%-15s", "3. Delete"));
+        System.out.println();
+        System.out.println("(Enter 0 to Main Menu.)");
         System.out.println();
     }
 
@@ -786,6 +790,8 @@ public class AdminInterface extends MainInterface {
         System.out.println();
         System.out.println(String.format("%-15s", "1. Create") + String.format("%-15s", "2. Update") + String.format("%-15s", "3. Delete"));
         System.out.println();
+        System.out.println("(Enter 0 to Main Menu.)");
+        System.out.println();
     }
 
     public static void createRunner() {
@@ -799,6 +805,7 @@ public class AdminInterface extends MainInterface {
         System.out.println();
         IDGenerator generator = new IDGenerator("Runner.ser","RA");
         id = generator.generateSerializedID();
+        System.out.println("Runner ID: "+id);
         while(status){
             System.out.print("Runner Name:");
             name = input.nextLine();

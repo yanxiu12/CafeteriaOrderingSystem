@@ -11,8 +11,18 @@ public class Credit {
         this.currentDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
     }
 
+    public Customer getCustomer() {return customer;}
+
+    public String getTransaction(){return transaction;}
+
+    public String getID(){return ID;}
+
+    public String getCurrentDate(){return currentDate;}
+
+    public String getTransactionType(){return transactionType;}
+
     public void addAmount(double amount,int type){//1=topUp 2=refund
-        IDGenerator generator = new IDGenerator("creditRecord.txt", "CT");
+        IDGenerator generator = new IDGenerator("CustomerCredit.txt", "CT");
         ID = generator.generateID();
         transaction = "+"+amount;
         if(type==1)
@@ -25,9 +35,9 @@ public class Credit {
     }
 
     public void deductAmount(double amount){
-        IDGenerator generator = new IDGenerator("creditRecord.txt", "CT");
+        IDGenerator generator = new IDGenerator("CustomerCredit.txt", "CT");
         ID = generator.generateID();
-        transaction = "+"+amount;
+        transaction = "-"+amount;
 
         customer.setWalletBalance(String.valueOf(customer.getWalletBalance()-amount));
         write2file();

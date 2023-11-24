@@ -28,6 +28,22 @@ public class CustomerNotification extends Notification{
         System.out.println("Current status: "+order.getStatus());
     }
 
+    public void transactionReceipt(Credit credit){//code 3
+        System.out.println("-------------------------------------------------------------------------------");
+        System.out.println("|"+String.format("%-29s", "")+"TRANSACTION RECEIPT"+String.format("%-29s", "")+"|");
+        System.out.println("|"+String.format("%-29s", "")+"-------------------"+String.format("%-29s", "")+"|");
+        System.out.println("|"+String.format("%-77s", "")+"|");
+        System.out.println("|"+String.format("%39s", (credit.getTransaction().charAt(0)+"RM "))+String.format("%-38s", credit.getTransaction().substring(1))+"|");
+        System.out.println("|"+String.format("%-77s", "")+"|");
+        System.out.println("|"+String.format("%-39s", "CUSTOMER NAME")+String.format("%38s", credit.getCustomer().getName())+"|");
+        System.out.println("|"+String.format("%-39s", "CUSTOMER ID")+String.format("%38s", credit.getCustomer().getID())+"|");
+        System.out.println("|"+String.format("%-39s", "TRANSACTION TYPE")+String.format("%38s", credit.getTransactionType())+"|");
+        System.out.println("|"+String.format("%-39s", "DATE")+String.format("%38s", credit.getCurrentDate())+"|");
+        System.out.println("|"+String.format("%-39s", "TRANSACTION ID")+String.format("%38s", credit.getID())+"|");
+        System.out.println("|"+String.format("%-77s", "")+"|");
+        System.out.println("-------------------------------------------------------------------------------");
+    }
+
     @Override
     public String toString() {
         return String.format("%s,%s,%s,%s", ID, customer.getID(),message,code);
