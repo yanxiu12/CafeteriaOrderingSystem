@@ -11,6 +11,14 @@ public class Credit {
         this.currentDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
     }
 
+    public Credit(String ID, Customer customer, String currentDate, String transaction,String transactionType){
+        this.ID = ID;
+        this.customer = customer;
+        this.currentDate = currentDate;
+        this.transaction = transaction;
+        this.transactionType = transactionType;
+    }
+
     public Customer getCustomer() {return customer;}
 
     public String getTransaction(){return transaction;}

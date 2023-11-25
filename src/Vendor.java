@@ -9,15 +9,15 @@ public class Vendor implements Serializable {
     private ArrayList<Notification> notifications;
 
     public Vendor(String userID){
-        FileOperation file = new FileOperation("Vendor.txt");
-        ArrayList<String> userData = file.search(userID);
+        SerializationOperation operation = new SerializationOperation("Vendor.ser");
+        ArrayList<Vendor> userData = operation.searchObjects(userID, Vendor.class);
         if (userData.size() == 1) {
-            String[] item = userData.get(0).split(";");
-            ID = item[0];
-            password = item[1];
-            vendorName = item[2];
-            category = item[3];
-            address = item[4];
+            Vendor vendor = userData.get(0);
+            ID = vendor.getID();
+            password = vendor.getPassword();
+            vendorName = vendor.getVendorName();
+            category = vendor.getCategory();
+            address = vendor.address;
         }else
             System.out.println("User not found!");
     }

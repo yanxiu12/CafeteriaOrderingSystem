@@ -27,6 +27,8 @@ public class Customer implements Serializable {
     public Customer(String ID,String password,String name,String dob,String contact,String address,String walletBalance){
         setID(ID);setPassword(password);setName(name);setDob(dob);setContact(contact);setAddress(address);setWalletBalance(walletBalance);
         this.notifications = new ArrayList<>();
+        this.cartItems = new ArrayList<>();
+        this.orders = new ArrayList<>();
     }//for register //obj.write2file(obj.toString());
 
     public String getID() {return ID;}
@@ -58,6 +60,19 @@ public class Customer implements Serializable {
     public void setWalletBalance(String walletBalance) {this.walletBalance = Double.parseDouble(walletBalance);}
 
     public ArrayList<Order> getOrders() {return orders;}
+
+    public ArrayList<Cart> getCartItems() {return cartItems;}
+
+    public ArrayList<Credit> getCreditRecords(){
+        ArrayList<Credit> creditRecords = new ArrayList<>();
+        FileOperation file = new FileOperation("CustomerCredit.txt");
+        ArrayList<String> foundRecords = file.search(ID);
+        for(String record:foundRecords){
+            String[] part = record.split(",");
+            creditRecords.add(new Credit(part[0],this,part[2],part[3],part[4]));
+        }
+        return creditRecords;
+    }
 
     public void setDetails(String userID){
         FileOperation file = new FileOperation("Customer.txt");
@@ -96,7 +111,7 @@ public class Customer implements Serializable {
 
     public void addToCart(MenuItem item,int quantity){
         for(Cart cartItem:cartItems){
-            if(cartItem.equals(item)){
+            if(cartItem.getItem().getItemID().equals(item.getItemID())){
                 cartItem.setQuantity(cartItem.getQuantity()+quantity);
                 return;
             }
@@ -107,7 +122,7 @@ public class Customer implements Serializable {
 
     public void removeFromCart(MenuItem item,int quantity){
         for(Cart cartItem:cartItems){
-            if(cartItem.equals(item)){
+            if(cartItem.getItem().getItemID().equals(item.getItemID())){
                 if(quantity>= cartItem.getQuantity()) {
                     cartItems.remove(cartItem);
                 }else{

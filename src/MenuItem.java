@@ -13,12 +13,12 @@ public class MenuItem {
         this.vendor = vendor;
     }
 
-    public MenuItem(String itemName){
+    public MenuItem(String itemID){
         FileOperation file = new FileOperation("MenuItem.txt");
-        ArrayList<String> orderData = file.search(itemName);
+        ArrayList<String> orderData = file.search(itemID);
         if (orderData.size() == 1) {
             String[] itemDetail = orderData.get(0).split(";");
-            itemID = itemDetail[0];
+            this.itemID = itemDetail[0];
             this.itemName = itemDetail[1];
             itemPrice = itemDetail[2];
             vendor = new Vendor(itemDetail[3]);
@@ -43,6 +43,8 @@ public class MenuItem {
     public Vendor getVendor(){
         return vendor;
     }
+
+    public ArrayList<MenuItem> getVendorItems(){return vendorItems;}
 
     public MenuItem getDetail(int row){
         int index = row-1;
@@ -73,11 +75,11 @@ public class MenuItem {
         int counter = 0;
         System.out.println("-----------------------------------------------------------------------------------------------");
         System.out.println(String.format("%-5s", "No.")+String.format("%-30s", "Item ID")+String.format("%-30s", "Item Name")+String.format("%-30s", "Price"));
-        System.out.println("------------------------------------------------------------------------------------------");
+        System.out.println("-----------------------------------------------------------------------------------------------");
         for(MenuItem item:vendorItems){
             counter++;
             System.out.println(String.format(String.format("%-5s", counter)+"%-30s", item.getItemID())+String.format("%-30s", item.getItemName())+String.format("%-30s", item.getItemPrice()));
         }
-        System.out.println("------------------------------------------------------------------------------------------");
+        System.out.println("-----------------------------------------------------------------------------------------------");
     }
 }

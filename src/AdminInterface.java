@@ -261,7 +261,7 @@ public class AdminInterface extends MainInterface {
                                 status = true;
                                 while(status){
                                     System.out.println("Customer Contact:"+contact);
-                                    System.out.println("New Customer Contact:");
+                                    System.out.print("New Customer Contact:");
                                     String newContact = input.nextLine();
                                     if (newContact.equals(contact)){
                                         status = false;
@@ -546,7 +546,7 @@ public class AdminInterface extends MainInterface {
         while(status){
             System.out.print("Vendor Name:");
             name = input.nextLine();
-            if(name.matches("[a-zA-Z\\s]+")){
+            if(!name.isEmpty()){
                 status = false;
             }else{
                 System.out.println("Please enter a valid name.");
