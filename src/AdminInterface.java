@@ -209,16 +209,14 @@ public class AdminInterface extends MainInterface {
                             try {
                                 choice = input.nextInt();
                                 if(choice==1 || choice==2 || choice==3 || choice==4 || choice==5) {
-                                    input.nextLine();
                                     status = false;
                                 }else {
                                     System.out.println("Please enter a valid input.");
-                                    input.nextLine();
                                 }
                             } catch (InputMismatchException e) {
                                 System.out.println("Please enter a valid input.");
-                                input.nextLine();//clear the scanner's buffer
                             }
+                            input.nextLine();
                         }
                         System.out.println();
                         switch(choice){
@@ -309,18 +307,19 @@ public class AdminInterface extends MainInterface {
                                 break;
                         }
                         System.out.println();
-                        System.out.print("Do you have anything more to update? Enter 1 to proceed.");
+                        System.out.print("Do you have anything more to update? \nEnter 1 to continue / Enter any other value to finish updating:");
                         try {
                             int more = input.nextInt();
                             if(more != 1)
                                 repeat = false;
                         } catch (InputMismatchException e) {
                             repeat = false;
-                            input.nextLine();//clear the scanner's buffer
                         }
+                        input.nextLine();//clear the scanner's buffer
                         System.out.println();
                     }
                     operation.updateObject(idToUpdate,new Customer(id,password, name, dob, contact,address,wallet));
+                    System.out.println();
                     System.out.println("Successfully updated the user.");
                     update=false;
                 } else {
@@ -333,8 +332,8 @@ public class AdminInterface extends MainInterface {
                             update=false;
                     } catch (InputMismatchException e) {
                         update = false;
-                        input.nextLine();//clear the scanner's buffer
                     }
+                    input.nextLine();//clear the scanner's buffer
                     System.out.println();
                 }
             }
@@ -586,7 +585,7 @@ public class AdminInterface extends MainInterface {
 
     public static void updateVendor(){
         Scanner input = new Scanner(System.in);
-        boolean status = true,repeat = true, update = true;
+        boolean status ,repeat, update = true;
         int choice=0;
         String idToUpdate;
         String id=null,name=null,category=null,password=null,address=null;
@@ -613,12 +612,14 @@ public class AdminInterface extends MainInterface {
                         id= vendor.getID();name=vendor.getVendorName();category=vendor.getCategory();address= vendor.getAddress();password=vendor.getPassword();
                     }
                     System.out.println();
+                    repeat = true;
                     while(repeat){
                         System.out.println("Which would you like to update?");
                         System.out.println();
                         System.out.println(String.format("%-20s", "1. Name")+String.format("%-20s", "2. Category"));
                         System.out.println(String.format("%-20s", "3. Password")+String.format("%-20s", "4. Address"));
                         System.out.println();
+                        status = true;
                         while(status){
                             System.out.print("Enter the number:");
                             try {
@@ -630,20 +631,20 @@ public class AdminInterface extends MainInterface {
                                 }
                             } catch (InputMismatchException e) {
                                 System.out.println("Please enter a valid input.");
-                                input.nextLine();//clear the scanner's buffer
                             }
+                            input.nextLine();//clear the scanner's buffer
                         }
                         System.out.println();
                         switch(choice){
                             case 1:
                                 status = true;
                                 while(status){
-                                    System.out.print("Vendor Name:"+name);
+                                    System.out.println("Vendor Name:"+name);
                                     System.out.print("New Vendor Name:");
                                     String newName = input.nextLine();
                                     if (newName.equals(name)) {
                                         System.out.println("The update was not processed. The new value matches the existing value.");
-                                    } else if(newName.matches("[a-zA-Z\\s]+")){
+                                    } else if(!newName.isEmpty()){
                                         status = false;
                                         name = newName;
                                         System.out.println("The updated information has been stored.");
@@ -651,10 +652,11 @@ public class AdminInterface extends MainInterface {
                                         System.out.println("Please enter a valid name.");
                                     }
                                 }
+                                break;
                             case 2:
                                 status = true;
                                 while(status){
-                                    System.out.print("Vendor Category:"+category);
+                                    System.out.println("Vendor Category:"+category);
                                     System.out.print("New Vendor Category:");
                                     String newCategory = input.nextLine();
                                     if (newCategory.equals(category)) {
@@ -666,10 +668,11 @@ public class AdminInterface extends MainInterface {
                                     }else
                                         System.out.println("Please enter a valid category.");
                                 }
+                                break;
                             case 3:
                                 status = true;
                                 while(status){
-                                    System.out.print("Vendor Password:"+password);
+                                    System.out.println("Vendor Password:"+password);
                                     System.out.print("New Vendor Password:");
                                     String newPassword = input.nextLine();
                                     if (newPassword.equals(password)) {
@@ -681,10 +684,11 @@ public class AdminInterface extends MainInterface {
                                     } else
                                         System.out.println("Please enter a valid password.");
                                 }
+                                break;
                             case 4:
                                 status = true;
                                 while(status){
-                                    System.out.print("Vendor Address:"+address);
+                                    System.out.println("Vendor Address:"+address);
                                     System.out.print("New Vendor Address:");
                                     String newAddress = input.nextLine();
                                     if (newAddress.equals(address)) {
@@ -696,19 +700,22 @@ public class AdminInterface extends MainInterface {
                                     }else
                                         System.out.println("Please enter a valid address.");
                                 }
+                                break;
                         }
                         System.out.println();
-                        System.out.println("Do you have anything more to update? Enter 1 to proceed.");
+                        System.out.print("Do you have anything more to update? \nEnter 1 to continue / Enter any other value to finish updating:");
                         try {
                             int more = input.nextInt();
                             if(more != 1)
                                 repeat = false;
                         } catch (InputMismatchException e) {
                             repeat = false;
-                            input.nextLine();//clear the scanner's buffer
+
                         }
+                        input.nextLine();//clear the scanner's buffer
                     }
                     operation.updateObject(idToUpdate,new Vendor(id,password,name,category,address));
+                    System.out.println();
                     System.out.println("Successfully updated the user.");
                     update = false;
                 } else {
@@ -721,8 +728,8 @@ public class AdminInterface extends MainInterface {
                             update=false;
                     } catch (InputMismatchException e) {
                         update = false;
-                        input.nextLine();//clear the scanner's buffer
                     }
+                    input.nextLine();//clear the scanner's buffer
                     System.out.println();
                 }
             }
@@ -891,7 +898,7 @@ public class AdminInterface extends MainInterface {
 
     public static void updateRunner(){
         Scanner input = new Scanner(System.in);
-        boolean status = true,repeat = true, update = true;
+        boolean status,repeat, update = true;
         int choice=0;
         String idToUpdate;
         String id=null,name=null,contact=null,password=null;
@@ -919,12 +926,14 @@ public class AdminInterface extends MainInterface {
                         id= runner.getID();name=runner.getRunnerName();contact=runner.getContact();password=runner.getPassword();
                     }
                     System.out.println();
+                    repeat = true;
                     while(repeat){
                         System.out.println("Which would you like to update?");
                         System.out.println();
                         System.out.println(String.format("%-20s", "1. Name")+String.format("%-20s", "2. Contact"));
                         System.out.println("3. Password");
                         System.out.println();
+                        status = true;
                         while(status){
                             System.out.print("Enter the number:");
                             try {
@@ -936,15 +945,15 @@ public class AdminInterface extends MainInterface {
                                 }
                             } catch (InputMismatchException e) {
                                 System.out.println("Please enter a valid input.");
-                                input.nextLine();//clear the scanner's buffer
                             }
+                            input.nextLine();//clear the scanner's buffer
                         }
                         System.out.println();
                         switch(choice){
                             case 1:
                                 status = true;
                                 while(status){
-                                    System.out.print("Runner Name:"+name);
+                                    System.out.println("Runner Name:"+name);
                                     System.out.print("New Runner Name:");
                                     String newName = input.nextLine();
                                     if (newName.equals(name)) {
@@ -957,10 +966,11 @@ public class AdminInterface extends MainInterface {
                                         System.out.println("Please enter a valid name.");
                                     }
                                 }
+                                break;
                             case 2:
                                 status = true;
                                 while(status){
-                                    System.out.print("Runner Contact:"+contact);
+                                    System.out.println("Runner Contact:"+contact);
                                     System.out.print("New Runner Contact:");
                                     String newContact = input.nextLine();
                                     if (newContact.equals(contact)) {
@@ -972,10 +982,11 @@ public class AdminInterface extends MainInterface {
                                     } else
                                         System.out.println("Please enter a valid contact.");
                                 }
+                                break;
                             case 3:
                                 status = true;
                                 while(status){
-                                    System.out.print("Runner Password:"+password);
+                                    System.out.println("Runner Password:"+password);
                                     System.out.print("New Runner Password:");
                                     String newPassword = input.nextLine();
                                     if (newPassword.equals(password)) {
@@ -987,19 +998,21 @@ public class AdminInterface extends MainInterface {
                                     }else
                                         System.out.println("Please enter a valid password.");
                                 }
+                                break;
                         }
                         System.out.println();
-                        System.out.println("Do you have anything more to update? Enter 1 to proceed.");
+                        System.out.print("Do you have anything more to update? \nEnter 1 to continue / Enter any other value to finish updating:");
                         try {
                             int more = input.nextInt();
                             if(more != 1)
                                 repeat = false;
                         } catch (InputMismatchException e) {
                             repeat = false;
-                            input.nextLine();//clear the scanner's buffer
                         }
+                        input.nextLine();//clear the scanner's buffer
                     }
                     operation.updateObject(idToUpdate,new Runner(id,password,name,contact));
+                    System.out.println();
                     System.out.println("Successfully updated the user.");
                     update = false;
                 } else {
@@ -1012,8 +1025,8 @@ public class AdminInterface extends MainInterface {
                             update=false;
                     } catch (InputMismatchException e) {
                         update = false;
-                        input.nextLine();//clear the scanner's buffer
                     }
+                    input.nextLine();//clear the scanner's buffer
                     System.out.println();
                 }
             }

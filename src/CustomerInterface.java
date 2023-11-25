@@ -87,5 +87,30 @@ public class CustomerInterface {
         System.out.println();
     }
 
+    public static void accessProfile(Customer customer){
+        Scanner input = new Scanner(System.in);
+
+        System.out.println("------------------------------------------------");
+        System.out.println("|                PROFILE DETAILS               |");
+        System.out.println("------------------------------------------------");//48
+        System.out.println();
+        System.out.println(String.format("%-24s", "Customer ID") + String.format("%24s", customer.getID()));
+        System.out.println(String.format("%-24s", "Customer Name") + String.format("%24s", customer.getName()));
+        System.out.println(String.format("%-24s", "Customer Birthday") + String.format("%24s", customer.getDob()));
+        System.out.println(String.format("%-24s", "Customer Contact") + String.format("%24s", customer.getContact()));
+        System.out.println(String.format("%-24s", "Customer Address") + String.format("%24s", customer.getAddress()));
+        System.out.println(String.format("%-24s", "Customer Password") + String.format("%24s", "*****"+customer.getPassword().substring(customer.getPassword().length()-3)));
+        System.out.println();
+        System.out.println("(To modify the details, please proceed to admin.)");
+        System.out.println();
+        System.out.print("Press enter to proceed");
+        String proceed = input.nextLine();
+        System.out.println();
+    }
+
+    public void accessMenu(){
+
+    }
+
 
 }
