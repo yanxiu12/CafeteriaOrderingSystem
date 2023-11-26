@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class CustomerInterface {
+public class CustomerInterface extends MainInterface{
 
     public static Customer login() {
         String usernameInput = null, passwordInput = null;
@@ -110,7 +110,7 @@ public class CustomerInterface {
         System.out.println();
     }
 
-    public static void accessMenu(Customer customer){
+    public static void accessMenu(Customer customer){//add review
         Scanner input = new Scanner(System.in);
         int repeat = 1;
 
@@ -289,7 +289,7 @@ public class CustomerInterface {
         }
     }
 
-    public static void accessOrderHistory(Customer customer){
+    public static void accessOrderHistory(Customer customer){//add review
         Scanner input = new Scanner(System.in);
         ArrayList<Order> orderHistory = customer.getOrderHistory();
 
@@ -336,7 +336,6 @@ public class CustomerInterface {
                             System.out.print("Enter 1 to remove / Enter other value to exit.");
                             try {
                                 selection = input.nextInt();
-
                             } catch (InputMismatchException e) {
 
                             }
@@ -355,7 +354,39 @@ public class CustomerInterface {
                     }
                 }
             }else if(proceed == 2){
-
+                while(true) {
+                    System.out.println("Enter the order ID:");
+                    String orderID = input.nextLine();
+                    if (orderID.isEmpty()) {
+                        System.out.println("Input cannot be null.");
+                        System.out.println();
+                    } else if (!orderHistory.contains(new Order(orderID))) {
+                        System.out.println("Please enter a valid order ID.");
+                        System.out.println();
+                    } else {
+                        Order order = new Order(orderID);
+                        String review = order.getReview();
+                        if(review!=null){
+                            System.out.println();
+                            System.out.println("You've already submitted a review for this order.");
+                        }else{
+                            System.out.println();
+                            System.out.println("Please share your experience with this order? Your review will be anonymous on the vendor page.");
+                            System.out.print("Review:");
+                            String rev = input.nextLine();
+                            while(rev.isEmpty()){
+                                System.out.println("Input cannot be null. Please re-enter the review.");
+                                System.out.println();
+                                System.out.print("Review:");
+                                rev = input.nextLine();
+                            }
+                            order.setReview(rev);
+                            System.out.println();
+                            System.out.println("Successfully submitted the review!");
+                        }
+                        break;
+                    }
+                }
             }
         }catch(InputMismatchException e){
 

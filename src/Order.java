@@ -20,6 +20,7 @@ public class Order {
     private Vendor vendor;
     private int orderType;// 1- Dine in,2- Take Away, 3- Delivery
     private Status status;
+    private OrderReview orderReview;
     private ArrayList<Cart> shoppingCart;
 
     public Order(String ID, Customer customer, Vendor vendor, int type, ArrayList<Cart> shoppingCart){
@@ -48,6 +49,7 @@ public class Order {
             for(int i=0;i<cartItem.length;i+=2){
                 shoppingCart.add(new Cart(new MenuItem(cartItem[i]),Integer.parseInt(cartItem[i+1])));
             }
+            this.orderReview = new OrderReview("OrderReview.txt");
         }
     }
 
@@ -76,6 +78,14 @@ public class Order {
     }
 
     public double getDeliveryFee(){return 5.00;}
+
+    public void setReview(String review) {
+        orderReview.setReview(this,review);
+    }
+
+    public String getReview() {
+        return orderReview.getReview(this);
+    }
 
     public String toString(){
         StringBuilder items = null;
