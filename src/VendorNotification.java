@@ -30,6 +30,17 @@ public class VendorNotification extends Notification{
         return input.nextLine();
     }
 
+    public void notifyCancelOrder(Order order){//code 2
+        System.out.println("Dear vendor,");
+        System.out.println();
+        System.out.println("The order "+order.getID()+ " has been canceled by "+order.getCustomer().getName()+".");
+        System.out.println("Order item:");
+        for(Cart item:order.getShoppingCart()){
+            System.out.println(item.getItem().getItemName()+" x "+item.getQuantity());
+        }
+        System.out.println();
+    }
+
     public String toString() {
         return String.format("%s,%s,%s,%s", ID, vendor.getID(),message,code);
     }

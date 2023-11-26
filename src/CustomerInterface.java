@@ -81,7 +81,7 @@ public class CustomerInterface {
         System.out.println();
         System.out.println(String.format("%-30s", "1. View Profile") + String.format("%-30s", "2. View Menu & Order"));
         System.out.println(String.format("%-30s", "3. Order History")+String.format("%-30s", "4. Transaction History"));
-        System.out.println(String.format("%-30s", "5. Check Current Order Status")+String.format("%-30s", "6. Check Notification"));
+        System.out.println(String.format("%-30s", "5. Check Active Order Status")+String.format("%-30s", "6. Check Notification"));
         System.out.println();
         System.out.println("(Enter 0 to log out.)");
         System.out.println();
@@ -267,27 +267,102 @@ public class CustomerInterface {
                 System.out.println();
                 if(method==1 || method==2 || method==3) {
                     System.out.println("Order confirmation:");
-                    if (!cartItems.isEmpty()) {
-                        for (Cart cart : cartItems) {
-                            System.out.println(String.format("%-30s", cart.getItem().getItemName()) + String.format("%-3s", cart.getQuantity()));
-                        }
-                        System.out.println();
-                        System.out.println("Enter 1 to edit cart / Enter 0 to confirm order (Enter other value to exit) :");
-                        try {
-                            repeat = input.nextInt();
-                            if(repeat == 0){
-                                customer.placeOrder(vendor,method);
+                    double totalPrice = customer.printCart(method);
+                    System.out.println("Enter 1 to edit cart / Enter 0 to confirm order (Enter other value to exit) :");
+                    try {
+                        repeat = input.nextInt();
+                        if(repeat == 0){
+                            Credit credit = new Credit(customer);
+                            if(credit.isBalanceEnough(totalPrice)) {
+                                customer.placeOrder(vendor, method);
                                 System.out.println("Successfully placed the order.");
-                                System.out.println();
-                            }
-                        } catch (InputMismatchException e) {
-                            repeat = 9;
+                            }else
+                                System.out.println("Insufficient balance! Please proceed to admin to top-up.");
                             System.out.println();
                         }
+                    } catch (InputMismatchException e) {
+                        repeat = 9;
+                        System.out.println();
                     }
                 }
             }
         }
+    }
+
+    public static void accessOrderHistory(Customer customer){
+        Scanner input = new Scanner(System.in);
+        ArrayList<Order> orderHistory = customer.getOrderHistory();
+
+        System.out.println("----------------------------------------------");
+        System.out.println("|                ORDER HISTORY               |");
+        System.out.println("----------------------------------------------");
+        System.out.println();
+        System.out.println("====================================================================================================================================================================================");
+        System.out.println(String.format("%-30s", "ORDER ID") + String.format("%-30s", "VENDOR") + String.format("%-30s", "SERVING METHOD") + String.format("%-30s", "STATUS") + String.format("%-30s", "ITEM")+String.format("%-30s", "QUANTITY"));
+        System.out.println("====================================================================================================================================================================================");
+        if (!orderHistory.isEmpty()) {
+            int counter = 1;
+            for (Order order : orderHistory) {
+                for(Cart item:order.getShoppingCart()){
+                    if(counter == 1) {
+                        System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getVendor().getVendorName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()));
+                    }else{
+                        System.out.println(String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()));
+                    }
+                    counter++;
+                }
+            }
+            System.out.println();
+        }else{
+            System.out.println("(No Order History Exist.)");
+            System.out.println();
+        }
+        System.out.print("Would you like to take any action from your history? Enter 1 to re-order / Enter 2 to review / Enter any other value to exit:");
+        try{
+            int proceed = input.nextInt();
+            if(proceed == 1){
+                while(true) {
+                    System.out.println("Enter the order ID:");
+                    String orderID = input.nextLine();
+                    if (orderID.isEmpty()) {
+                        System.out.println("Input cannot be null.");
+                    } else if (!orderHistory.contains(new Order(orderID))) {
+                        System.out.println("Please enter a valid ID.");
+                    } else {
+                        ArrayList<Cart> cart = customer.getCartItems();
+                        int selection = 0;
+                        if (!cart.isEmpty()) {
+                            System.out.println("Your cart is not empty. If you continue your cart and selection will be removed.");
+                            System.out.print("Enter 1 to remove / Enter other value to exit.");
+                            try {
+                                selection = input.nextInt();
+
+                            } catch (InputMismatchException e) {
+
+                            }
+                        }
+                        if(selection == 1){
+                            Order order = new Order(orderID);
+                            ArrayList<Cart> orderItems = order.getShoppingCart();
+                            for(Cart items:orderItems){
+                                customer.addToCart(items.getItem(),items.getQuantity());
+                            }
+                            System.out.println("Successfully add to cart!");
+                            System.out.println();
+                            accessCart(customer,order.getVendor());
+                        }
+                        break;
+                    }
+                }
+            }else if(proceed == 2){
+
+            }
+        }catch(InputMismatchException e){
+
+        }
+        System.out.println();
+        System.out.println("Proceeding to main menu......");
+        System.out.println();
     }
 
     public static void accessTransactionHistory(Customer customer) {
@@ -312,6 +387,72 @@ public class CustomerInterface {
         }
         System.out.print("Press Enter to exit.");
         String proceed = input.nextLine();
+        System.out.println();
+        System.out.println("Proceeding to main menu......");
+        System.out.println();
+    }
+
+    public static void checkOrderStatus(Customer customer) {
+        Scanner input = new Scanner(System.in);
+
+        System.out.println("-----------------------------------------------------");
+        System.out.println("|                 ACTIVE ORDER STATUS               |");
+        System.out.println("-----------------------------------------------------");
+        System.out.println();
+        ArrayList<Order> orders = customer.getOrders();
+        System.out.println("====================================================================================================================================================================================");
+        System.out.println(String.format("%-30s", "ORDER ID") + String.format("%-30s", "VENDOR") + String.format("%-30s", "SERVING METHOD") + String.format("%-30s", "STATUS") + String.format("%-30s", "ITEM") + String.format("%-30s", "QUANTITY"));
+        System.out.println("====================================================================================================================================================================================");
+        if (!orders.isEmpty()) {
+            int counter = 1;
+            for (Order order : orders) {
+                for (Cart item : order.getShoppingCart()) {
+                    if (counter == 1) {
+                        System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getVendor().getVendorName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()));
+                    } else {
+                        System.out.println(String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()));
+                    }
+                    counter++;
+                }
+            }
+            System.out.println();
+        } else {
+            System.out.println("(You have currently no active order.)");
+            System.out.println();
+        }
+        System.out.println();
+        System.out.print("Would you like to take any action on your order? (Enter 'yes' to proceed) ");
+        String userInput = input.nextLine().trim().toLowerCase();
+        if (userInput.equals("yes")) {
+            System.out.println("What action would you like to take?");
+            System.out.println("1. Cancel an order");
+            System.out.println();
+            System.out.println("(Enter other value to exit.)");
+            System.out.println();
+            System.out.print("Enter the number:");
+            try{
+                int action = input.nextInt();
+                if(action == 1){
+                    System.out.print("Enter the order ID you wish to cancel:");
+                    String orderID = input.nextLine();
+                    Order order = new Order(orderID);
+                    if(orders.contains(order)){
+                        if(order.getStatus() == Order.Status.Accepted || order.getStatus() == Order.Status.PendingAccepted) {
+                            customer.cancelVendorOrder(order.getVendor(), order);
+                            System.out.println("Successfully canceled the order.");
+                        }else{
+                            System.out.println("Unable to cancel the order due to [Order Status : "+order.getStatus()+"]");
+                        }
+                    }
+                }
+            }catch(InputMismatchException e){
+
+            }
+        } else {
+            System.out.println("Your orders will remain unchanged.");
+        }
+        System.out.println();
+        System.out.println("Proceeding to main menu......");
         System.out.println();
     }
 

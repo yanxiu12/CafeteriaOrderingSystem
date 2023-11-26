@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -29,6 +30,16 @@ public class Customer implements Serializable {
         this.notifications = new ArrayList<>();
         this.cartItems = new ArrayList<>();
         this.orders = new ArrayList<>();
+        FileOperation file = new FileOperation("CusOrder.txt");
+        ArrayList<String> foundOrder = file.search(ID);
+        if(!foundOrder.isEmpty()) {
+            for (String order : foundOrder) {
+                String[] part = order.split(";");
+                if (part[5] != String.valueOf(Order.Status.Completed)) {
+                    orders.add(new Order(part[0]));
+                }
+            }
+        }
     }//for register //obj.write2file(obj.toString());
 
     public String getID() {return ID;}
@@ -60,6 +71,19 @@ public class Customer implements Serializable {
     public void setWalletBalance(String walletBalance) {this.walletBalance = Double.parseDouble(walletBalance);}
 
     public ArrayList<Order> getOrders() {return orders;}
+
+    public ArrayList<Order> getOrderHistory(){
+        ArrayList<Order> orderHistory = new ArrayList<>();
+        FileOperation file = new FileOperation("CusOrder.txt");
+        ArrayList<String> foundRecords = file.search(ID);
+        for(String record:foundRecords){
+            String[] part = record.split(",");
+            orderHistory.add(new Order(part[0]));
+        }
+        return orderHistory;
+    }
+
+    public void resetCartItems(){this.cartItems = new ArrayList<>();}
 
     public ArrayList<Cart> getCartItems() {return cartItems;}
 
@@ -133,20 +157,23 @@ public class Customer implements Serializable {
         }
     }
 
-    public void placeOrder(Vendor vendor, int type){
+    public void placeOrder(Vendor vendor, int method){
         runnerCounter=0;
         IDGenerator generator = new IDGenerator("CusOrder.txt","CO");
         String orderID = generator.generateID();
-        Order ord = new Order(orderID,this,vendor,type,cartItems);
+        Order ord = new Order(orderID,this,vendor,method,cartItems);
         orders.add(ord);
         VendorNotification notification = new VendorNotification("You have new order!",ord.getVendor(),1);
         notification.saveNotification();
+        if(method == 3)
+            allocateRunner(ord);
         write2OrderFile(ord.toString());
     }
 
-    public void printCart(){
+    public double printCart(int method){
         int counter = 0;
         double totalPrice = 0;
+        double deliveryFee=0;
         System.out.println("-----------------------------------------------------------------------------------------------");
         System.out.println(String.format("%-5s", "No.")+String.format("%-30s", "Item Name")+String.format("%-30s", "Price")+String.format("%-30s", "Quantity"));
         System.out.println("------------------------------------------------------------------------------------------");
@@ -156,12 +183,22 @@ public class Customer implements Serializable {
             totalPrice+= (item.getItem().getItemPrice()*item.getQuantity());
         }
         System.out.println("------------------------------------------------------------------------------------------");
-        System.out.println("Total Price (RM) : "+totalPrice);
+        if(method == 3) {
+            deliveryFee=5.00;
+            System.out.println("Subtotal (RM) : "+totalPrice);
+            System.out.println("Delivery Fee (RM) :"+deliveryFee);
+        }
+        System.out.println("Total Price (RM) : "+totalPrice+deliveryFee);
+        System.out.println();
+        return totalPrice+deliveryFee;
     }
 
     public void cancelVendorOrder(Vendor vendor,Order order){
-        vendor.cancelOrder(order);
         orders.remove(order);
+        VendorNotification notification = new VendorNotification("An order has been canceled! ", order.getVendor(),2);
+        notification.saveNotification();
+        FileOperation file = new FileOperation("CusOrder.txt");
+        file.delete(order.getID());
     }
 
     public void cancelOrder(Order order){

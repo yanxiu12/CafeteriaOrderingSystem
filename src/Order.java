@@ -8,6 +8,7 @@ public class Order {
         PendingAccepted,
         Accepted,
         Rejected,
+        Ready,
         Completed,
         PendingRunner,
         Delivering,
@@ -17,7 +18,7 @@ public class Order {
     String currentDate;
     private Customer customer;
     private Vendor vendor;
-    private int orderType;// 0- Dine in,1- Take Away, 2- Delivery
+    private int orderType;// 1- Dine in,2- Take Away, 3- Delivery
     private Status status;
     private ArrayList<Cart> shoppingCart;
 
