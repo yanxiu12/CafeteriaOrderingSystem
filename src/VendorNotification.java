@@ -41,6 +41,17 @@ public class VendorNotification extends Notification{
         System.out.println();
     }
 
+    public void notifyOrderChange(Order order){//code 3
+        System.out.println("Dear vendor,");
+        System.out.println();
+        System.out.println("The serving method of order "+order.getID()+ " has been changed to "+order.getOrderType()+".");
+        System.out.println("Order item:");
+        for(Cart item:order.getShoppingCart()){
+            System.out.println(item.getItem().getItemName()+" x "+item.getQuantity());
+        }
+        System.out.println();
+    }
+
     public String toString() {
         return String.format("%s,%s,%s,%s", ID, vendor.getID(),message,code);
     }
@@ -49,5 +60,10 @@ public class VendorNotification extends Notification{
     public void saveNotification() {
         FileOperation file = new FileOperation("VendorNotification.txt");
         file.writeToFile(this.toString());
+    }
+
+    @Override
+    public void deleteNotification() {
+
     }
 }

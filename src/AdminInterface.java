@@ -473,7 +473,7 @@ public class AdminInterface extends MainInterface {
                             System.out.println();
                             Credit credit = new Credit(cus);
                             credit.addAmount(amount,1);
-                            CustomerNotification notification = new CustomerNotification("Successfully top up credit!",cus,3);
+                            CustomerNotification notification = new CustomerNotification("Successfully top up credit!",cus,3, credit.getID());
                             notification.saveNotification();
                             status = false;
                             System.out.println("Successfully top-up the amount. \nThe transaction receipt has been sent to customer account.");

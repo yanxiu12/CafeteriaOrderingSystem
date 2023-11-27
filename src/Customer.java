@@ -6,14 +6,21 @@ public class Customer implements Serializable {
     private String ID,name,dob,contact,password,address;
     private double walletBalance;
 
-    private ArrayList<Notification> notifications;
+    private ArrayList<CustomerNotification> notifications;
     private ArrayList<Order>orders;
     private ArrayList<Cart>cartItems;
     private static int runnerCounter=0;
 
     public Customer(String userID){
-        setDetails(userID);
-    }//for credit use (Customer CA = new Customer("CA1"); Credit userCredit = new Credit(CA); userCredit.addAmount();CA.write2file();userCredit.write2file();
+        SerializationOperation operation = new SerializationOperation("Customer.ser");
+        ArrayList<Customer> foundCustomer = new ArrayList<>();
+        foundCustomer = operation.searchObjects(userID,Customer.class);
+        if(foundCustomer.size()==1) {
+            Customer found = foundCustomer.get(0);
+            setID(found.getID());setPassword(found.getPassword());setName(found.getName());setDob(found.getDob());setContact(found.getContact());setAddress(found.getAddress());
+
+        }
+    }
 
 //    public Customer(String userID,String password){
 //        FileOperation file = new FileOperation("Customer.txt");
@@ -29,17 +36,6 @@ public class Customer implements Serializable {
         setID(ID);setPassword(password);setName(name);setDob(dob);setContact(contact);setAddress(address);setWalletBalance(walletBalance);
         this.notifications = new ArrayList<>();
         this.cartItems = new ArrayList<>();
-        this.orders = new ArrayList<>();
-        FileOperation file = new FileOperation("CusOrder.txt");
-        ArrayList<String> foundOrder = file.search(ID);
-        if(!foundOrder.isEmpty()) {
-            for (String order : foundOrder) {
-                String[] part = order.split(";");
-                if (part[5] != String.valueOf(Order.Status.Completed)) {
-                    orders.add(new Order(part[0]));
-                }
-            }
-        }
     }//for register //obj.write2file(obj.toString());
 
     public String getID() {return ID;}
@@ -70,7 +66,20 @@ public class Customer implements Serializable {
 
     public void setWalletBalance(String walletBalance) {this.walletBalance = Double.parseDouble(walletBalance);}
 
-    public ArrayList<Order> getOrders() {return orders;}
+    public ArrayList<Order> getOrders() {
+        this.orders = new ArrayList<>();
+        FileOperation file = new FileOperation("CusOrder.txt");
+        ArrayList<String> foundOrder = file.search(ID);
+        if(!foundOrder.isEmpty()) {
+            for (String order : foundOrder) {
+                String[] part = order.split(";");
+                if (part[5] != String.valueOf(Order.Status.Completed)) {
+                    orders.add(new Order(part[0]));
+                }
+            }
+        }
+        return orders;
+    }
 
     public ArrayList<Order> getOrderHistory(){
         ArrayList<Order> orderHistory = new ArrayList<>();
@@ -98,7 +107,17 @@ public class Customer implements Serializable {
         return creditRecords;
     }
 
-    public void setDetails(String userID){
+    public ArrayList<CustomerNotification> getNotifications(){
+        FileOperation file = new FileOperation("CustomerNotification.txt");
+        ArrayList<String> foundRecords = file.search(ID);
+        for(String record:foundRecords){
+            String[] part = record.split(";");
+            notifications.add(new CustomerNotification(part[0],this,part[2],Integer.parseInt(part[3]),part[4]));
+        }
+        return notifications;
+    }
+
+   /* public void setDetails(String userID){
         FileOperation file = new FileOperation("Customer.txt");
         ArrayList<String> userData = file.search(userID);
         if (userData.size() == 1) {
@@ -112,7 +131,7 @@ public class Customer implements Serializable {
             setWalletBalance(item[6]);
         }else
             System.out.println("User not found!");
-    }
+    }*/
 
     public String toString(){
         return String.format("%s;%s;%s;%s;%s;%s", ID, password, name, dob, contact,address,walletBalance);
@@ -126,6 +145,11 @@ public class Customer implements Serializable {
     public void write2OrderFile(String input){
         FileOperation file = new FileOperation("CusOrder.txt");
         file.writeToFile(input);
+    }
+
+    public void modifyOrderFile(String id,String input){
+        FileOperation file = new FileOperation("CusOrder.txt");
+        file.modifyFile(id,input);
     }
 
     public void modifyFile(Customer customer){
@@ -179,7 +203,7 @@ public class Customer implements Serializable {
         System.out.println("------------------------------------------------------------------------------------------");
         for(Cart item:cartItems){
             counter++;
-            System.out.println(String.format(String.format("%-5s", counter)+String.format("%-30s", item.getItem().getItemName())+String.format("%-30s", item.getItem().getItemPrice())+String.format("%-30s", item.getQuantity())));
+            System.out.println((String.format("%-5s", counter)+String.format("%-30s", item.getItem().getItemName())+String.format("%-30s", item.getItem().getItemPrice())+String.format("%-30s", item.getQuantity())));
             totalPrice+= (item.getItem().getItemPrice()*item.getQuantity());
         }
         System.out.println("------------------------------------------------------------------------------------------");
@@ -215,8 +239,8 @@ public class Customer implements Serializable {
                 notification.saveNotification();
                 runnerCounter++;
             }else {
-                CustomerNotification notification = new CustomerNotification("Failed to get runner!", this,1);
-                notifications.add(notification);
+                CustomerNotification notification = new CustomerNotification("Failed to get runner!", this,1,order.getID());
+                notification.saveNotification();
             }
         }
     }

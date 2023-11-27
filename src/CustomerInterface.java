@@ -110,9 +110,9 @@ public class CustomerInterface extends MainInterface{
         System.out.println();
     }
 
-    public static void accessMenu(Customer customer){//add review
+    public static void accessMenu(Customer customer){
         Scanner input = new Scanner(System.in);
-        int repeat = 1;
+        int repeat;
 
         System.out.println("------------------------------------------------");
         System.out.println("|                   MENU PAGE                  |");
@@ -130,38 +130,70 @@ public class CustomerInterface extends MainInterface{
                 menu.printMenu();
                 System.out.println();
             }
-            System.out.print("Do you have anything to order? (Note: You can only purchase from selected vendor in an order.)\nEnter 1 to proceed / Enter any other value to exit:");
+            System.out.print("Do you have anything to order? (Note: You can only purchase from selected vendor in an order.)\nEnter 1 to proceed / Enter 2 to view reviews / Enter any other value to exit:");
             try{
                 int proceed = input.nextInt();
-                if(proceed!=1){
-                    System.out.println();
-                    System.out.println("Proceeding to main menu......");
-                    System.out.println();
-                }else{
-                    input.nextLine();
-                    System.out.println();
-                    while(repeat == 1) {
+                input.nextLine();
+                System.out.println();
+                if(proceed==1 ) {
+                    repeat = 1;
+                    while (repeat == 1) {
                         System.out.print("Please enter the vendor ID (eg. VA1) :");
                         String vendorID = input.nextLine();
                         System.out.println();
                         ArrayList<Vendor> foundVendor = operation.searchObjects(vendorID, Vendor.class);
                         if (foundVendor.size() == 1) {
                             Vendor vendor = foundVendor.get(0);
-                            accessCart(customer,vendor);
+                            accessCart(customer, vendor);
+                            repeat = 0;
                         } else {
                             System.out.println("Invalid vendor ID. Enter 1 to try again / Enter other value to exit.");
                             try {
                                 repeat = input.nextInt();
-                            }catch (InputMismatchException e){
+                            } catch (InputMismatchException e) {
                                 repeat = 0;
                             }
                             System.out.println();
                             input.nextLine();
                         }
                     }
-                    System.out.println("Proceeding to main menu......");
-                    System.out.println();
+                }else if (proceed == 2) {
+                    repeat = 1;
+                    while (repeat == 1) {
+                        System.out.print("Please enter the vendor ID (eg. VA1) :");
+                        String vendorID = input.nextLine();
+                        System.out.println();
+                        ArrayList<Vendor> foundVendor = operation.searchObjects(vendorID, Vendor.class);
+                        if (foundVendor.size() == 1) {
+                            Vendor vendor = foundVendor.get(0);
+                            OrderReview orderReview = new OrderReview("OrderReview.txt");
+                            ArrayList<String> foundReview = orderReview.getReviewByVendor(vendor);
+                            System.out.println("Customer Reviews for " + vendor.getVendorName() + ":");
+                            System.out.println();
+                            if (!foundReview.isEmpty()) {
+                                System.out.println(String.format("%-5s", "CUSTOMER NAME") + "| REVIEW");
+                                for (String review : foundReview) {
+                                    System.out.println(review);
+                                }
+                            } else {
+                                System.out.println("(Sorry. There is currently no review for this vendor.)");
+                            }
+                            repeat = 0;
+                        } else {
+                            System.out.println("Invalid vendor ID. Enter 1 to try again / Enter other value to exit.");
+                            try {
+                                repeat = input.nextInt();
+                            } catch (InputMismatchException e) {
+                                repeat = 0;
+                            }
+                            System.out.println();
+                            input.nextLine();
+                        }
+                    }
                 }
+                System.out.println();
+                System.out.println("Proceeding to main menu......");
+                System.out.println();
             }catch (InputMismatchException e){
                 input.nextLine();
                 System.out.println();
@@ -275,6 +307,7 @@ public class CustomerInterface extends MainInterface{
                             Credit credit = new Credit(customer);
                             if(credit.isBalanceEnough(totalPrice)) {
                                 customer.placeOrder(vendor, method);
+                                customer.resetCartItems();
                                 System.out.println("Successfully placed the order.");
                             }else
                                 System.out.println("Insufficient balance! Please proceed to admin to top-up.");
@@ -289,7 +322,7 @@ public class CustomerInterface extends MainInterface{
         }
     }
 
-    public static void accessOrderHistory(Customer customer){//add review
+    public static void accessOrderHistory(Customer customer){
         Scanner input = new Scanner(System.in);
         ArrayList<Order> orderHistory = customer.getOrderHistory();
 
@@ -297,17 +330,24 @@ public class CustomerInterface extends MainInterface{
         System.out.println("|                ORDER HISTORY               |");
         System.out.println("----------------------------------------------");
         System.out.println();
-        System.out.println("====================================================================================================================================================================================");
-        System.out.println(String.format("%-30s", "ORDER ID") + String.format("%-30s", "VENDOR") + String.format("%-30s", "SERVING METHOD") + String.format("%-30s", "STATUS") + String.format("%-30s", "ITEM")+String.format("%-30s", "QUANTITY"));
-        System.out.println("====================================================================================================================================================================================");
+        System.out.println("==================================================================================================================================================================================================================");
+        System.out.println(String.format("%-30s", "ORDER ID") + String.format("%-30s", "VENDOR") + String.format("%-30s", "SERVING METHOD") + String.format("%-30s", "STATUS") + String.format("%-30s", "REVIEW") + String.format("%-30s", "ITEM")+String.format("%-30s", "QUANTITY"));
+        System.out.println("==================================================================================================================================================================================================================");
         if (!orderHistory.isEmpty()) {
             int counter = 1;
             for (Order order : orderHistory) {
                 for(Cart item:order.getShoppingCart()){
                     if(counter == 1) {
-                        System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getVendor().getVendorName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()));
+                        if(order.getStatus() == Order.Status.Completed){
+                            if(order.getReview().isEmpty())
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getVendor().getVendorName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "REVIEWED") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()));
+                            else
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getVendor().getVendorName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "NOT REVIEWED") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()));
+                        }else
+                            System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getVendor().getVendorName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()));
+
                     }else{
-                        System.out.println(String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()));
+                        System.out.println(String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") +  String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()));
                     }
                     counter++;
                 }
@@ -369,6 +409,7 @@ public class CustomerInterface extends MainInterface{
                         if(review!=null){
                             System.out.println();
                             System.out.println("You've already submitted a review for this order.");
+                            System.out.println("Review : "+review);
                         }else{
                             System.out.println();
                             System.out.println("Please share your experience with this order? Your review will be anonymous on the vendor page.");
@@ -423,7 +464,7 @@ public class CustomerInterface extends MainInterface{
         System.out.println();
     }
 
-    public static void checkOrderStatus(Customer customer) {
+    public static void checkActiveOrderStatus(Customer customer) {
         Scanner input = new Scanner(System.in);
 
         System.out.println("-----------------------------------------------------");
@@ -487,5 +528,102 @@ public class CustomerInterface extends MainInterface{
         System.out.println();
     }
 
+    public static void checkNotification(Customer customer){
+        Scanner input = new Scanner(System.in);
+        int counter=1;
+        System.out.println("-------------------------------------------------------");
+        System.out.println("|                     NOTIFICATIONS                   |");
+        System.out.println("|-----------------------------------------------------|");
+        if(!customer.getNotifications().isEmpty()) {
+            for (CustomerNotification notification : customer.getNotifications()) {
+                System.out.println("|" + String.format("%-3s", counter) + notification.getMessage() + "|");
+                counter++;
+            }
+            System.out.println("-------------------------------------------------------");
+            System.out.println();
+            System.out.print("Enter 1 to check notification detail / Enter any other value to exit:");
+            try {
+                int proceed = input.nextInt();
+                if(proceed == 1){
+                    input.nextLine();
+                    int repeat = 1;
+                    while (repeat == 1) {
+                        System.out.println();
+                        System.out.print("Which notification you would like to access? Enter the number:");
+                        try {
+                            int number = input.nextInt();
+                            if(number<1 || number>customer.getNotifications().size()){
+                                System.out.print("Invalid number. Enter 1 to try again / Enter any other value to exit:");
+                                try{
+                                    repeat = input.nextInt();
+                                }catch (InputMismatchException e){
+                                    repeat=0;
+                                }
+                            }else{
+                                System.out.println();
+                                System.out.println("(The notification will be removed after viewing.)");
+                                System.out.println("Message:");
+                                CustomerNotification notification = customer.getNotifications().get(number-1);
+                                int code = notification.getCode();
+                                if(code == 3){
+                                    FileOperation file = new FileOperation("CustomerCredit.txt");
+                                    ArrayList<String> foundCredit = file.search(notification.getObjectID());
+                                    if(foundCredit.size()==1){
+                                        String[] credit = foundCredit.get(0).split(",");
+                                        notification.transactionReceipt(new Credit(credit[0],customer,credit[2],credit[3],credit[4]));
+                                        System.out.println();
+                                        System.out.print("Enter any key to exit.");
+                                        String exit = input.nextLine();
+                                    }else{
+                                        System.out.println("Unable to retrieve the notification.");
+                                    }
+                                }else if(code == 2){
+                                    Order order = new Order(notification.getObjectID());
+                                    notification.notifyOrderStatusUpdate(order);
+                                    System.out.println();
+                                    System.out.print("Enter any key to exit.");
+                                    String exit = input.nextLine();
+                                }else if(code == 1){
+                                    Order order = new Order(notification.getObjectID());
+                                    int method = notification.notifyRunnerNotAvailable(order);
+                                    order.setOrderType(method);
+                                    customer.modifyOrderFile(order.getID(),order.toString());
+                                    VendorNotification vendorNotification = new VendorNotification("Serviing method has been changed!",order.getVendor(),3);
+                                    vendorNotification.saveNotification();
+                                    System.out.println("Your order has been updated and notified the vendor.");
+                                    System.out.println();
+                                    System.out.print("Enter any key to exit.");
+                                    String exit = input.nextLine();
+                                }else{
+                                    System.out.println("Unable to retrieve the notification.");
+                                }
+                                System.out.println();
+                                repeat=0;
+                            }
+                        } catch (InputMismatchException e) {
+                            System.out.print("Invalid input, please enter an integer input. Enter 1 to try again / Enter any other value to exit:");
+                            try{
+                                repeat = input.nextInt();
+                            }catch (InputMismatchException ex){
+                                repeat=0;
+                            }
+                        }
+                        input.nextLine();
+                    }
+                }
+            }catch(InputMismatchException e){
+                input.nextLine();
+            }
+        }else {
+            System.out.println("|" + String.format("%-53s", "(No Notification.)") + "|");
+            System.out.println("-------------------------------------------------------");
+            System.out.println();
+            System.out.print("Press enter to exit");
+            String proceed = input.nextLine();
+        }
+        System.out.println();
+        System.out.println("Proceeding to main menu......");
+        System.out.println();
+    }
 
 }

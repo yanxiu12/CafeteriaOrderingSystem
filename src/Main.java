@@ -118,6 +118,45 @@ public class Main {
                         }
                         break;
                     case 2://customer
+                        Customer customer = CustomerInterface.login();
+                        if (!(customer ==null)) {
+                            boolean returnToMainMenu = false;
+                            while(true) {
+                                int access;
+                                CustomerInterface.CustomerMain(customer);
+                                access = CustomerInterface.userInput();
+
+                                switch (access) {
+                                    case 1://View Profile
+                                        CustomerInterface.accessProfile(customer);
+                                        break;
+                                    case 2://View Menu & Order
+                                        CustomerInterface.accessMenu(customer);
+                                        break;
+                                    case 3://Order History
+                                        CustomerInterface.accessOrderHistory(customer);
+                                        break;
+                                    case 4://Transaction History
+                                        CustomerInterface.accessTransactionHistory(customer);
+                                        break;
+                                    case 5://Check Active Order Status
+                                        CustomerInterface.checkActiveOrderStatus(customer);
+                                        break;
+                                    case 6://Check Notification
+                                        CustomerInterface.checkNotification(customer);
+                                        break;
+                                    case 0:
+                                        returnToMainMenu = true;
+                                        break;
+                                    default:
+                                        System.out.println("Invalid choice. Please try again");
+                                        break;
+                                }
+                                if (returnToMainMenu) {
+                                    break; // Break the inner while loop
+                                }
+                            }
+                        }
                         break;
                     case 3://vendor
                         break;

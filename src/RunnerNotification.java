@@ -43,4 +43,9 @@ public class RunnerNotification extends Notification{
         FileOperation file = new FileOperation("RunnerNotification.txt");
         file.writeToFile(this.toString());
     }
+
+    @Override
+    public void deleteNotification() {
+
+    }
 }

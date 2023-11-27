@@ -15,5 +15,7 @@ abstract public class Notification {
         this.message = message;
     }
 
-    abstract public void saveNotification();
+    public abstract void saveNotification();
+
+    public abstract void deleteNotification();
 }

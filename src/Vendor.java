@@ -104,7 +104,7 @@ public class Vendor implements Serializable {
     }
 
     public void updateOrder(Order order,int status){
-        CustomerNotification notification = new CustomerNotification("Order Status Updated!",order.getCustomer(),2);
+        CustomerNotification notification = new CustomerNotification("Order Status Updated!",order.getCustomer(),2, order.getID());
         switch (status) {
             case 1://accept order
                 order.setStatus(Order.Status.Accepted);
