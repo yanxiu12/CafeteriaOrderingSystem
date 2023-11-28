@@ -73,6 +73,17 @@ public class CustomerNotification extends Notification{
         System.out.println("-------------------------------------------------------------------------------");
     }
 
+    public void notifyCancelOrder(Order order){//code 4
+        System.out.println("Dear "+customer.getName()+", ");
+        System.out.println();
+        System.out.println("The order "+order.getID()+ " has been canceled by "+order.getVendor().getVendorName()+".");
+        System.out.println("Order item:");
+        for(Cart item:order.getShoppingCart()){
+            System.out.println(item.getItem().getItemName()+" x "+item.getQuantity());
+        }
+        System.out.println();
+    }
+
     @Override
     public String toString() {
         return String.format("%s;%s;%s;%s", ID, customer.getID(),message,code);

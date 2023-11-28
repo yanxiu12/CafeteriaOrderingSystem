@@ -159,6 +159,45 @@ public class Main {
                         }
                         break;
                     case 3://vendor
+                        Vendor vendor = VendorInterface.login();
+                        if (!(vendor ==null)) {
+                            boolean returnToMainMenu = false;
+                            while(true) {
+                                int access;
+                                VendorInterface.VendorMain(vendor);
+                                access = VendorInterface.userInput();
+
+                                switch (access) {
+                                    case 1://View Profile
+                                        VendorInterface.accessProfile(vendor);
+                                        break;
+                                    case 2://Access Menu Items
+                                        VendorInterface.accessMenu(vendor);
+                                        break;
+                                    case 3://Access Active Order
+                                        VendorInterface.checkActiveOrderStatus(vendor);
+                                        break;
+                                    case 4://Check Order History
+                                        VendorInterface.checkOrderHistory(vendor);
+                                        break;
+                                    case 5://Check Notification
+                                        VendorInterface.checkNotification(vendor);
+                                        break;
+                                    case 6://Sales & Revenue Dashboard
+                                        VendorInterface.accessDashboard(vendor);
+                                        break;
+                                    case 0:
+                                        returnToMainMenu = true;
+                                        break;
+                                    default:
+                                        System.out.println("Invalid choice. Please try again");
+                                        break;
+                                }
+                                if (returnToMainMenu) {
+                                    break; // Break the inner while loop
+                                }
+                            }
+                        }
                         break;
                     case 4://runner
                         break;

@@ -33,12 +33,12 @@ public class Credit {
     public void addAmount(double amount,int type){//1=topUp 2=refund
         IDGenerator generator = new IDGenerator("CustomerCredit.txt", "CT");
         ID = generator.generateID();
-        transaction = "+"+amount;
+        transaction = "+"+String.format("%.2f",amount);
         if(type==1)
             transactionType = "Top-Up";
         else if (type == 2)
             transactionType = "Refund";
-        customer.setWalletBalance(String.valueOf(customer.getWalletBalance()+amount));
+        customer.setWalletBalance(String.format("%.2f",customer.getWalletBalance()+amount));
         write2file();
         customer.modifyFile(customer);
     }
@@ -46,9 +46,9 @@ public class Credit {
     public void deductAmount(double amount){
         IDGenerator generator = new IDGenerator("CustomerCredit.txt", "CT");
         ID = generator.generateID();
-        transaction = "-"+amount;
+        transaction = "-"+String.format("%.2f",amount);
 
-        customer.setWalletBalance(String.valueOf(customer.getWalletBalance()-amount));
+        customer.setWalletBalance(String.format("%.2f",customer.getWalletBalance()-amount));
         write2file();
     }
 

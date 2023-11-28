@@ -10,7 +10,7 @@ public class VendorDashboard extends Dashboard{
         super(orders);
     }
 
-    public Map<LocalDate, Double> generateRevenueByDate() {
+    private Map<LocalDate, Double> generateRevenueByDate() {
         Map<LocalDate, Double> revenueByDate = new HashMap<>();
         for (Order order : orders) {
             if (order.getStatus() == Order.Status.Completed) {
@@ -21,16 +21,16 @@ public class VendorDashboard extends Dashboard{
         return revenueByDate;
     }
 
-    private void printRevenueByDate() {
+    public void printRevenueByDate() {
         Map<LocalDate, Double> revenueByDate = generateRevenueByDate();
         for (Map.Entry<LocalDate, Double> entry : revenueByDate.entrySet()) {
             LocalDate date = entry.getKey();
             double revenue = entry.getValue();
-            System.out.println("Date: " + date + " - Revenue: " + revenue);
+            System.out.println(String.format("%-30s",  date) + String.format("%-30s",  revenue));
         }
     }
 
-    private void printRevenueByMonth() {
+    public void printRevenueByMonth() {
         Map<LocalDate, Double> revenueByDate = generateRevenueByDate();
         Map<Month, Double> revenueByMonth = new HashMap<>();
         for (Map.Entry<LocalDate, Double> entry : revenueByDate.entrySet()) {
@@ -42,11 +42,11 @@ public class VendorDashboard extends Dashboard{
         for (Map.Entry<Month, Double> entry : revenueByMonth.entrySet()) {
             Month month = entry.getKey();
             double revenue = entry.getValue();
-            System.out.println("Month: " + month + " - Revenue: " + revenue);
+            System.out.println(String.format("%-30s", month) + String.format("%-30s", revenue));
         }
     }
 
-    private void printRevenueByYear() {
+    public void printRevenueByYear() {
         Map<LocalDate, Double> revenueByDate = generateRevenueByDate();
         Map<Integer, Double> revenueByYear = new HashMap<>();
         for (Map.Entry<LocalDate, Double> entry : revenueByDate.entrySet()) {
@@ -58,7 +58,7 @@ public class VendorDashboard extends Dashboard{
         for (Map.Entry<Integer, Double> entry : revenueByYear.entrySet()) {
             int year = entry.getKey();
             double revenue = entry.getValue();
-            System.out.println("Year: " + year + " - Revenue: " + revenue);
+            System.out.println(String.format("%-30s", year) + String.format("%-30s", revenue));
         }
     }
 
@@ -79,7 +79,7 @@ public class VendorDashboard extends Dashboard{
         for (Map.Entry<String, Integer> entry : sortedList) {
             String itemName = entry.getKey();
             int quantitySold = entry.getValue();
-            System.out.println("Item: " + itemName + " - Quantity Sold: " + quantitySold);
+            System.out.println(String.format("%-30s",  itemName )+ String.format("%-30s",  quantitySold));
         }
     }
 }

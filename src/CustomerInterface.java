@@ -76,6 +76,7 @@ public class CustomerInterface extends MainInterface{
         System.out.println("------------------------------------------");
         System.out.println();
         System.out.println("Welcome, "+customer.getName()+".");
+        System.out.println("(You have currently "+customer.getNotifications().size()+" notification(s).)");
         System.out.println();
         System.out.println("Please choose which you would like to proceed.");
         System.out.println();
@@ -171,7 +172,7 @@ public class CustomerInterface extends MainInterface{
                             System.out.println("Customer Reviews for " + vendor.getVendorName() + ":");
                             System.out.println();
                             if (!foundReview.isEmpty()) {
-                                System.out.println(String.format("%-5s", "CUSTOMER NAME") + "| REVIEW");
+                                System.out.println(String.format("%-20s", "CUSTOMER NAME") + String.format("%-10s", "| RATING")+ "| REVIEW");
                                 for (String review : foundReview) {
                                     System.out.println(review);
                                 }
@@ -293,8 +294,9 @@ public class CustomerInterface extends MainInterface{
                 System.out.print("Please select the serving method for your order:");
                 try {
                     method = input.nextInt();
+                    input.nextLine();
                 } catch (InputMismatchException e) {
-
+                    input.nextLine();
                 }
                 System.out.println();
                 if(method==1 || method==2 || method==3) {
@@ -330,9 +332,11 @@ public class CustomerInterface extends MainInterface{
         System.out.println("|                ORDER HISTORY               |");
         System.out.println("----------------------------------------------");
         System.out.println();
-        System.out.println("==================================================================================================================================================================================================================");
-        System.out.println(String.format("%-30s", "ORDER ID") + String.format("%-30s", "VENDOR") + String.format("%-30s", "SERVING METHOD") + String.format("%-30s", "STATUS") + String.format("%-30s", "REVIEW") + String.format("%-30s", "ITEM")+String.format("%-30s", "QUANTITY"));
-        System.out.println("==================================================================================================================================================================================================================");
+        System.out.println("Number of orders: "+orderHistory.size());
+        System.out.println();
+        System.out.println("================================================================================================================================================================================================================================================");
+        System.out.println(String.format("%-30s", "ORDER ID") + String.format("%-30s", "VENDOR") + String.format("%-30s", "SERVING METHOD") + String.format("%-30s", "STATUS") + String.format("%-30s", "REVIEW") + String.format("%-30s", "ITEM")+String.format("%-30s", "QUANTITY") + String.format("%-30s", "TOTAL PRICE"));
+        System.out.println("================================================================================================================================================================================================================================================");
         if (!orderHistory.isEmpty()) {
             int counter = 1;
             for (Order order : orderHistory) {
@@ -340,14 +344,14 @@ public class CustomerInterface extends MainInterface{
                     if(counter == 1) {
                         if(order.getStatus() == Order.Status.Completed){
                             if(order.getReview().isEmpty())
-                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getVendor().getVendorName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "REVIEWED") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()));
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getVendor().getVendorName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "REVIEWED") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
                             else
-                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getVendor().getVendorName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "NOT REVIEWED") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()));
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getVendor().getVendorName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "NOT REVIEWED") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
                         }else
-                            System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getVendor().getVendorName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()));
+                            System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getVendor().getVendorName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
 
                     }else{
-                        System.out.println(String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") +  String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()));
+                        System.out.println(String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") +  String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", ""));
                     }
                     counter++;
                 }
@@ -376,8 +380,9 @@ public class CustomerInterface extends MainInterface{
                             System.out.print("Enter 1 to remove / Enter other value to exit.");
                             try {
                                 selection = input.nextInt();
+                                input.nextLine();
                             } catch (InputMismatchException e) {
-
+                                input.nextLine();
                             }
                         }
                         if(selection == 1){
@@ -410,18 +415,36 @@ public class CustomerInterface extends MainInterface{
                             System.out.println();
                             System.out.println("You've already submitted a review for this order.");
                             System.out.println("Review : "+review);
-                        }else{
+                        }else {
                             System.out.println();
                             System.out.println("Please share your experience with this order? Your review will be anonymous on the vendor page.");
-                            System.out.print("Review:");
+                            System.out.print("How will you rate your experience with the order? Rate from 1-5:");
+                            int rate;
+                            while (true) {
+                                try {
+                                    rate = input.nextInt();
+                                    if (rate > 5 || rate < 1) {
+                                        System.out.println("Please enter a valid rating (range from 1 to 5). ");
+                                        System.out.println();
+                                        System.out.print("Rate from 1-5:");
+                                    } else
+                                        break;
+
+                                } catch (InputMismatchException e) {
+                                    System.out.println("Please enter a valid rating (range from 1 to 5). ");
+                                    System.out.println();
+                                    System.out.print("Rate from 1-5:");
+                                }
+                            }
+                            System.out.print("Give a feedback on your order:");
                             String rev = input.nextLine();
-                            while(rev.isEmpty()){
-                                System.out.println("Input cannot be null. Please re-enter the review.");
+                            while (rev.isEmpty()) {
+                                System.out.println("Unable to submit an empty feedback. Please submit again.");
                                 System.out.println();
-                                System.out.print("Review:");
+                                System.out.print("Feedback: ");
                                 rev = input.nextLine();
                             }
-                            order.setReview(rev);
+                            order.setReview(rate, rev);
                             System.out.println();
                             System.out.println("Successfully submitted the review!");
                         }
@@ -430,7 +453,7 @@ public class CustomerInterface extends MainInterface{
                 }
             }
         }catch(InputMismatchException e){
-
+            input.nextLine();
         }
         System.out.println();
         System.out.println("Proceeding to main menu......");
@@ -508,17 +531,19 @@ public class CustomerInterface extends MainInterface{
                     System.out.print("Enter the order ID you wish to cancel:");
                     String orderID = input.nextLine();
                     Order order = new Order(orderID);
-                    if(orders.contains(order)){
-                        if(order.getStatus() == Order.Status.Accepted || order.getStatus() == Order.Status.PendingAccepted) {
-                            customer.cancelVendorOrder(order.getVendor(), order);
+                    if (orders.contains(order)) {
+                        if (order.getStatus() == Order.Status.Accepted || order.getStatus() == Order.Status.PendingAccepted) {
+                            customer.cancelVendorOrder(order);
                             System.out.println("Successfully canceled the order.");
-                        }else{
-                            System.out.println("Unable to cancel the order due to [Order Status : "+order.getStatus()+"]");
+                        } else {
+                            System.out.println("Unable to cancel the order due to [Order Status : " + order.getStatus() + "]");
                         }
+                    }else{
+                        System.out.println("Order ID not found. Your orders will remain unchanged.");
                     }
                 }
             }catch(InputMismatchException e){
-
+                input.nextLine();
             }
         } else {
             System.out.println("Your orders will remain unchanged.");
@@ -577,9 +602,12 @@ public class CustomerInterface extends MainInterface{
                                     }else{
                                         System.out.println("Unable to retrieve the notification.");
                                     }
-                                }else if(code == 2){
+                                }else if(code == 2 || code == 4){
                                     Order order = new Order(notification.getObjectID());
-                                    notification.notifyOrderStatusUpdate(order);
+                                    if(code == 2)
+                                        notification.notifyOrderStatusUpdate(order);
+                                    if(code == 4)
+                                        notification.notifyCancelOrder(order);
                                     System.out.println();
                                     System.out.print("Enter any key to exit.");
                                     String exit = input.nextLine();
@@ -588,7 +616,7 @@ public class CustomerInterface extends MainInterface{
                                     int method = notification.notifyRunnerNotAvailable(order);
                                     order.setOrderType(method);
                                     customer.modifyOrderFile(order.getID(),order.toString());
-                                    VendorNotification vendorNotification = new VendorNotification("Serviing method has been changed!",order.getVendor(),3);
+                                    VendorNotification vendorNotification = new VendorNotification("Serving method has been changed!",order.getVendor(),3,order.getID());
                                     vendorNotification.saveNotification();
                                     System.out.println("Your order has been updated and notified the vendor.");
                                     System.out.println();

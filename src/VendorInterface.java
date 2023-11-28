@@ -76,14 +76,664 @@ public class VendorInterface extends MainInterface{
         System.out.println("------------------------------------------");
         System.out.println();
         System.out.println("Welcome, "+vendor.getVendorName()+".");
+        System.out.println("(You have currently "+vendor.getNotifications().size()+" notification(s).)");
         System.out.println();
         System.out.println("Please choose which you would like to proceed.");
         System.out.println();
-        System.out.println(String.format("%-30s", "1. View Profile") + String.format("%-30s", "2. Access Menu"));
-        System.out.println(String.format("%-30s", "3. View Active Order Detail")+String.format("%-30s", "4. Order History"));
+        System.out.println(String.format("%-30s", "1. View Profile") + String.format("%-30s", "2. Access Menu Items"));
+        System.out.println(String.format("%-30s", "3. Access Active Order")+String.format("%-30s", "4. Check Order History"));
         System.out.println(String.format("%-30s", "5. Check Notification")+String.format("%-30s", "6. Sales & Revenue Dashboard"));
         System.out.println();
         System.out.println("(Enter 0 to log out.)");
         System.out.println();
     }
+
+    public static void accessProfile(Vendor vendor){
+        Scanner input = new Scanner(System.in);
+
+        System.out.println("------------------------------------------------");
+        System.out.println("|                PROFILE DETAILS               |");
+        System.out.println("------------------------------------------------");//48
+        System.out.println();
+        System.out.println(String.format("%-24s", "Vendor ID") + String.format("%24s", vendor.getID()));
+        System.out.println(String.format("%-24s", "Vendor Name") + String.format("%24s", vendor.getVendorName()));
+        System.out.println(String.format("%-24s", "Vendor Category") + String.format("%24s", vendor.getCategory()));
+        System.out.println(String.format("%-24s", "Vendor Address") + String.format("%24s", vendor.getAddress()));
+        System.out.println(String.format("%-24s", "Vendor Password") + String.format("%24s", "*****"+vendor.getPassword().substring(vendor.getPassword().length()-3)));
+        System.out.println();
+        System.out.println("(To modify the details, please proceed to admin.)");
+        System.out.println();
+        System.out.print("Press enter to exit");
+        String proceed = input.nextLine();
+        System.out.println();
+        System.out.println("Proceeding to main menu......");
+        System.out.println();
+    }
+
+    public static void accessMenu(Vendor vendor) {
+        Scanner input = new Scanner(System.in);
+
+        System.out.println("------------------------------------------------");
+        System.out.println("|                   MENU PAGE                  |");
+        System.out.println("------------------------------------------------");
+        System.out.println();
+        MenuItem menu = new MenuItem(vendor);
+        menu.setMenu(vendor);
+        menu.printMenu();
+        System.out.println();
+        System.out.println("Access Menu:");
+        System.out.println(String.format("%-30s", "1. Create Item")+String.format("%-30s", "2. Edit Item")+String.format("%-30s", "3. Delete Item"));
+        System.out.println();
+        System.out.println("Would you like to take any action of your menu? ");
+        System.out.print("Select from option 1-3 / Enter any other value to exit: ");
+        try {
+            int proceed = input.nextInt();
+            if(proceed == 1){
+                createItem(vendor);
+            }else if(proceed == 2){
+                editItem(vendor);
+            }else if(proceed == 3){
+                deleteItem();
+            }
+            input.nextLine();
+        }catch (InputMismatchException e){
+            input.nextLine();
+        }
+        System.out.println();
+        System.out.println("Proceeding to main menu......");
+        System.out.println();
+    }
+
+    public static void createItem(Vendor vendor){
+        Scanner input = new Scanner(System.in);
+        boolean status;
+        String itemID,itemName = null;
+        double price = 0;
+
+        System.out.println("------------------------------------------------");
+        System.out.println("|                  CREATE ITEM                 |");
+        System.out.println("------------------------------------------------");
+        System.out.println();
+        IDGenerator generator = new IDGenerator("MenuItem.txt","MI");
+        itemID = generator.generateID();
+        System.out.println("Item ID:"+itemID);
+        status = true;
+        while(status){
+            System.out.print("Item Name:");
+            itemName = input.nextLine();
+            if(itemName.matches("[a-zA-Z\\s]+")){
+                status = false;
+            }else{
+                System.out.println("Please enter a valid name.");
+            }
+        }
+        status = true;
+        while(status){
+            System.out.print("Item Price (RM):");
+            try {
+                price = input.nextDouble();
+                input.nextLine();
+                if(price <= 0){
+                    System.out.println("Price must be greater than 0.00");
+                }else
+                    status = false;
+            }catch(InputMismatchException e){
+                System.out.println("Please enter a numeric value.");
+                input.nextLine();
+            }
+        }
+        String itemPrice = String.format("%.2f", price);
+        MenuItem menu = new MenuItem(itemID,itemName,itemPrice,vendor);
+        menu.write2file(menu.toString());
+        System.out.println();
+        System.out.println("Successfully created the item.");
+    }
+
+    public static void editItem(Vendor vendor){
+        Scanner input = new Scanner(System.in);
+        boolean status,repeat,update=true;
+        int choice=0;
+        String idToUpdate;
+        MenuItem menu = null;
+
+        System.out.println("------------------------------------------------");
+        System.out.println("|                  UPDATE ITEM                 |");
+        System.out.println("------------------------------------------------");
+        System.out.println();
+        while(update){
+            System.out.print("Enter Item ID:");
+            idToUpdate = input.nextLine();
+            if(idToUpdate.isEmpty())
+                System.out.println("Input cannot be null.");
+            else {
+                System.out.println();
+                FileOperation file = new FileOperation("MenuItem.txt");
+                ArrayList<String> foundItem = file.search(idToUpdate);
+                System.out.println("==========================================================================================");
+                System.out.println(String.format("%-30s", "ITEM ID") + String.format("%-30s", "ITEM NAME") + String.format("%-30s", "ITEM PRICE"));
+                System.out.println("==========================================================================================");
+                if (!foundItem.isEmpty()) {
+                    for (String item : foundItem) {
+                        String[] part = item.split(";");
+                        System.out.println(String.format("%-30s", part[0]) + String.format("%-30s", part[1]) + String.format("%-30s", part[2]));
+                        menu = new MenuItem(part[0],part[1],part[2],vendor);
+                    }
+                    System.out.println();
+                    repeat = true;
+                    while(repeat){
+                        System.out.println("Which would you like to update?");
+                        System.out.println();
+                        System.out.println(String.format("%-20s", "1. Item Name")+String.format("%-20s", "2. Item Price"));
+                        System.out.println();
+                        status=true;
+                        while(status){
+                            System.out.print("Enter the number:");
+                            try {
+                                choice = input.nextInt();
+                                if(choice==1 || choice==2) {
+                                    status = false;
+                                }else {
+                                    System.out.println("Please enter a valid input.");
+                                }
+                            } catch (InputMismatchException e) {
+                                System.out.println("Please enter a valid input.");
+                            }
+                            input.nextLine();
+                        }
+                        System.out.println();
+                        switch(choice){
+                            case 1:
+                                status = true;
+                                while (status) {
+                                    System.out.println("Item Name:"+menu.getItemName());
+                                    System.out.print("New Item Name:");
+                                    String newName = input.nextLine();
+                                    if (newName.isEmpty()) {
+                                        System.out.println("Input cannot be empty.");
+                                    }else if (newName.equals(menu.getItemName())) {
+                                        status = false;
+                                        System.out.println("The update was not processed. The new value matches the existing value.");
+                                    }else if (newName.matches("[a-zA-Z\\s]+")) {
+                                        status = false; // Exit loop if name format is valid
+                                        menu.setItemName(newName);
+                                        System.out.println("The updated information has been stored.");
+                                    }else {
+                                        System.out.println("Please enter a valid name.");
+                                    }
+                                }
+                                break;
+                            case 2:
+                                status = true;
+                                while(status){
+                                    System.out.println("Item Price (RM):"+menu.getItemPrice());
+                                    System.out.print("New Item Price (RM):");
+                                    try {
+                                        double newPrice = input.nextDouble();
+                                        input.nextLine();
+                                        if (newPrice <= 0) {
+                                            System.out.println("Price must be greater than 0.00");
+                                        } else if (newPrice == menu.getItemPrice()) {
+                                            status = false;
+                                            System.out.println("The update was not processed. The new value matches the existing value.");
+                                        } else {
+                                            status = false;
+                                            menu.setItemPrice(newPrice);
+                                            System.out.println("The updated information has been stored.");
+                                        }
+                                    }catch(InputMismatchException e){
+                                        System.out.println("Please enter a numeric value.");
+                                        input.nextLine();
+                                    }
+                                }
+                                break;
+                        }
+                        System.out.println();
+                        System.out.print("Do you have anything more to update? \nEnter 1 to continue / Enter any other value to finish updating:");
+                        try {
+                            int more = input.nextInt();
+                            if(more != 1)
+                                repeat = false;
+                        } catch (InputMismatchException e) {
+                            repeat = false;
+                        }
+                        input.nextLine();//clear the scanner's buffer
+                        System.out.println();
+                    }
+                    menu.modifyFile(idToUpdate,menu.toString());
+                    System.out.println();
+                    System.out.println("Successfully updated the item.");
+                    update=false;
+                } else {
+                    System.out.println("(No Item Record Exist.)");
+                    System.out.println();
+                    System.out.print("Enter 1 to re-try again.");
+                    try {
+                        int retry=input.nextInt();
+                        if (retry!=1)
+                            update=false;
+                    } catch (InputMismatchException e) {
+                        update = false;
+                    }
+                    input.nextLine();//clear the scanner's buffer
+                    System.out.println();
+                }
+            }
+        }
+    }
+
+    public static void deleteItem(){
+        Scanner input = new Scanner(System.in);
+        boolean status,repeat;
+        int choice;
+        String idToDelete;
+
+        System.out.println("------------------------------------------------");
+        System.out.println("|                  DELETE ITEM                 |");
+        System.out.println("------------------------------------------------");
+        System.out.println();
+        repeat = true;
+        while(repeat){
+            System.out.print("Enter Item ID to delete:");
+            idToDelete = input.nextLine();
+            if(idToDelete.isEmpty())
+                System.out.println("Input cannot be null.");
+            else{
+                System.out.println();
+                FileOperation file = new FileOperation("MenuItem.txt");
+                ArrayList<String> foundItem = file.search(idToDelete);
+                System.out.println("==========================================================================================");
+                System.out.println(String.format("%-30s", "ITEM ID") + String.format("%-30s", "ITEM NAME") + String.format("%-30s", "ITEM PRICE"));
+                System.out.println("==========================================================================================");
+                if (!foundItem.isEmpty()) {
+                    for (String item : foundItem) {
+                        String[] part = item.split(";");
+                        System.out.println(String.format("%-30s", part[0]) + String.format("%-30s", part[1]) + String.format("%-30s", part[2]));
+                    }
+                    System.out.println();
+                    System.out.println("Are you sure you want to delete?");
+                    System.out.println("1. Yes\n2. No");
+                    System.out.println();
+                    status = true;
+                    while(status){
+                        System.out.print("Enter the number:");
+                        try {
+                            choice = input.nextInt();
+                            System.out.println();
+                            if(choice==1){
+                                status = false;
+                                file.delete(idToDelete);
+                                System.out.println("Successfully deleted the item.");
+                                repeat=false;
+                            }
+                            else if(choice==2){
+                                status = false;
+                                System.out.print("Do you want to delete other item? Enter 1 to re-try.");
+                                try {
+                                    int retry=input.nextInt();
+                                    if (retry!=1)
+                                        repeat=false;
+                                } catch (InputMismatchException e) {
+                                    repeat = false;
+                                }
+                                input.nextLine();
+                            }
+                            else {
+                                System.out.println("Please enter a valid input.");
+                                input.nextLine();
+                                System.out.println();
+                            }
+                        } catch (InputMismatchException e) {
+                            System.out.println("Please enter a valid input.");
+                            input.nextLine();//clear the scanner's buffer
+                            System.out.println();
+                        }
+                    }
+                }else {
+                    System.out.println("(No Item Record Exist.)");
+                    System.out.println();
+                    System.out.print("Do you want to delete other item? Enter 1 to re-try.");
+                    try {
+                        int retry=input.nextInt();
+                        if (retry!=1)
+                            repeat=false;
+                    } catch (InputMismatchException e) {
+                        repeat = false;
+                    }
+                    input.nextLine();
+                    System.out.println();
+                }
+            }
+        }
+    }
+
+    public static void checkActiveOrderStatus(Vendor vendor) {
+        Scanner input = new Scanner(System.in);
+
+        System.out.println("-----------------------------------------------------");
+        System.out.println("|                 ACTIVE ORDER STATUS               |");
+        System.out.println("-----------------------------------------------------");
+        System.out.println();
+        ArrayList<Order> orders = vendor.getReceivedOrders();
+        System.out.println("====================================================================================================================================================================================");
+        System.out.println(String.format("%-30s", "ORDER ID") + String.format("%-30s", "CUSTOMER") + String.format("%-30s", "SERVING METHOD") + String.format("%-30s", "STATUS") + String.format("%-30s", "ITEM") + String.format("%-30s", "QUANTITY"));
+        System.out.println("====================================================================================================================================================================================");
+        if (!orders.isEmpty()) {
+            int counter = 1;
+            for (Order order : orders) {
+                for (Cart item : order.getShoppingCart()) {
+                    if (counter == 1) {
+                        System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()));
+                    } else {
+                        System.out.println(String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()));
+                    }
+                    counter++;
+                }
+            }
+            System.out.println();
+        } else {
+            System.out.println("(You have currently no active order.)");
+            System.out.println();
+        }
+        System.out.println();
+        System.out.print("Would you like to take any action on your order? (Enter 'yes' to proceed) ");
+        String userInput = input.nextLine().trim().toLowerCase();
+        if (userInput.equals("yes")) {
+            System.out.println("What action would you like to take?");
+            System.out.println("1. Update status of an order");
+            System.out.println();
+            System.out.println("(Enter other value to exit.)");
+            System.out.println();
+            System.out.print("Enter the number:");
+            try{
+                int action = input.nextInt();
+                if (action == 1) {
+                    System.out.print("Enter the order ID you wish to update: ");
+                    String orderID = input.nextLine();
+                    Order order = new Order(orderID);
+                    if (orders.contains(order)) {
+                        System.out.println();
+                        System.out.println("Current Order Status: " + order.getStatus());
+                        if (order.getStatus().equals(Order.Status.Accepted)) {
+                            System.out.println("|");
+                            System.out.println("v");
+                            System.out.println("New Order Status: " + Order.Status.Ready);
+                            System.out.println();
+
+                            System.out.print("Is the information correct? (Enter 'yes' to proceed): ");
+                            String confirmation = input.nextLine().trim().toLowerCase();
+
+                            if (confirmation.equals("yes")) {
+                                vendor.updateOrder(order,3);
+                            } else {
+                                System.out.println("Update canceled. Please review the information and try again.");
+                            }
+                        } else if(order.getOrderType()!=3 && order.getStatus().equals(Order.Status.Ready)) {
+                            System.out.println("|");
+                            System.out.println("v");
+                            System.out.println("New Order Status: " + Order.Status.Completed);
+                            System.out.println();
+
+                            System.out.print("Is the information correct? (Enter 'yes' to proceed): ");
+                            String confirmation = input.nextLine().trim().toLowerCase();
+
+                            if (confirmation.equals("yes")) {
+                                vendor.updateOrder(order,4);
+                            } else {
+                                System.out.println("Update canceled. Please review the information and try again.");
+                            }
+                        } else if(order.getOrderType()==3 && order.getStatus().equals(Order.Status.Ready)) {
+                            System.out.println("Unable to proceed with the update due to [Serving Method : " + order.getOrderType() + "]");
+                        } else {
+                            System.out.println("Unable to proceed with the update due to [Order Status : " + order.getStatus() + "]");
+                        }
+                    } else {
+                        System.out.println("Order ID not found.");
+                    }
+                }
+            }catch(InputMismatchException e){
+                input.nextLine();
+            }
+        } else {
+            System.out.println("The order will remain unchanged.");
+        }
+        System.out.println();
+        System.out.println("Proceeding to main menu......");
+        System.out.println();
+    }
+
+    public static void checkOrderHistory(Vendor vendor){
+        Scanner input = new Scanner(System.in);
+        ArrayList<Order> orderHistory = vendor.getOrderHistory();
+
+        System.out.println("----------------------------------------------");
+        System.out.println("|                ORDER HISTORY               |");
+        System.out.println("----------------------------------------------");
+        System.out.println();
+        System.out.println("Number of orders: "+orderHistory.size());
+        System.out.println();
+        System.out.println("================================================================================================================================================================================================================================================");
+        System.out.println(String.format("%-30s", "ORDER ID") + String.format("%-30s", "CUSTOMER") + String.format("%-30s", "SERVING METHOD") + String.format("%-30s", "STATUS") + String.format("%-30s", "REVIEW") + String.format("%-30s", "ITEM")+String.format("%-30s", "QUANTITY") + String.format("%-30s", "TOTAL PRICE"));
+        System.out.println("================================================================================================================================================================================================================================================");
+        if (!orderHistory.isEmpty()) {
+            int counter = 1;
+            for (Order order : orderHistory) {
+                for(Cart item:order.getShoppingCart()){
+                    if(counter == 1) {
+                        if(order.getStatus() == Order.Status.Completed){
+                            if(order.getReview().isEmpty())
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "REVIEWED") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                            else
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "NOT REVIEWED") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                        }else
+                            System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+
+                    }else{
+                        System.out.println(String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") +  String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", ""));
+                    }
+                    counter++;
+                }
+            }
+            System.out.println();
+        }else{
+            System.out.println("(No Order History Exist.)");
+            System.out.println();
+        }
+        System.out.print("Would you like to take any action from your history? Enter 1 to check customer reviews / Enter any other value to exit:");
+        try{
+            int proceed = input.nextInt();
+            if(proceed == 1){
+                boolean reviewFound = false;
+                for (Order order : orderHistory) {
+                    if (order.getReview() != null) {
+                        reviewFound = true;
+                        System.out.println();
+                        System.out.println("Review from " + order.getCustomer().getName() + " on order " + order.getID() + ": " + order.getReview());
+                    }
+                }
+                if (!reviewFound) {
+                    System.out.println();
+                    System.out.println("No reviews found for any orders in the order history.");
+                }
+            }
+        }catch(InputMismatchException e){
+            input.nextLine();
+        }
+        System.out.println();
+        System.out.println("Proceeding to main menu......");
+        System.out.println();
+    }
+
+    public static void checkNotification(Vendor vendor){
+        Scanner input = new Scanner(System.in);
+        int counter=1;
+        System.out.println("-------------------------------------------------------");
+        System.out.println("|                     NOTIFICATIONS                   |");
+        System.out.println("|-----------------------------------------------------|");
+        if(!vendor.getNotifications().isEmpty()) {
+            for (VendorNotification notification : vendor.getNotifications()) {
+                System.out.println("|" + String.format("%-3s", counter) + notification.getMessage() + "|");
+                counter++;
+            }
+            System.out.println("-------------------------------------------------------");
+            System.out.println();
+            System.out.print("Enter 1 to check notification detail / Enter any other value to exit:");
+            try {
+                int proceed = input.nextInt();
+                if(proceed == 1){
+                    input.nextLine();
+                    int repeat = 1;
+                    while (repeat == 1) {
+                        System.out.println();
+                        System.out.print("Which notification you would like to access? Enter the number:");
+                        try {
+                            int number = input.nextInt();
+                            if(number<1 || number>vendor.getNotifications().size()){
+                                System.out.print("Invalid number. Enter 1 to try again / Enter any other value to exit:");
+                                try{
+                                    repeat = input.nextInt();
+                                }catch (InputMismatchException e){
+                                    repeat=0;
+                                }
+                            }else{
+                                System.out.println();
+                                System.out.println("(The notification will be removed after viewing.)");
+                                System.out.println("Message:");
+                                VendorNotification notification = vendor.getNotifications().get(number-1);
+                                int code = notification.getCode();
+                                Order order = new Order(notification.getObjectID());
+                                if(code == 1){
+                                    int orderStatus = notification.notifyComingOrder(order);
+                                    vendor.updateOrder(order,orderStatus);
+                                    System.out.println();
+                                    System.out.println("The order has been updated and notified the customer.");
+                                    System.out.println();
+                                    System.out.print("Enter any key to exit.");
+                                    String exit = input.nextLine();
+                                }else if(code == 2 || code == 3){
+                                    if(code == 2)
+                                        notification.notifyCancelOrder(order);
+                                    if(code == 3)
+                                        notification.notifyOrderChange(order);
+                                    System.out.println();
+                                    System.out.print("Enter any key to exit.");
+                                    String exit = input.nextLine();
+                                }else{
+                                    System.out.println("Unable to retrieve the notification.");
+                                }
+                                System.out.println();
+                                repeat=0;
+                            }
+                        } catch (InputMismatchException e) {
+                            System.out.print("Invalid input, please enter an integer input. Enter 1 to try again / Enter any other value to exit:");
+                            try{
+                                repeat = input.nextInt();
+                            }catch (InputMismatchException ex){
+                                repeat=0;
+                            }
+                        }
+                        input.nextLine();
+                    }
+                }
+            }catch(InputMismatchException e){
+                input.nextLine();
+            }
+        }else {
+            System.out.println("|" + String.format("%-53s", "(No Notification.)") + "|");
+            System.out.println("-------------------------------------------------------");
+            System.out.println();
+            System.out.print("Press enter to exit");
+            String proceed = input.nextLine();
+        }
+        System.out.println();
+        System.out.println("Proceeding to main menu......");
+        System.out.println();
+    }
+
+    public static void accessDashboard(Vendor vendor){
+        Scanner input = new Scanner(System.in);
+        VendorDashboard dashboard = new VendorDashboard(vendor.getOrderHistory());
+
+        System.out.println("------------------------------------------");
+        System.out.println("|                DASHBOARD                |");
+        System.out.println("------------------------------------------");
+        System.out.println();
+        System.out.println("Welcome! Please select the dashboard you'd like to view:");
+        System.out.println("1. Sales Dashboard");
+        System.out.println("2. Revenue Dashboard");
+        System.out.println();
+        System.out.println("(Enter any other key to exit.)");
+        System.out.println();
+        while(true) {
+            System.out.print("Enter the number of your choice: ");
+            try {
+                int choice = input.nextInt();
+                System.out.println();
+                if(choice == 1){
+                    System.out.println("------------------------------------------------------------");
+                    System.out.println(String.format("%-30s", "ITEM")+String.format("%-30s", "QUANTITY SOLD"));
+                    System.out.println("------------------------------------------------------------");
+                    dashboard.printItemsBySales();
+                    System.out.println();
+                    System.out.print("Would you like to view another dashboard? (Enter 'yes' to continue or any other key to exit): ");
+                    input.nextLine();
+                    String continueChoice = input.nextLine().trim().toLowerCase();
+                    if (!continueChoice.equals("yes")) {
+                        break;
+                    }else {
+                        choice = 2;
+                        System.out.println();
+                    }
+                }
+                if(choice == 2){
+                    System.out.println("Please choose the type of revenue report:");
+                    System.out.println("1. Daily");
+                    System.out.println("2. Monthly");
+                    System.out.println("3. Yearly");
+                    System.out.println();
+                    System.out.println("(Enter any other key to exit.)");
+                    System.out.println();
+                    System.out.print("Enter the number of your choice: ");
+                    try {
+                        int revenueChoice = input.nextInt();
+                        input.nextLine();
+
+                        switch (revenueChoice) {
+                            case 1:
+                                System.out.println("------------------------------------------------------------");
+                                System.out.println(String.format("%-30s", "DATE")+String.format("%-30s", "REVENUE (RM)"));
+                                System.out.println("------------------------------------------------------------");
+                                dashboard.printRevenueByDate();
+                                break;
+                            case 2:
+                                System.out.println("------------------------------------------------------------");
+                                System.out.println(String.format("%-30s", "MONTH")+String.format("%-30s", "REVENUE (RM)"));
+                                System.out.println("------------------------------------------------------------");
+                                dashboard.printRevenueByMonth();
+                                break;
+                            case 3:
+                                System.out.println("------------------------------------------------------------");
+                                System.out.println(String.format("%-30s", "YEAR")+String.format("%-30s", "REVENUE (RM)"));
+                                System.out.println("------------------------------------------------------------");
+                                dashboard.printRevenueByYear();
+                                break;
+                            default:
+                                System.out.println("Exiting the dashboard. Thank you!");
+                                break;
+                        }
+                    } catch (InputMismatchException e) {
+                        input.nextLine(); // Clear the invalid input
+                    }
+                }else {
+                    System.out.println("Exiting the dashboard. Thank you!");
+                    break;
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Please enter an integer input.");
+            }
+        }
+        System.out.println();
+        System.out.println("Proceeding to main menu......");
+        System.out.println();
+    }
+
 }

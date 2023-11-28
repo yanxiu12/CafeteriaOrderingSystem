@@ -40,6 +40,10 @@ public class MenuItem {
         return Double.parseDouble(itemPrice);
     }
 
+    public void setItemName(String itemName) {this.itemName = itemName;}
+
+    public void setItemPrice(double itemPrice) {this.itemPrice = String.format("%.2f", itemPrice);}
+
     public Vendor getVendor(){
         return vendor;
     }
@@ -60,6 +64,11 @@ public class MenuItem {
         file.writeToFile(input);
     }
 
+    public void modifyFile(String id,String input){
+        FileOperation file = new FileOperation("MenuItem.txt");
+        file.modifyFile(id,input);
+    }
+
     public void setMenu(Vendor vendor){
         vendorItems = new ArrayList<>();
         FileOperation file = new FileOperation("MenuItem.txt");
@@ -72,14 +81,12 @@ public class MenuItem {
     }
 
     public void printMenu(){
-        int counter = 0;
-        System.out.println("-----------------------------------------------------------------------------------------------");
-        System.out.println(String.format("%-5s", "No.")+String.format("%-30s", "Item ID")+String.format("%-30s", "Item Name")+String.format("%-30s", "Price"));
-        System.out.println("-----------------------------------------------------------------------------------------------");
+        System.out.println("------------------------------------------------------------------------------------------");
+        System.out.println(String.format("%-30s", "ITEM ID")+String.format("%-30s", "ITEM NAME")+String.format("%-30s", "ITEM PRICE (RM)"));
+        System.out.println("------------------------------------------------------------------------------------------");
         for(MenuItem item:vendorItems){
-            counter++;
-            System.out.println(String.format(String.format("%-5s", counter)+"%-30s", item.getItemID())+String.format("%-30s", item.getItemName())+String.format("%-30s", item.getItemPrice()));
+            System.out.println(String.format("%-30s", item.getItemID())+String.format("%-30s", item.getItemName())+String.format("%-30s", item.getItemPrice()));
         }
-        System.out.println("-----------------------------------------------------------------------------------------------");
+        System.out.println("------------------------------------------------------------------------------------------");
     }
 }

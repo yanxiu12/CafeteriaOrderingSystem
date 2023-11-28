@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class Vendor implements Serializable {
     private String ID, vendorName, category, password,address;
     private ArrayList<Order> receivedOrders;
-    private ArrayList<Notification> notifications;
+    private ArrayList<VendorNotification> notifications;
 
     public Vendor(String userID){
         SerializationOperation operation = new SerializationOperation("Vendor.ser");
@@ -22,13 +22,13 @@ public class Vendor implements Serializable {
             System.out.println("User not found!");
     }
 
-    public Vendor(String userID, String password){
-        FileOperation file = new FileOperation("Vendor.txt");
-        if(file.checkUserCredential(userID,password)){
-            setDetails(userID);
-            this.receivedOrders = new ArrayList<Order>();
-        }
-    }//for login
+//    public Vendor(String userID, String password){
+//        FileOperation file = new FileOperation("Vendor.txt");
+//        if(file.checkUserCredential(userID,password)){
+//            setDetails(userID);
+//            this.receivedOrders = new ArrayList<Order>();
+//        }
+//    }//for login
 
     public Vendor(String ID,String password,String vendorName,String category,String address){
         setID(ID);setPassword(password);setVendorName(vendorName);setCategory(category);setAddress(address);
@@ -54,7 +54,15 @@ public class Vendor implements Serializable {
 
     public String getAddress(){return address;}
 
-    public void addNotification(VendorNotification notification){notifications.add(notification);}
+    public ArrayList<VendorNotification> getNotifications(){
+        FileOperation file = new FileOperation("VendorNotification.txt");
+        ArrayList<String> foundRecords = file.search(ID);
+        for(String record:foundRecords){
+            String[] part = record.split(";");
+            notifications.add(new VendorNotification(part[0],this,part[2],Integer.parseInt(part[3]),part[4]));
+        }
+        return notifications;
+    }
 
     public void setDetails(String userID){
         FileOperation file = new FileOperation("Vendor.txt");
@@ -78,12 +86,30 @@ public class Vendor implements Serializable {
         operation.addObject(vendor);
     }
 
-    public void receiveOrder(Order order) {
-        receivedOrders.add(order);
+    public ArrayList<Order> getReceivedOrders(){
+        this.receivedOrders = new ArrayList<>();
+        FileOperation file = new FileOperation("CusOrder.txt");
+        ArrayList<String> foundOrder = file.search(ID);
+        if(!foundOrder.isEmpty()) {
+            for (String order : foundOrder) {
+                String[] part = order.split(";");
+                if (!part[5].equals(String.valueOf(Order.Status.Completed))) {
+                    receivedOrders.add(new Order(part[0]));
+                }
+            }
+        }
+        return receivedOrders;
     }
 
-    public ArrayList<Order> getReceivedOrders(){
-        return receivedOrders;
+    public ArrayList<Order> getOrderHistory(){
+        ArrayList<Order> orderHistory = new ArrayList<>();
+        FileOperation file = new FileOperation("CusOrder.txt");
+        ArrayList<String> foundRecords = file.search(ID);
+        for(String record:foundRecords){
+            String[] part = record.split(",");
+            orderHistory.add(new Order(part[0]));
+        }
+        return orderHistory;
     }
 
     public void cancelOrder(Order order){
@@ -110,7 +136,9 @@ public class Vendor implements Serializable {
                 order.setStatus(Order.Status.Accepted);
             case 2://reject order
                 order.setStatus(Order.Status.Rejected);
-            case 3://complete order
+            case 3:
+                order.setStatus(Order.Status.Ready);
+            case 4://complete order
                 order.setStatus(Order.Status.Completed);
         }
         FileOperation file = new FileOperation("CusOrder.txt");

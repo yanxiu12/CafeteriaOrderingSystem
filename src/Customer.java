@@ -73,7 +73,7 @@ public class Customer implements Serializable {
         if(!foundOrder.isEmpty()) {
             for (String order : foundOrder) {
                 String[] part = order.split(";");
-                if (part[5] != String.valueOf(Order.Status.Completed)) {
+                if (!part[5].equals(String.valueOf(Order.Status.Completed))) {
                     orders.add(new Order(part[0]));
                 }
             }
@@ -187,7 +187,7 @@ public class Customer implements Serializable {
         String orderID = generator.generateID();
         Order ord = new Order(orderID,this,vendor,method,cartItems);
         orders.add(ord);
-        VendorNotification notification = new VendorNotification("You have new order!",ord.getVendor(),1);
+        VendorNotification notification = new VendorNotification("You have new order!",ord.getVendor(),1,ord.getID());
         notification.saveNotification();
         if(method == 3)
             allocateRunner(ord);
@@ -217,9 +217,9 @@ public class Customer implements Serializable {
         return totalPrice+deliveryFee;
     }
 
-    public void cancelVendorOrder(Vendor vendor,Order order){
+    public void cancelVendorOrder(Order order){
         orders.remove(order);
-        VendorNotification notification = new VendorNotification("An order has been canceled! ", order.getVendor(),2);
+        VendorNotification notification = new VendorNotification("An order has been canceled! ", order.getVendor(),2,order.getID());
         notification.saveNotification();
         FileOperation file = new FileOperation("CusOrder.txt");
         file.delete(order.getID());

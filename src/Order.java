@@ -79,8 +79,8 @@ public class Order {
 
     public double getDeliveryFee(){return 5.00;}
 
-    public void setReview(String review) {
-        orderReview.setReview(this,review);
+    public void setReview(int rate,String review) {
+        orderReview.setReview(this,rate,review);
     }
 
     public String getReview() {

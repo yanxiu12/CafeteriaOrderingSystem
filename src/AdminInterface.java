@@ -157,7 +157,7 @@ public class AdminInterface extends MainInterface {
             else
                 System.out.println("Please enter a valid password.");
         }
-        Customer newCustomer = new Customer(id,password,name,dob,contact,address,"0");
+        Customer newCustomer = new Customer(id,password,name,dob,contact,address,"0.00");
         newCustomer.write2file(newCustomer);
         System.out.println();
         System.out.println("Successfully created the user.");
