@@ -5,13 +5,23 @@ public class CustomerNotification extends Notification{
     private String ID;
     private Customer customer;
     private int code;
-    private String objectID;
+    private String objectID,runnerContact=null;
 
     public CustomerNotification(String message, Customer customer, int code, String objectID) {
         super(message);
         this.customer = customer;
         this.code = code;
         this.objectID = objectID;
+        IDGenerator generator = new IDGenerator("CustomerNotification","CN");
+        this.ID = generator.generateID();
+    }
+
+    public CustomerNotification(String message, Customer customer, int code, String objectID,String runnerContact) {
+        super(message);
+        this.customer = customer;
+        this.code = code;
+        this.objectID = objectID;
+        this.runnerContact = runnerContact;
         IDGenerator generator = new IDGenerator("CustomerNotification","CN");
         this.ID = generator.generateID();
     }
@@ -82,11 +92,19 @@ public class CustomerNotification extends Notification{
             System.out.println(item.getItem().getItemName()+" x "+item.getQuantity());
         }
         System.out.println();
+        System.out.println("The refund will be credited to your account. ");
+        System.out.println();
+    }
+
+    public void notifyRunnerDetail(Order order){//code 5
+        System.out.println("Dear "+customer.getName()+", we have found a runner for your delivery order!");
+        System.out.println("Current status: "+order.getStatus());
+        System.out.println("Runner contact: "+runnerContact);
     }
 
     @Override
     public String toString() {
-        return String.format("%s;%s;%s;%s", ID, customer.getID(),message,code);
+        return String.format("%s;%s;%s;%s;%s;%s", ID, customer.getID(),message,code,objectID,runnerContact);
     }
 
     @Override

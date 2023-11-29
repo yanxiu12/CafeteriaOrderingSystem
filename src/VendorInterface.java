@@ -511,24 +511,17 @@ public class VendorInterface extends MainInterface{
         System.out.println();
         System.out.println("Number of orders: "+orderHistory.size());
         System.out.println();
-        System.out.println("================================================================================================================================================================================================================================================");
-        System.out.println(String.format("%-30s", "ORDER ID") + String.format("%-30s", "CUSTOMER") + String.format("%-30s", "SERVING METHOD") + String.format("%-30s", "STATUS") + String.format("%-30s", "REVIEW") + String.format("%-30s", "ITEM")+String.format("%-30s", "QUANTITY") + String.format("%-30s", "TOTAL PRICE"));
-        System.out.println("================================================================================================================================================================================================================================================");
+        System.out.println("==================================================================================================================================================================================================================");
+        System.out.println(String.format("%-30s", "ORDER ID") + String.format("%-30s", "CUSTOMER") + String.format("%-30s", "SERVING METHOD") + String.format("%-30s", "STATUS") + String.format("%-30s", "ITEM")+String.format("%-30s", "QUANTITY") + String.format("%-30s", "TOTAL PRICE"));
+        System.out.println("==================================================================================================================================================================================================================");
         if (!orderHistory.isEmpty()) {
             int counter = 1;
             for (Order order : orderHistory) {
                 for(Cart item:order.getShoppingCart()){
                     if(counter == 1) {
-                        if(order.getStatus() == Order.Status.Completed){
-                            if(order.getReview().isEmpty())
-                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "REVIEWED") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
-                            else
-                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "NOT REVIEWED") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
-                        }else
-                            System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
-
+                        System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
                     }else{
-                        System.out.println(String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") +  String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", ""));
+                        System.out.println(String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", ""));
                     }
                     counter++;
                 }
@@ -544,10 +537,10 @@ public class VendorInterface extends MainInterface{
             if(proceed == 1){
                 boolean reviewFound = false;
                 for (Order order : orderHistory) {
-                    if (order.getReview() != null) {
+                    if (order.getReview(1) != null) {
                         reviewFound = true;
                         System.out.println();
-                        System.out.println("Review from " + order.getCustomer().getName() + " on order " + order.getID() + ": " + order.getReview());
+                        System.out.println("Review from " + "*****"+order.getCustomer().getName().substring(order.getCustomer().getName().length()-3) + ": " + order.getReview(1));
                     }
                 }
                 if (!reviewFound) {
@@ -604,11 +597,18 @@ public class VendorInterface extends MainInterface{
                                 if(code == 1){
                                     int orderStatus = notification.notifyComingOrder(order);
                                     vendor.updateOrder(order,orderStatus);
+                                    if(orderStatus==1 && order.getOrderType()==3){
+                                        order.getCustomer().allocateRunner(order);
+                                    }else if(orderStatus==2){
+                                        Credit credit = new Credit(order.getCustomer());
+                                        credit.addAmount(order.getTotalPrice(),2);
+                                    }
                                     System.out.println();
                                     System.out.println("The order has been updated and notified the customer.");
                                     System.out.println();
                                     System.out.print("Enter any key to exit.");
                                     String exit = input.nextLine();
+                                    notification.deleteNotification();
                                 }else if(code == 2 || code == 3){
                                     if(code == 2)
                                         notification.notifyCancelOrder(order);
@@ -617,6 +617,7 @@ public class VendorInterface extends MainInterface{
                                     System.out.println();
                                     System.out.print("Enter any key to exit.");
                                     String exit = input.nextLine();
+                                    notification.deleteNotification();
                                 }else{
                                     System.out.println("Unable to retrieve the notification.");
                                 }
@@ -669,6 +670,8 @@ public class VendorInterface extends MainInterface{
                 int choice = input.nextInt();
                 System.out.println();
                 if(choice == 1){
+                    dashboard.countCompletedOrders();
+                    System.out.println();
                     System.out.println("------------------------------------------------------------");
                     System.out.println(String.format("%-30s", "ITEM")+String.format("%-30s", "QUANTITY SOLD"));
                     System.out.println("------------------------------------------------------------");
@@ -685,6 +688,8 @@ public class VendorInterface extends MainInterface{
                     }
                 }
                 if(choice == 2){
+                    dashboard.calculateRevenue();
+                    System.out.println();
                     System.out.println("Please choose the type of revenue report:");
                     System.out.println("1. Daily");
                     System.out.println("2. Monthly");

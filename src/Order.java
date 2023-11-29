@@ -79,12 +79,12 @@ public class Order {
 
     public double getDeliveryFee(){return 5.00;}
 
-    public void setReview(int rate,String review) {
-        orderReview.setReview(this,rate,review);
+    public void setReview(int rate,String review,int type) {
+        orderReview.setReview(this,rate,review,type);
     }
 
-    public String getReview() {
-        return orderReview.getReview(this);
+    public String getReview(int type) {
+        return orderReview.getReview(this,type);
     }
 
     public String toString(){
@@ -99,6 +99,9 @@ public class Order {
         double totalPrice = 0;
         for(Cart item:shoppingCart){
             totalPrice += item.getItem().getItemPrice()* item.getQuantity();
+        }
+        if(orderType==3){
+            totalPrice+=5.00;
         }
         return totalPrice;
     }

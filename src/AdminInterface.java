@@ -897,7 +897,7 @@ public class AdminInterface extends MainInterface {
                 System.out.println("Please enter a valid password.");
         }
         Runner newRunner = new Runner(id,password,name,contact);
-        newRunner.write2file(newRunner);
+        newRunner.write2file();
         System.out.println();
         System.out.println("Successfully created the user.");
         System.out.println();

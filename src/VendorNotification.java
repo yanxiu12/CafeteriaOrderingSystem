@@ -85,7 +85,7 @@ public class VendorNotification extends Notification{
     }
 
     public String toString() {
-        return String.format("%s,%s,%s,%s", ID, vendor.getID(),message,code);
+        return String.format("%s;%s;%s;%s;%s", ID, vendor.getID(),message,code,objectID);
     }
 
     @Override
@@ -96,6 +96,7 @@ public class VendorNotification extends Notification{
 
     @Override
     public void deleteNotification() {
-
+        FileOperation file = new FileOperation("VendorNotification.txt");
+        file.delete(ID);
     }
 }

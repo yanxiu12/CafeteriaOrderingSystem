@@ -9,7 +9,7 @@ public class Customer implements Serializable {
     private ArrayList<CustomerNotification> notifications;
     private ArrayList<Order>orders;
     private ArrayList<Cart>cartItems;
-    private static int runnerCounter=0;
+    private static int runnerCounter;
 
     public Customer(String userID){
         SerializationOperation operation = new SerializationOperation("Customer.ser");
@@ -86,7 +86,7 @@ public class Customer implements Serializable {
         FileOperation file = new FileOperation("CusOrder.txt");
         ArrayList<String> foundRecords = file.search(ID);
         for(String record:foundRecords){
-            String[] part = record.split(",");
+            String[] part = record.split(";");
             orderHistory.add(new Order(part[0]));
         }
         return orderHistory;
@@ -182,15 +182,16 @@ public class Customer implements Serializable {
     }
 
     public void placeOrder(Vendor vendor, int method){
-        runnerCounter=0;
         IDGenerator generator = new IDGenerator("CusOrder.txt","CO");
         String orderID = generator.generateID();
         Order ord = new Order(orderID,this,vendor,method,cartItems);
         orders.add(ord);
         VendorNotification notification = new VendorNotification("You have new order!",ord.getVendor(),1,ord.getID());
         notification.saveNotification();
-        if(method == 3)
+        if(method == 3) {
+            runnerCounter = 0;
             allocateRunner(ord);
+        }
         write2OrderFile(ord.toString());
     }
 
@@ -219,10 +220,10 @@ public class Customer implements Serializable {
 
     public void cancelVendorOrder(Order order){
         orders.remove(order);
+        order.setStatus(Order.Status.Cancelled);
+        modifyOrderFile(order.getID(),order.toString());
         VendorNotification notification = new VendorNotification("An order has been canceled! ", order.getVendor(),2,order.getID());
         notification.saveNotification();
-        FileOperation file = new FileOperation("CusOrder.txt");
-        file.delete(order.getID());
     }
 
     public void cancelOrder(Order order){
@@ -235,7 +236,7 @@ public class Customer implements Serializable {
         ArrayList<Runner> runnerList = runner.getAvailableRunner();
         if (runnerList!=null){
             if(runnerCounter<runnerList.size()){
-                RunnerNotification notification = new RunnerNotification("You have new task!",runnerList.get(runnerCounter),1);
+                RunnerNotification notification = new RunnerNotification("You have new task!",runnerList.get(runnerCounter),1,order.getID());
                 notification.saveNotification();
                 runnerCounter++;
             }else {

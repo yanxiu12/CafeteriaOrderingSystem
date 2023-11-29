@@ -9,7 +9,7 @@ public class RunnerDashboard extends Dashboard{
         super(orders);
     }
 
-    public Map<LocalDate, Double> generateRevenueByDate() {
+    private Map<LocalDate, Double> generateRevenueByDate() {
         Map<LocalDate, Double> revenueByDate = new HashMap<>();
         for (Order order : orders) {
             if (order.getOrderType() == 2 && order.getStatus() == Order.Status.Completed) {
@@ -20,7 +20,7 @@ public class RunnerDashboard extends Dashboard{
         return revenueByDate;
     }
 
-    private void printRevenueByDate() {
+    public void printRevenueByDate() {
         Map<LocalDate, Double> revenueByDate = generateRevenueByDate();
         for (Map.Entry<LocalDate, Double> entry : revenueByDate.entrySet()) {
             LocalDate date = entry.getKey();
@@ -29,7 +29,7 @@ public class RunnerDashboard extends Dashboard{
         }
     }
 
-    private void printRevenueByMonth() {
+    public void printRevenueByMonth() {
         Map<LocalDate, Double> revenueByDate = generateRevenueByDate();
         Map<Month, Double> revenueByMonth = new HashMap<>();
         for (Map.Entry<LocalDate, Double> entry : revenueByDate.entrySet()) {
@@ -45,7 +45,7 @@ public class RunnerDashboard extends Dashboard{
         }
     }
 
-    private void printRevenueByYear() {
+    public void printRevenueByYear() {
         Map<LocalDate, Double> revenueByDate = generateRevenueByDate();
         Map<Integer, Double> revenueByYear = new HashMap<>();
         for (Map.Entry<LocalDate, Double> entry : revenueByDate.entrySet()) {

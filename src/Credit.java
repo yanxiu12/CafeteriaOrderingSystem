@@ -49,6 +49,7 @@ public class Credit {
         transaction = "-"+String.format("%.2f",amount);
 
         customer.setWalletBalance(String.format("%.2f",customer.getWalletBalance()-amount));
+        customer.modifyFile(customer);
         write2file();
     }
 

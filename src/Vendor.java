@@ -32,6 +32,7 @@ public class Vendor implements Serializable {
 
     public Vendor(String ID,String password,String vendorName,String category,String address){
         setID(ID);setPassword(password);setVendorName(vendorName);setCategory(category);setAddress(address);
+        this.receivedOrders = new ArrayList<>();
     }//for register //obj.write2file(obj.toString());
 
     public String getID(){return ID;}
@@ -64,19 +65,6 @@ public class Vendor implements Serializable {
         return notifications;
     }
 
-    public void setDetails(String userID){
-        FileOperation file = new FileOperation("Vendor.txt");
-        ArrayList<String> userData = file.search(userID);
-        if (userData.size() == 1) {
-            String[] item = userData.get(0).split(",");
-            setID(item[0]);
-            setPassword(item[1]);
-            setVendorName(item[2]);
-            setCategory(item[3]);
-            setAddress(item[4]);
-        }
-    }
-
     public String toString(){
         return String.format("%s;%s;%s;%s;%s", ID, password, vendorName,category,address);
     }
@@ -106,31 +94,30 @@ public class Vendor implements Serializable {
         FileOperation file = new FileOperation("CusOrder.txt");
         ArrayList<String> foundRecords = file.search(ID);
         for(String record:foundRecords){
-            String[] part = record.split(",");
+            String[] part = record.split(";");
             orderHistory.add(new Order(part[0]));
         }
         return orderHistory;
     }
 
-    public void cancelOrder(Order order){
-        receivedOrders.remove(order);
-        System.out.println("Order "+order.getID()+" ordered by "+order.getCustomer().getName()+" has been canceled.");
-    }
+//    public void cancelOrder(Order order){
+//        receivedOrders.remove(order);
+//        System.out.println("Order "+order.getID()+" ordered by "+order.getCustomer().getName()+" has been canceled.");
+//    }
 
-    public void cancelCustomerOrder(Customer customer) {
-        ArrayList<Order> customerOrders = customer.getOrders();
-
-        for (Order customerOrder : customerOrders) {
-            if (receivedOrders.contains(customerOrder)) {
-                receivedOrders.remove(customerOrder);
-                customer.cancelOrder(customerOrder);
-                System.out.println("Customer's order canceled successfully.");
-            }
-        }
-    }
+//    public void cancelCustomerOrder(Customer customer) {
+//        ArrayList<Order> customerOrders = customer.getOrders();
+//
+//        for (Order customerOrder : customerOrders) {
+//            if (receivedOrders.contains(customerOrder)) {
+//                receivedOrders.remove(customerOrder);
+//                customer.cancelOrder(customerOrder);
+//                System.out.println("Customer's order canceled successfully.");
+//            }
+//        }
+//    }
 
     public void updateOrder(Order order,int status){
-        CustomerNotification notification = new CustomerNotification("Order Status Updated!",order.getCustomer(),2, order.getID());
         switch (status) {
             case 1://accept order
                 order.setStatus(Order.Status.Accepted);
@@ -141,6 +128,13 @@ public class Vendor implements Serializable {
             case 4://complete order
                 order.setStatus(Order.Status.Completed);
         }
+        CustomerNotification notification;
+        if(order.getStatus()==Order.Status.Rejected){
+            notification = new CustomerNotification("Your order [" + order.getID() + "] has been rejected!", order.getCustomer(), 4, order.getID());
+        }else {
+            notification = new CustomerNotification("Order Status Updated!", order.getCustomer(), 2, order.getID());
+        }
+        notification.saveNotification();
         FileOperation file = new FileOperation("CusOrder.txt");
         file.modifyFile(order.getID(),order.toString());
     }
