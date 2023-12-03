@@ -4,11 +4,12 @@ import java.util.ArrayList;
 public class Runner implements Serializable {
 
     private String ID, runnerName, contact, password;
-    private boolean status = false;
-    private ArrayList<Order> receivedOrders;
-    private ArrayList<RunnerNotification> notifications;
+    private boolean status = true;
+    private transient ArrayList<Runner> availableRunners;
+    private transient ArrayList<Order> receivedOrders;
+    private transient ArrayList<RunnerNotification> notifications;
 
-    public Runner(){};//for task usage
+    public Runner(){availableRunners = new ArrayList<>();}//for task usage
 
 //    public Runner(String userID, String password){
 //        FileOperation file = new FileOperation("Customer.txt");
@@ -19,9 +20,10 @@ public class Runner implements Serializable {
 //        this.receivedOrders = new ArrayList<>();
 //    }//for login
 
-    public Runner(String ID,String password,String runnerName,String contact){
-        setID(ID);setPassword(password);setRunnerName(runnerName);setContact(contact);
+    public Runner(String ID,String password,String runnerName,String contact,boolean status){
+        setID(ID);setPassword(password);setRunnerName(runnerName);setContact(contact);setStatus(status);
         this.notifications = new ArrayList<>();
+        this.receivedOrders = new ArrayList<>();
     }//for register //obj.write2file(obj.toString());
 
     public String getID() {return ID;}
@@ -45,56 +47,50 @@ public class Runner implements Serializable {
     public void setStatus(boolean status) {this.status = status;}
 
     public ArrayList<RunnerNotification> getNotifications(){
+        this.notifications = new ArrayList<>();
         FileOperation file = new FileOperation("RunnerNotification.txt");
         ArrayList<String> foundRecords = file.search(ID);
         for(String record:foundRecords){
             String[] part = record.split(";");
-            notifications.add(new RunnerNotification(part[0],part[1],this,Integer.parseInt(part[3]),part[4]));
+            notifications.add(new RunnerNotification(part[0],this,part[2],Integer.parseInt(part[3]),part[4]));
         }
         return notifications;
     }
 
-    public void setDetails(String userID){
-        FileOperation file = new FileOperation("Vendor.txt");
-        ArrayList<String> userData = file.search(userID);
-        if (userData.size() == 1) {
-            String[] item = userData.get(0).split(",");
-            setID(item[0]);
-            setPassword(item[1]);
-            setRunnerName(item[2]);
-            setContact(item[3]);
-            setStatus(Boolean.parseBoolean(item[4]));
-        }
-    }
-
     public ArrayList<Runner> getAvailableRunner(){
         SerializationOperation operation = new SerializationOperation("Runner.ser");
-        ArrayList<Runner> runnerFound = new ArrayList<>();
         ArrayList<Runner> allRunner = operation.readAllObjects(Runner.class);
-        for(Runner runner:allRunner){
-            if(runner.getStatus())
-                runnerFound.add(runner);
+        if(!allRunner.isEmpty()) {
+            for (Runner runner : allRunner) {
+                if (runner.getStatus())
+                    availableRunners.add(runner);
+            }
         }
-        return runnerFound;
+        return availableRunners;
     }
 
     public void receiveOrder(Order order){
         receivedOrders.add(order);
-        write2TaskFile(ID+","+order.toString());
+        OrderTask task = new OrderTask(order,this);
+        task.setAccept(true);
+        task.modifyFile(order.getID(),task.toString());
         status=false;
         modifyFile();
+        System.out.println("Contact:"+contact);
         CustomerNotification notification = new CustomerNotification("We have found you a runner!",order.getCustomer(),5,order.getID(),contact);
         notification.saveNotification();
     }
 
     public ArrayList<Order> getReceivedOrders(){
-        if(receivedOrders.isEmpty()){
-            FileOperation file = new FileOperation("RunnerTask.txt");
-            ArrayList<String> foundTask = file.search(ID);
-            for(String task:foundTask){
+        this.receivedOrders = new ArrayList<>();
+        FileOperation file = new FileOperation("RunnerTask.txt");
+        ArrayList<String> foundTask = file.search(ID);
+        if(!foundTask.isEmpty()) {
+            for (String task : foundTask) {
                 String[] part = task.split(";");
-                if (!part[5].equals(String.valueOf(Order.Status.Completed))) {
-                    receivedOrders.add(new Order(part[1]));
+                Order order = new Order(part[0]);
+                if (!(order.getStatus() == Order.Status.Completed)) {
+                    receivedOrders.add(order);
                 }
             }
         }
@@ -107,30 +103,40 @@ public class Runner implements Serializable {
         ArrayList<String> foundTask = file.search(ID);
         for(String task:foundTask){
             String[] part = task.split(";");
-            receivedOrders.add(new Order(part[1]));
+            taskHistory.add(new Order(part[0]));
         }
         return taskHistory;
     }
 
-    public void rejectOrder(Order order){
-        order.getCustomer().allocateRunner(order);
-    }
 
     public void updateOrder(Order order,int status){
+        boolean statusChange = false;
         switch (status) {
             case 1://accept order
-                order.setStatus(Order.Status.Delivering);
+                if(order.getStatus() == Order.Status.Ready) {
+                    order.setStatus(Order.Status.Delivering);
+                    statusChange = true;
+                }
+                break;
             case 2://reject order
-                order.setStatus(Order.Status.PendingRunner);
+                if(order.getStatus() == Order.Status.Ready) {
+                    order.setStatus(Order.Status.PendingRunner);
+                    statusChange = true;
+                }
+                break;
             case 3://complete order
                 order.setStatus(Order.Status.Completed);
                 this.status=true;
                 modifyFile();
+                statusChange = true;
+                break;
         }
-        CustomerNotification notification = new CustomerNotification("Order Status Updated!",order.getCustomer(),2, order.getID());
-        notification.saveNotification();
-        FileOperation file = new FileOperation("CusOrder.txt");
-        file.modifyFile(order.getID(),order.toString());
+        if(statusChange) {
+            CustomerNotification notification = new CustomerNotification("Order Status Updated!", order.getCustomer(), 2, order.getID());
+            notification.saveNotification();
+            FileOperation file = new FileOperation("CusOrder.txt");
+            file.modifyFile(order.getID(), order.toString());
+        }
     }
 
     public String toString(){
@@ -142,13 +148,9 @@ public class Runner implements Serializable {
         operation.addObject(this);
     }
 
-    public void write2TaskFile(String input){
-        FileOperation file = new FileOperation("RunnerTask.txt");
-        file.writeToFile(input);
-    }
 
     public void modifyFile(){
-        SerializationOperation operation = new SerializationOperation("Customer.ser");
-        operation.updateObject(ID,Runner.class);
+        SerializationOperation operation = new SerializationOperation("Runner.ser");
+        operation.updateObject(ID, this);
     }
 }

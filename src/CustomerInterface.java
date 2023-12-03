@@ -40,7 +40,7 @@ public class CustomerInterface extends MainInterface{
             System.out.println();
             SerializationOperation operation = new SerializationOperation("Customer.ser");
             ArrayList<Customer> foundCustomer = operation.searchObjects(usernameInput,Customer.class);
-            if(foundCustomer.size() != 1){
+            if(foundCustomer.size() == 1){
                 customer = foundCustomer.get(0);
             }
             if (customer == null) {
@@ -65,6 +65,7 @@ public class CustomerInterface extends MainInterface{
                 System.out.println();
             }else{
                 loginCustomer = new Customer(customer.getID(),customer.getPassword(),customer.getName(),customer.getDob(),customer.getContact(),customer.getAddress(),String.valueOf(customer.getWalletBalance()));
+                repeat = 0;
             }
         }
         return loginCustomer;
@@ -84,7 +85,7 @@ public class CustomerInterface extends MainInterface{
         System.out.println(String.format("%-30s", "3. Order History")+String.format("%-30s", "4. Transaction History"));
         System.out.println(String.format("%-30s", "5. Check Active Order Status")+String.format("%-30s", "6. Check Notification"));
         System.out.println();
-        System.out.println("(Enter 0 to log out.)");
+        System.out.println("(Enter 0 to log out. Note: Your cart will be clear after you log out.)");
         System.out.println();
     }
 
@@ -101,10 +102,11 @@ public class CustomerInterface extends MainInterface{
         System.out.println(String.format("%-24s", "Customer Contact") + String.format("%24s", customer.getContact()));
         System.out.println(String.format("%-24s", "Customer Address") + String.format("%24s", customer.getAddress()));
         System.out.println(String.format("%-24s", "Customer Password") + String.format("%24s", "*****"+customer.getPassword().substring(customer.getPassword().length()-3)));
+        System.out.println(String.format("%-24s", "Wallet Balance") + String.format("%24s", customer.getWalletBalance()));
         System.out.println();
         System.out.println("(To modify the details, please proceed to admin.)");
         System.out.println();
-        System.out.print("Press enter to exit");
+        System.out.print("(Press Enter to exit.)");
         String proceed = input.nextLine();
         System.out.println();
         System.out.println("Proceeding to main menu......");
@@ -147,6 +149,9 @@ public class CustomerInterface extends MainInterface{
                             Vendor vendor = foundVendor.get(0);
                             accessCart(customer, vendor);
                             repeat = 0;
+                            System.out.println();
+                            System.out.print("(Press enter to exit.)");
+                            String exit = input.nextLine();
                         } else {
                             System.out.println("Invalid vendor ID. Enter 1 to try again / Enter other value to exit.");
                             try {
@@ -179,6 +184,9 @@ public class CustomerInterface extends MainInterface{
                             } else {
                                 System.out.println("(Sorry. There is currently no review for this vendor.)");
                             }
+                            System.out.println();
+                            System.out.print("(Press enter to exit.)");
+                            String exit = input.nextLine();
                             repeat = 0;
                         } else {
                             System.out.println("Invalid vendor ID. Enter 1 to try again / Enter other value to exit.");
@@ -208,117 +216,151 @@ public class CustomerInterface extends MainInterface{
     public static void accessCart(Customer customer,Vendor vendor){//if possible check cart got things first
         int repeat = 1;
         Scanner input = new Scanner(System.in);
+        ArrayList<Cart> carts = customer.getCartItems();
+        boolean allItemsFromVendor = true;
 
-        MenuItem menu = new MenuItem(vendor);
-        menu.printMenu();
-        System.out.println();
-        while(repeat == 1) {
-            System.out.println("Current cart item:");
-            ArrayList<Cart> cartItems = customer.getCartItems();
-            if(!cartItems.isEmpty()) {
-                for (Cart cart : cartItems) {
-                    System.out.println(String.format("%-30s", cart.getItem().getItemName()) + String.format("%-3s", cart.getQuantity()));
+        if(!carts.isEmpty()) {
+            for (Cart cart : carts) {
+                if (cart.getItem().getVendor().getID() == null || !cart.getItem().getVendor().getID().equals(vendor.getID())) {
+                    allItemsFromVendor = false; // If any item doesn't match the vendor, set the flag to false
+                    break;
                 }
-            }else
-                System.out.println("(Empty cart.)");
+            }
+        }
+        if(!allItemsFromVendor){
+            System.out.println("You have selected a different vendor from your current cart! This will clear your current cart!");
+            System.out.println("(Note: You can only purchase from selected vendor in an order.)");
             System.out.println();
-            System.out.print("Enter the index no. of item to add to cart / remove from cart (Enter 0 to exit): ");
-            try {
-                int item = input.nextInt();
-                if(item == 0){
-                    System.out.println();
-                } else if ((item > menu.getVendorItems().size()) || (item < 0)) {
-                    input.nextLine();
-                    System.out.println("Please enter a number in range of " + menu.getVendorItems().size() + ".");
-                    System.out.println();
-                    System.out.print("Enter 1 to continue / Enter other value to exit:");
-                    try{
-                        repeat = input.nextInt();
-                        if(repeat == 2)
-                            repeat = 0;
-                    }catch(InputMismatchException e){
-                        repeat = 0;
+            System.out.print("Enter 'yes' if you agree:");
+            String clear = input.nextLine().toLowerCase();
+            if(clear.equals("yes")){
+                customer.resetCartItems();
+                allItemsFromVendor = true;
+            }
+        }
+        if(allItemsFromVendor) {
+            MenuItem menu = new MenuItem(vendor);
+            menu.printMenu();
+            System.out.println();
+            int counter=0;
+            while (repeat == 1) {
+                counter++;
+                System.out.println("Current cart item:");
+                ArrayList<Cart> cartItems = customer.getCartItems();
+                if (!cartItems.isEmpty()) {
+                    for (Cart cart : cartItems) {
+                        System.out.println(String.format("%-30s", cart.getItem().getItemName()) + String.format("%-3s", cart.getQuantity()));
                     }
-                    System.out.println();
-                    input.nextLine();
                 } else {
-                    int quantity;
-                    MenuItem selectedItem = menu.getDetail(item);
-                    input.nextLine();
-                    System.out.println("You have selected: "+selectedItem.getItemName());
-                    System.out.print("Enter the quantity:");
-                    try{
-                        quantity = input.nextInt();
-                    }catch(InputMismatchException e){
-                        quantity = 0;
-                    }
-                    if(quantity>0){
-                        customer.addToCart(selectedItem,quantity);
+                    System.out.println("(Empty cart.)");
+                }
+                if(cartItems.isEmpty() || counter>1) {
+                    System.out.println();
+                    System.out.print("Enter the index no. of item to add to cart / remove from cart (Enter 0 to exit): ");
+                    try {
+                        int item = input.nextInt();
+                        if (item == 0) {
+                            System.out.println();
+                            repeat = 0;
+                        } else if ((item > menu.getVendorItems().size()) || (item < 0)) {
+                            input.nextLine();
+                            System.out.println("Please enter a number in range of " + menu.getVendorItems().size() + ".");
+                            System.out.println();
+                            System.out.print("Enter 1 to continue / Enter other value to exit:");
+                            try {
+                                repeat = input.nextInt();
+                                if (repeat == 2)
+                                    repeat = 0;
+                            } catch (InputMismatchException e) {
+                                repeat = 0;
+                            }
+                            System.out.println();
+                            input.nextLine();
+                        } else {
+                            int quantity;
+                            MenuItem selectedItem = menu.getDetail(item);
+                            input.nextLine();
+                            System.out.println("You have selected: " + selectedItem.getItemName());
+                            System.out.print("Enter the quantity (Enter -1 to remove an item) :");
+                            try {
+                                quantity = input.nextInt();
+                            } catch (InputMismatchException e) {
+                                quantity = 0;
+                            }
+                            if (quantity > 0) {
+                                customer.addToCart(selectedItem, quantity);
+                                System.out.println();
+                                System.out.println("Successfully added " + quantity + " " + selectedItem.getItemName() + " to cart.");
+                            } else {
+                                customer.removeFromCart(selectedItem, quantity);
+                                System.out.println("Successfully remove from cart.");
+                            }
+                        }
+                        counter++;
+                    } catch (InputMismatchException e) {
+                        input.nextLine();
                         System.out.println();
-                        System.out.println("Successfully added "+quantity+" "+selectedItem.getItemName()+" to cart.");
-                    }else{
-                        customer.removeFromCart(selectedItem,quantity);
-                        System.out.println("Successfully remove from cart.");
+                        System.out.println("Please enter an integer number.");
+                        System.out.println();
+                        System.out.print("Enter 1 to continue / Enter other value to exit:");
+                        try {
+                            repeat = input.nextInt();
+                            if (repeat == 2)
+                                repeat = 0;
+                        } catch (InputMismatchException ex) {
+                            repeat = 0;
+                        }
+                        System.out.println();
+                        input.nextLine();
                     }
+                }
+                if(!cartItems.isEmpty()) {
                     System.out.println();
                     System.out.print("Do you have any other item to add on? Enter 1 to continue / Enter 2 to place order / Enter other value to exit:");
-                    try{
+                    try {
                         repeat = input.nextInt();
-                    }catch(InputMismatchException e){
+                    } catch (InputMismatchException e) {
                         repeat = 0;
                     }
                     input.nextLine();
                 }
-            } catch (InputMismatchException e) {
-                input.nextLine();
-                System.out.println();
-                System.out.println("Please enter an integer number.");
-                System.out.println();
-                System.out.print("Enter 1 to continue / Enter other value to exit:");
-                try{
-                    repeat = input.nextInt();
-                    if(repeat == 2)
-                        repeat = 0;
-                }catch(InputMismatchException ex){
-                    repeat = 0;
-                }
-                System.out.println();
-                input.nextLine();
-            }
-            if (repeat == 2){
-                int method = 0;
+                if (repeat == 2) {
+                    int method = 0;
 
-                System.out.println();
-                System.out.println(String.format("%-15s", "1. Dine-in") + String.format("%-15s", "2. Take Away") + String.format("%-15s", "3. Delivery"));
-                System.out.println("(Enter other value to exit.)");
-                System.out.print("Please select the serving method for your order:");
-                try {
-                    method = input.nextInt();
-                    input.nextLine();
-                } catch (InputMismatchException e) {
-                    input.nextLine();
-                }
-                System.out.println();
-                if(method==1 || method==2 || method==3) {
-                    System.out.println("Order confirmation:");
-                    double totalPrice = customer.printCart(method);
-                    System.out.println("Enter 1 to edit cart / Enter 0 to confirm order (Enter other value to exit) :");
+                    System.out.println();
+                    System.out.println(String.format("%-15s", "1. Dine-in") + String.format("%-15s", "2. Take Away") + String.format("%-15s", "3. Delivery"));
+                    System.out.println("(Enter other value to exit.)");
+                    System.out.println();
+                    System.out.print("Please select the serving method for your order:");
                     try {
-                        repeat = input.nextInt();
-                        if(repeat == 0){
-                            Credit credit = new Credit(customer);
-                            if(credit.isBalanceEnough(totalPrice)) {
-                                customer.placeOrder(vendor, method);
-                                credit.deductAmount(totalPrice);
-                                customer.resetCartItems();
-                                System.out.println("Successfully placed the order.");
-                            }else
-                                System.out.println("Insufficient balance! Please proceed to admin to top-up.");
+                        method = input.nextInt();
+                        input.nextLine();
+                    } catch (InputMismatchException e) {
+                        input.nextLine();
+                    }
+                    System.out.println();
+                    if (method == 1 || method == 2 || method == 3) {
+                        System.out.println("Order confirmation:");
+                        double totalPrice = customer.printCart(method);
+                        System.out.print("Enter 1 to edit cart / Enter 0 to confirm order (Enter other value to exit) :");
+                        try {
+                            repeat = input.nextInt();
+                            input.nextLine();
+                            if (repeat == 0) {
+                                Credit credit = new Credit(customer);
+                                if (credit.isBalanceEnough(totalPrice)) {
+                                    customer.placeOrder(vendor, method);
+                                    credit.deductAmount(totalPrice);
+                                    customer.resetCartItems();
+                                    System.out.println("Successfully placed the order.");
+                                } else {
+                                    System.out.println("Insufficient balance! Please proceed to admin to top-up.");
+                                }
+                            }
+                        } catch (InputMismatchException e) {
+                            repeat = 9;
                             System.out.println();
                         }
-                    } catch (InputMismatchException e) {
-                        repeat = 9;
-                        System.out.println();
                     }
                 }
             }
@@ -344,10 +386,17 @@ public class CustomerInterface extends MainInterface{
                 for(Cart item:order.getShoppingCart()){
                     if(counter == 1) {
                         if(order.getStatus() == Order.Status.Completed){
-                            if(order.getReview(1).isEmpty())
-                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getVendor().getVendorName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "REVIEWED") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
-                            else
-                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getVendor().getVendorName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "NOT REVIEWED") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                            if(order.getOrderType()==1 || order.getOrderType()==2) {
+                                if (order.getReview(1) == null)
+                                    System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getVendor().getVendorName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "NOT REVIEWED") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                                else
+                                    System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getVendor().getVendorName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "REVIEWED") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                            }else{
+                                if (order.getReview(1) == null || order.getReview(2) == null)
+                                    System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getVendor().getVendorName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "NOT REVIEWED") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                                else
+                                    System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getVendor().getVendorName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "REVIEWED") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                            }
                         }else
                             System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getVendor().getVendorName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
 
@@ -356,26 +405,37 @@ public class CustomerInterface extends MainInterface{
                     }
                     counter++;
                 }
+                counter=1;
             }
             System.out.println();
-        }else{
-            System.out.println("(No Order History Exist.)");
-            System.out.println();
-        }
-        System.out.print("Would you like to take any action from your history? Enter 1 to re-order / Enter 2 to review / Enter any other value to exit:");
-        try{
-            int proceed = input.nextInt();
-            if(proceed == 1){
-                while(true) {
-                    System.out.println("Enter the order ID:");
-                    String orderID = input.nextLine();
-                    if (orderID.isEmpty()) {
-                        System.out.println("Input cannot be null.");
-                    } else if (!orderHistory.contains(new Order(orderID))) {
-                        System.out.println("Please enter a valid ID.");
-                    } else {
+            System.out.print("Would you like to take any action from your history? Enter 1 to re-order / Enter 2 to review / Enter any other value to exit:");
+            try{
+                int proceed = input.nextInt();
+                input.nextLine();
+                if(proceed == 1){
+                    String orderID;
+                    boolean validOrderID = false;
+                    while(true) {
+                        System.out.print("Enter the order ID:");
+                        orderID = input.nextLine();
+                        if (orderID.isEmpty()) {
+                            System.out.println("Input cannot be null.");
+                        } else {
+                            for(Order order:orderHistory){
+                                if(order.getID().equals(orderID)){
+                                    validOrderID = true;
+                                    break;
+                                }
+                            }
+                            if(!validOrderID)
+                                System.out.println("Please enter a valid ID.");
+                            else
+                                break;
+                        }
+                    }
+                    if(validOrderID){
                         ArrayList<Cart> cart = customer.getCartItems();
-                        int selection = 0;
+                        int selection = 1;
                         if (!cart.isEmpty()) {
                             System.out.println("Your cart is not empty. If you continue your cart and selection will be removed.");
                             System.out.print("Enter 1 to remove / Enter other value to exit.");
@@ -389,6 +449,7 @@ public class CustomerInterface extends MainInterface{
                         if(selection == 1){
                             Order order = new Order(orderID);
                             ArrayList<Cart> orderItems = order.getShoppingCart();
+                            customer.resetCartItems();
                             for(Cart items:orderItems){
                                 customer.addToCart(items.getItem(),items.getQuantity());
                             }
@@ -396,80 +457,107 @@ public class CustomerInterface extends MainInterface{
                             System.out.println();
                             accessCart(customer,order.getVendor());
                         }
-                        break;
                     }
-                }
-            }else if(proceed == 2){
-                while(true) {
-                    System.out.println("Enter the order ID:");
-                    String orderID = input.nextLine();
-                    if (orderID.isEmpty()) {
-                        System.out.println("Input cannot be null.");
-                        System.out.println();
-                    } else if (!orderHistory.contains(new Order(orderID))) {
-                        System.out.println("Please enter a valid order ID.");
-                        System.out.println();
-                    } else {
-                        boolean reviewVendor=false,reviewRunner=false;
-                        Order order = new Order(orderID);
-                        String vendorReview = order.getReview(1);
-                        String runnerReview = order.getReview(2);
-                        if(vendorReview!=null && runnerReview!=null){
-                            System.out.println();
-                            System.out.println("You've already submitted both vendor and runner review for this order.");
-                            System.out.println("Vendor Review : "+vendorReview);
-                            System.out.println("Runner Review : "+runnerReview);
-                        }else {
-                            if (vendorReview == null && runnerReview == null) {
-                                System.out.println("Would you like to share your experience with both vendor and runner? Your review will be anonymous on their page.");
-                                System.out.print("Enter 'yes' or 'no': ");
-                                String choice = input.nextLine().toLowerCase();
-                                if (choice.equals("yes")) {
-                                    reviewVendor = true;
-                                    reviewRunner = true;
-                                }else if(choice.equals("no")){
-                                    System.out.println("Would you like to share your experience for either one?");
-                                    System.out.println("1. Vendor\n2. Runner");
-                                    System.out.println();
-                                    System.out.println("(Enter any other value to exit.)");
-                                    System.out.println();
-                                    System.out.print("Enter the number:");
-                                    try{
-                                        int share = input.nextInt();
-                                        if(share == 1){
-                                            reviewVendor = true;
-                                        }else if(share == 2){
-                                            reviewRunner = true;
-                                        }
-                                        input.nextLine();
-                                    }catch(InputMismatchException e){
-                                        input.nextLine();
-                                    }
-                                }
-                            } else if (runnerReview != null) {
-                                System.out.println();
-                                System.out.println("You've already submitted a runner review for this order.");
-                                System.out.println("Runner Review : " + runnerReview);
-                                System.out.println();
-                                System.out.println("Would you like to share your experience with this vendor? Your review will be anonymous on the vendor page.");
-                                System.out.print("Enter 'yes' or 'no': ");
-                                String choice = input.nextLine().toLowerCase();
-                                if (choice.equals("yes")) {
-                                    reviewVendor = true;
-                                }
-                            } else{
-                                System.out.println();
-                                System.out.println("You've already submitted a vendor review for this order.");
-                                System.out.println("Vendor Review : " + vendorReview);
-                                System.out.println();
-                                System.out.println("Would you like to share your experience with the runner? Your review will be anonymous on the runner page.");
-                                System.out.print("Enter 'yes' or 'no': ");
-                                String choice = input.nextLine().toLowerCase();
-                                if (choice.equals("yes")) {
-                                    reviewRunner = true;
+                }else if(proceed == 2){
+                    String orderID;
+                    boolean validOrderID = false;
+                    while(true) {
+                        System.out.print("Enter the order ID:");
+                        orderID = input.nextLine();
+                        if (orderID.isEmpty()) {
+                            System.out.println("Input cannot be null.");
+                        } else {
+                            for(Order order:orderHistory){
+                                if(order.getID().equals(orderID)){
+                                    validOrderID = true;
+                                    break;
                                 }
                             }
+                            if(!validOrderID)
+                                System.out.println("Please enter a valid ID.");
+                            else
+                                break;
                         }
+                    }
+                    if(validOrderID){
+                        boolean reviewVendor=false,reviewRunner=false;
+                        Order order = new Order(orderID);
+                        if(order.getStatus() == Order.Status.Completed) {
+                            String vendorReview = order.getReview(1);
+                            String runnerReview = order.getReview(2);
+                            if (vendorReview != null && runnerReview != null) {
+                                System.out.println();
+                                System.out.println("You've already submitted both vendor and runner review for this order.");
+                                System.out.println("Vendor Review : " + vendorReview);
+                                System.out.println("Runner Review : " + runnerReview);
+                            } else {
+                                if(order.getOrderType() == 3) {
+                                    if (vendorReview == null && runnerReview == null) {
+                                        System.out.println("Would you like to share your experience with both vendor and runner? Your review will be anonymous on their page.");
+                                        System.out.print("Enter 'yes' or 'no': ");
+                                        String choice = input.nextLine().toLowerCase();
+                                        if (choice.equals("yes")) {
+                                            reviewVendor = true;
+                                            reviewRunner = true;
+                                        } else if (choice.equals("no")) {
+                                            System.out.println("Would you like to share your experience for either one?");
+                                            System.out.println("1. Vendor\n2. Runner");
+                                            System.out.println();
+                                            System.out.println("(Enter any other value to exit.)");
+                                            System.out.println();
+                                            System.out.print("Enter the number:");
+                                            try {
+                                                int share = input.nextInt();
+                                                if (share == 1) {
+                                                    reviewVendor = true;
+                                                } else if (share == 2) {
+                                                    reviewRunner = true;
+                                                }
+                                                input.nextLine();
+                                            } catch (InputMismatchException e) {
+                                                input.nextLine();
+                                            }
+                                        }
+                                    } else if (runnerReview != null) {
+                                        System.out.println();
+                                        System.out.println("You've already submitted a runner review for this order.");
+                                        System.out.println("Runner Review : " + runnerReview);
+                                        System.out.println();
+                                        System.out.println("Would you like to share your experience with this vendor? Your review will be anonymous on the vendor page.");
+                                        System.out.print("Enter 'yes' or 'no': ");
+                                        String choice = input.nextLine().toLowerCase();
+                                        if (choice.equals("yes")) {
+                                            reviewVendor = true;
+                                        }
+                                    } else {
+                                        System.out.println();
+                                        System.out.println("You've already submitted a vendor review for this order.");
+                                        System.out.println("Vendor Review : " + vendorReview);
+                                        System.out.println();
+                                        System.out.println("Would you like to share your experience with the runner? Your review will be anonymous on the runner page.");
+                                        System.out.print("Enter 'yes' or 'no': ");
+                                        String choice = input.nextLine().toLowerCase();
+                                        if (choice.equals("yes")) {
+                                            reviewRunner = true;
+                                        }
+                                    }
+                                }else if (order.getOrderType() == 1 || order.getOrderType() == 2) {
+                                    if (vendorReview == null){
+                                        System.out.println("Would you like to share your experience with this vendor? Your review will be anonymous on vendor page.");
+                                        System.out.print("Enter 'yes' or 'no': ");
+                                        String choice = input.nextLine().toLowerCase();
+                                        if (choice.equals("yes")) {
+                                            reviewVendor = true;
+                                        }
+                                    }else{
+                                        System.out.println();
+                                        System.out.println("You've already submitted a vendor review for this order.");
+                                        System.out.println("Vendor Review : " + vendorReview);
+                                    }
+                                }
+                            }
+                        }else
+                            System.out.println("Unable to review the order due to the Order Status: "+order.getStatus());
                         if(reviewVendor){
                             System.out.println();
                             System.out.println("Please share your experience with this vendor? Your review will be anonymous on the vendor page.");
@@ -478,6 +566,7 @@ public class CustomerInterface extends MainInterface{
                             while (true) {
                                 try {
                                     rate = input.nextInt();
+                                    input.nextLine();
                                     if (rate > 5 || rate < 1) {
                                         System.out.println("Please enter a valid rating (range from 1 to 5). ");
                                         System.out.println();
@@ -536,13 +625,17 @@ public class CustomerInterface extends MainInterface{
                             System.out.println();
                             System.out.println("Successfully submitted the review!");
                         }
-                        break;
                     }
                 }
+            }catch(InputMismatchException e){
+                input.nextLine();
             }
-        }catch(InputMismatchException e){
-            input.nextLine();
+        }else{
+            System.out.println("(No Order History Exist.)");
         }
+        System.out.println();
+        System.out.print("(Press enter to exit.)");
+        String exit = input.nextLine();
         System.out.println();
         System.out.println("Proceeding to main menu......");
         System.out.println();
@@ -568,7 +661,7 @@ public class CustomerInterface extends MainInterface{
             System.out.println("(No Transaction Record Exist.)");
             System.out.println();
         }
-        System.out.print("Press Enter to exit.");
+        System.out.print("(Press Enter to exit.)");
         String proceed = input.nextLine();
         System.out.println();
         System.out.println("Proceeding to main menu......");
@@ -597,47 +690,57 @@ public class CustomerInterface extends MainInterface{
                     }
                     counter++;
                 }
+                counter=1;
             }
             System.out.println();
+            System.out.println();
+            System.out.print("Would you like to take any action on your order? (Enter 'yes' to proceed) ");
+            String userInput = input.nextLine().trim().toLowerCase();
+            if (userInput.equals("yes")) {
+                System.out.println("What action would you like to take?");
+                System.out.println("1. Cancel an order");
+                System.out.println();
+                System.out.println("(Enter other value to exit.)");
+                System.out.println();
+                System.out.print("Enter the number:");
+                try{
+                    int action = input.nextInt();
+                    input.nextLine();
+                    if(action == 1){
+                        System.out.print("Enter the order ID you wish to cancel:");
+                        String orderID = input.nextLine();
+                        Order order = new Order(orderID);
+                        boolean validOrderID=false;
+                        for(Order cusOrder:orders) {
+                            if (cusOrder.getID().equals(order.getID())) {
+                                validOrderID = true;
+                                break;
+                            }
+                        }
+                        if(validOrderID) {
+                            if (order.getStatus() == Order.Status.PendingAccepted) {
+                                customer.cancelVendorOrder(order);
+                                Credit credit = new Credit(customer);
+                                credit.addAmount(order.getTotalPrice(), 2);
+                                System.out.println("Successfully canceled the order. The refund will be credited to your account");
+                            } else {
+                                System.out.println("Unable to cancel the order due to [Order Status : " + order.getStatus() + "]");
+                            }
+                        }else
+                            System.out.println("Order ID not found. Please enter a valid ID.)");
+                    }
+                }catch(InputMismatchException e){
+                    input.nextLine();
+                }
+            } else {
+                System.out.println("Your orders will remain unchanged.");
+            }
         } else {
             System.out.println("(You have currently no active order.)");
-            System.out.println();
         }
         System.out.println();
-        System.out.print("Would you like to take any action on your order? (Enter 'yes' to proceed) ");
-        String userInput = input.nextLine().trim().toLowerCase();
-        if (userInput.equals("yes")) {
-            System.out.println("What action would you like to take?");
-            System.out.println("1. Cancel an order");
-            System.out.println();
-            System.out.println("(Enter other value to exit.)");
-            System.out.println();
-            System.out.print("Enter the number:");
-            try{
-                int action = input.nextInt();
-                if(action == 1){
-                    System.out.print("Enter the order ID you wish to cancel:");
-                    String orderID = input.nextLine();
-                    Order order = new Order(orderID);
-                    if (orders.contains(order)) {
-                        if (order.getStatus() == Order.Status.PendingAccepted) {
-                            customer.cancelVendorOrder(order);
-                            Credit credit = new Credit(customer);
-                            credit.addAmount(order.getTotalPrice(),2);
-                            System.out.println("Successfully canceled the order. The refund will be credited to your account");
-                        } else {
-                            System.out.println("Unable to cancel the order due to [Order Status : " + order.getStatus() + "]");
-                        }
-                    }else{
-                        System.out.println("Order ID not found. Your orders will remain unchanged.");
-                    }
-                }
-            }catch(InputMismatchException e){
-                input.nextLine();
-            }
-        } else {
-            System.out.println("Your orders will remain unchanged.");
-        }
+        System.out.print("(Press enter to exit.)");
+        String exit = input.nextLine();
         System.out.println();
         System.out.println("Proceeding to main menu......");
         System.out.println();
@@ -651,7 +754,7 @@ public class CustomerInterface extends MainInterface{
         System.out.println("|-----------------------------------------------------|");
         if(!customer.getNotifications().isEmpty()) {
             for (CustomerNotification notification : customer.getNotifications()) {
-                System.out.println("|" + String.format("%-3s", counter) + notification.getMessage() + "|");
+                System.out.println("|" + String.format("%-3s", counter) + String.format("%-50s", notification.getMessage()) + "|");
                 counter++;
             }
             System.out.println("-------------------------------------------------------");
@@ -684,10 +787,10 @@ public class CustomerInterface extends MainInterface{
                                     FileOperation file = new FileOperation("CustomerCredit.txt");
                                     ArrayList<String> foundCredit = file.search(notification.getObjectID());
                                     if(foundCredit.size()==1){
-                                        String[] credit = foundCredit.get(0).split(",");
+                                        String[] credit = foundCredit.get(0).split(";");
                                         notification.transactionReceipt(new Credit(credit[0],customer,credit[2],credit[3],credit[4]));
                                         System.out.println();
-                                        System.out.print("Enter any key to exit.");
+                                        System.out.print("(Enter any key to exit.)");
                                         String exit = input.nextLine();
                                         notification.deleteNotification();
                                     }else{
@@ -702,7 +805,7 @@ public class CustomerInterface extends MainInterface{
                                     if(code == 5)
                                         notification.notifyRunnerDetail(order);
                                     System.out.println();
-                                    System.out.print("Enter any key to exit.");
+                                    System.out.print("(Enter any key to exit.)");
                                     String exit = input.nextLine();
                                     notification.deleteNotification();
                                 }else if(code == 1){
@@ -714,7 +817,7 @@ public class CustomerInterface extends MainInterface{
                                     vendorNotification.saveNotification();
                                     System.out.println("Your order has been updated and notified the vendor.");
                                     System.out.println();
-                                    System.out.print("Enter any key to exit.");
+                                    System.out.print("(Enter any key to exit.)");
                                     String exit = input.nextLine();
                                     notification.deleteNotification();
                                 }else{
@@ -741,7 +844,7 @@ public class CustomerInterface extends MainInterface{
             System.out.println("|" + String.format("%-53s", "(No Notification.)") + "|");
             System.out.println("-------------------------------------------------------");
             System.out.println();
-            System.out.print("Press enter to exit");
+            System.out.print("(Press Enter to exit.)");
             String proceed = input.nextLine();
         }
         System.out.println();

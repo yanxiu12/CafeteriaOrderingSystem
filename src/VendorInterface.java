@@ -1,6 +1,6 @@
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.*;
 
 public class VendorInterface extends MainInterface{
 
@@ -40,7 +40,7 @@ public class VendorInterface extends MainInterface{
             System.out.println();
             SerializationOperation operation = new SerializationOperation("Vendor.ser");
             ArrayList<Vendor> foundVendor = operation.searchObjects(usernameInput,Vendor.class);
-            if(foundVendor.size() != 1){
+            if(foundVendor.size() == 1){
                 vendor = foundVendor.get(0);
             }
             if (vendor == null) {
@@ -65,6 +65,7 @@ public class VendorInterface extends MainInterface{
                 System.out.println();
             }else{
                 loginVendor = new Vendor(vendor.getID(),vendor.getPassword(),vendor.getVendorName(),vendor.getCategory(),vendor.getAddress());
+                repeat = 0;
             }
         }
         return loginVendor;
@@ -81,7 +82,7 @@ public class VendorInterface extends MainInterface{
         System.out.println("Please choose which you would like to proceed.");
         System.out.println();
         System.out.println(String.format("%-30s", "1. View Profile") + String.format("%-30s", "2. Access Menu Items"));
-        System.out.println(String.format("%-30s", "3. Access Active Order")+String.format("%-30s", "4. Check Order History"));
+        System.out.println(String.format("%-30s", "3. Access Active Order")+String.format("%-30s", "4. Check Order History & Reviews"));
         System.out.println(String.format("%-30s", "5. Check Notification")+String.format("%-30s", "6. Sales & Revenue Dashboard"));
         System.out.println();
         System.out.println("(Enter 0 to log out.)");
@@ -103,7 +104,7 @@ public class VendorInterface extends MainInterface{
         System.out.println();
         System.out.println("(To modify the details, please proceed to admin.)");
         System.out.println();
-        System.out.print("Press enter to exit");
+        System.out.print("(Press Enter to exit.)");
         String proceed = input.nextLine();
         System.out.println();
         System.out.println("Proceeding to main menu......");
@@ -125,7 +126,7 @@ public class VendorInterface extends MainInterface{
         System.out.println(String.format("%-30s", "1. Create Item")+String.format("%-30s", "2. Edit Item")+String.format("%-30s", "3. Delete Item"));
         System.out.println();
         System.out.println("Would you like to take any action of your menu? ");
-        System.out.print("Select from option 1-3 / Enter any other value to exit: ");
+        System.out.print("Select from option 1-3 / Enter any other value to exit:");
         try {
             int proceed = input.nextInt();
             if(proceed == 1){
@@ -154,14 +155,13 @@ public class VendorInterface extends MainInterface{
         System.out.println("|                  CREATE ITEM                 |");
         System.out.println("------------------------------------------------");
         System.out.println();
-        IDGenerator generator = new IDGenerator("MenuItem.txt","MI");
-        itemID = generator.generateID();
+        itemID = IDGenerator.generateIDForMenu();
         System.out.println("Item ID:"+itemID);
         status = true;
         while(status){
             System.out.print("Item Name:");
             itemName = input.nextLine();
-            if(itemName.matches("[a-zA-Z\\s]+")){
+            if(!itemName.isEmpty()){
                 status = false;
             }else{
                 System.out.println("Please enter a valid name.");
@@ -253,12 +253,10 @@ public class VendorInterface extends MainInterface{
                                     }else if (newName.equals(menu.getItemName())) {
                                         status = false;
                                         System.out.println("The update was not processed. The new value matches the existing value.");
-                                    }else if (newName.matches("[a-zA-Z\\s]+")) {
+                                    }else {
                                         status = false; // Exit loop if name format is valid
                                         menu.setItemName(newName);
                                         System.out.println("The updated information has been stored.");
-                                    }else {
-                                        System.out.println("Please enter a valid name.");
                                     }
                                 }
                                 break;
@@ -422,80 +420,98 @@ public class VendorInterface extends MainInterface{
             for (Order order : orders) {
                 for (Cart item : order.getShoppingCart()) {
                     if (counter == 1) {
-                        System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()));
+                        if(order.getOrderType()==1)
+                            System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Dine-In") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                        else if(order.getOrderType()==2)
+                            System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Take Away") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                        else
+                            System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Delivery") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
                     } else {
                         System.out.println(String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()));
                     }
                     counter++;
                 }
+                counter = 1;
             }
             System.out.println();
+            System.out.println();
+            System.out.print("Would you like to take any action on your order? (Enter 'yes' to proceed) ");
+            String userInput = input.nextLine().trim().toLowerCase();
+            if (userInput.equals("yes")) {
+                System.out.println("What action would you like to take?");
+                System.out.println("1. Update status of an order");
+                System.out.println();
+                System.out.println("(Enter other value to exit.)");
+                System.out.println();
+                System.out.print("Enter the number:");
+                try{
+                    int action = input.nextInt();
+                    input.nextLine();
+                    if (action == 1) {
+                        boolean validOrderID = false;
+                        System.out.print("Enter the order ID you wish to update: ");
+                        String orderID = input.nextLine();
+                        Order order = new Order(orderID);
+                        for(Order receiveOrder:orders) {
+                            if (receiveOrder.getID().equals(order.getID())) {
+                                validOrderID = true;
+                                break;
+                            } else {
+                                System.out.println("Order ID not found.");
+                            }
+                        }
+                        if(validOrderID) {
+                            System.out.println();
+                            System.out.println("Current Order Status: " + order.getStatus());
+                            if (order.getStatus().equals(Order.Status.Accepted)) {
+                                System.out.println("|");
+                                System.out.println("v");
+                                System.out.println("New Order Status: " + Order.Status.Ready);
+                                System.out.println();
+
+                                System.out.print("Is the information correct? (Enter 'yes' to proceed): ");
+                                String confirmation = input.nextLine().trim().toLowerCase();
+
+                                if (confirmation.equals("yes")) {
+                                    vendor.updateOrder(order, 3);
+                                    System.out.println("Successfully updated the order. We have notify the customer for lastest status.");
+                                } else {
+                                    System.out.println("Update canceled. Please review the information and try again.");
+                                }
+                            } else if (order.getOrderType() != 3 && order.getStatus().equals(Order.Status.Ready)) {
+                                System.out.println("|");
+                                System.out.println("v");
+                                System.out.println("New Order Status: " + Order.Status.Completed);
+                                System.out.println();
+
+                                System.out.print("Is the information correct? (Enter 'yes' to proceed): ");
+                                String confirmation = input.nextLine().trim().toLowerCase();
+
+                                if (confirmation.equals("yes")) {
+                                    vendor.updateOrder(order, 4);
+                                    System.out.println("Successfully updated the order. We have notify the customer for lastest status.");
+                                } else {
+                                    System.out.println("Update canceled. Please review the information and try again.");
+                                }
+                            } else if (order.getOrderType() == 3) {
+                                System.out.println("Unable to proceed with the update due to [Serving Method : Delivery] ");
+                            } else {
+                                System.out.println("Unable to proceed with the update due to [Order Status : " + order.getStatus() + "]");
+                            }
+                        }
+                    }
+                }catch(InputMismatchException e){
+                    input.nextLine();
+                }
+            } else {
+                System.out.println("The order will remain unchanged.");
+            }
         } else {
             System.out.println("(You have currently no active order.)");
-            System.out.println();
         }
         System.out.println();
-        System.out.print("Would you like to take any action on your order? (Enter 'yes' to proceed) ");
-        String userInput = input.nextLine().trim().toLowerCase();
-        if (userInput.equals("yes")) {
-            System.out.println("What action would you like to take?");
-            System.out.println("1. Update status of an order");
-            System.out.println();
-            System.out.println("(Enter other value to exit.)");
-            System.out.println();
-            System.out.print("Enter the number:");
-            try{
-                int action = input.nextInt();
-                if (action == 1) {
-                    System.out.print("Enter the order ID you wish to update: ");
-                    String orderID = input.nextLine();
-                    Order order = new Order(orderID);
-                    if (orders.contains(order)) {
-                        System.out.println();
-                        System.out.println("Current Order Status: " + order.getStatus());
-                        if (order.getStatus().equals(Order.Status.Accepted)) {
-                            System.out.println("|");
-                            System.out.println("v");
-                            System.out.println("New Order Status: " + Order.Status.Ready);
-                            System.out.println();
-
-                            System.out.print("Is the information correct? (Enter 'yes' to proceed): ");
-                            String confirmation = input.nextLine().trim().toLowerCase();
-
-                            if (confirmation.equals("yes")) {
-                                vendor.updateOrder(order,3);
-                            } else {
-                                System.out.println("Update canceled. Please review the information and try again.");
-                            }
-                        } else if(order.getOrderType()!=3 && order.getStatus().equals(Order.Status.Ready)) {
-                            System.out.println("|");
-                            System.out.println("v");
-                            System.out.println("New Order Status: " + Order.Status.Completed);
-                            System.out.println();
-
-                            System.out.print("Is the information correct? (Enter 'yes' to proceed): ");
-                            String confirmation = input.nextLine().trim().toLowerCase();
-
-                            if (confirmation.equals("yes")) {
-                                vendor.updateOrder(order,4);
-                            } else {
-                                System.out.println("Update canceled. Please review the information and try again.");
-                            }
-                        } else if(order.getOrderType()==3 && order.getStatus().equals(Order.Status.Ready)) {
-                            System.out.println("Unable to proceed with the update due to [Serving Method : " + order.getOrderType() + "]");
-                        } else {
-                            System.out.println("Unable to proceed with the update due to [Order Status : " + order.getStatus() + "]");
-                        }
-                    } else {
-                        System.out.println("Order ID not found.");
-                    }
-                }
-            }catch(InputMismatchException e){
-                input.nextLine();
-            }
-        } else {
-            System.out.println("The order will remain unchanged.");
-        }
+        System.out.print("(Press enter to exit.)");
+        String exit = input.nextLine();
         System.out.println();
         System.out.println("Proceeding to main menu......");
         System.out.println();
@@ -505,55 +521,226 @@ public class VendorInterface extends MainInterface{
         Scanner input = new Scanner(System.in);
         ArrayList<Order> orderHistory = vendor.getOrderHistory();
 
-        System.out.println("----------------------------------------------");
-        System.out.println("|                ORDER HISTORY               |");
-        System.out.println("----------------------------------------------");
+        System.out.println("--------------------------------------------------------");
+        System.out.println("|                ORDER HISTORY & REVIEWS               |");
+        System.out.println("--------------------------------------------------------");
         System.out.println();
-        System.out.println("Number of orders: "+orderHistory.size());
+        System.out.println("Please select an option:");
+        System.out.println("1. Check order history by date");
+        System.out.println("2. Check order history by month");
+        System.out.println("3. Check order history by year");
+        System.out.println("4. Check customer reviews");
+
+        System.out.print("Enter your choice (1-4): ");
+        int choice = 0;
+        while (choice < 1 || choice > 4) {
+            try {
+                choice = input.nextInt();
+                if (choice < 1 || choice > 4) {
+                    System.out.println("Invalid input. Please enter a number between 1 and 4.");
+                    System.out.print("Enter your choice (1-4): ");
+                }
+            } catch (InputMismatchException e) {
+                input.nextInt(); // Clear the invalid input
+                System.out.println("Invalid input. Please enter a number between 1 and 4.");
+                System.out.print("Enter your choice (1-4): ");
+            }
+        }
         System.out.println();
-        System.out.println("==================================================================================================================================================================================================================");
-        System.out.println(String.format("%-30s", "ORDER ID") + String.format("%-30s", "CUSTOMER") + String.format("%-30s", "SERVING METHOD") + String.format("%-30s", "STATUS") + String.format("%-30s", "ITEM")+String.format("%-30s", "QUANTITY") + String.format("%-30s", "TOTAL PRICE"));
-        System.out.println("==================================================================================================================================================================================================================");
-        if (!orderHistory.isEmpty()) {
-            int counter = 1;
-            for (Order order : orderHistory) {
-                for(Cart item:order.getShoppingCart()){
-                    if(counter == 1) {
-                        System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", order.getOrderType()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
-                    }else{
-                        System.out.println(String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", ""));
-                    }
-                    counter++;
-                }
-            }
-            System.out.println();
-        }else{
-            System.out.println("(No Order History Exist.)");
-            System.out.println();
+        switch (choice) {
+            case 1:
+                displayOrderHistoryDayByDay(vendor);
+                break;
+            case 2:
+                displayOrderHistoryMonthly(vendor);
+                break;
+            case 3:
+                displayOrderHistoryYearly(vendor);
+                break;
+            case 4:
+                checkReview(orderHistory);
+                break;
+            default:
+                break;
         }
-        System.out.print("Would you like to take any action from your history? Enter 1 to check customer reviews / Enter any other value to exit:");
-        try{
-            int proceed = input.nextInt();
-            if(proceed == 1){
-                boolean reviewFound = false;
-                for (Order order : orderHistory) {
-                    if (order.getReview(1) != null) {
-                        reviewFound = true;
-                        System.out.println();
-                        System.out.println("Review from " + "*****"+order.getCustomer().getName().substring(order.getCustomer().getName().length()-3) + ": " + order.getReview(1));
-                    }
-                }
-                if (!reviewFound) {
-                    System.out.println();
-                    System.out.println("No reviews found for any orders in the order history.");
-                }
-            }
-        }catch(InputMismatchException e){
-            input.nextLine();
-        }
+
+        input.nextLine();
+        System.out.println();
+        System.out.print("(Press enter to exit.)");
+        String exit = input.nextLine();
         System.out.println();
         System.out.println("Proceeding to main menu......");
         System.out.println();
+    }
+
+    private static void displayOrderHistoryDayByDay(Vendor vendor) {
+        Set<LocalDate> uniqueDates = new HashSet<>();
+        for (Order order : vendor.getOrderHistory()) {
+            LocalDate orderDate = LocalDate.parse(order.getCurrentDate()); // Parse the date string
+            uniqueDates.add(orderDate);
+        }
+
+        // Loop through each unique date and display orders for that date
+        for (LocalDate date : uniqueDates) {
+            System.out.println("Orders for " + date + ":");
+            System.out.println();
+
+            ArrayList<Order> ordersForDate = vendor.getOrderHistoryByDate(date);
+
+            System.out.println("----------------------------------------------");
+            System.out.println("|                ORDER HISTORY               |");
+            System.out.println("----------------------------------------------");
+            System.out.println();
+            System.out.println("Number of orders: "+ordersForDate.size());
+            System.out.println();
+            System.out.println("==================================================================================================================================================================================================================");
+            System.out.println(String.format("%-30s", "ORDER ID") + String.format("%-30s", "CUSTOMER") + String.format("%-30s", "SERVING METHOD") + String.format("%-30s", "STATUS") + String.format("%-30s", "ITEM")+String.format("%-30s", "QUANTITY") + String.format("%-30s", "TOTAL PRICE"));
+            System.out.println("==================================================================================================================================================================================================================");
+
+            if (!ordersForDate.isEmpty()) {
+                int counter = 1;
+                for (Order order : ordersForDate) {
+                    for(Cart item:order.getShoppingCart()){
+                        if(counter == 1) {
+                            if(order.getOrderType()==1)
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Dine-In") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                            else if(order.getOrderType()==2)
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Take Away") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                            else
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Delivery") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                        }else{
+                            System.out.println(String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", ""));
+                        }
+                        counter++;
+                    }
+                    counter = 1;
+                }
+            } else {
+                System.out.println("(No orders for this date.)");
+            }
+            System.out.println();
+            System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        }
+    }
+
+    private static void displayOrderHistoryMonthly(Vendor vendor) {
+        Set<YearMonth> uniqueMonths = new HashSet<>();
+        for (Order order : vendor.getOrderHistory()) {
+            LocalDate orderDate = LocalDate.parse(order.getCurrentDate()); // Parse the date string
+            uniqueMonths.add(YearMonth.from(orderDate));
+        }
+
+        // Loop through each unique month and display orders for that month
+        for (YearMonth month : uniqueMonths) {
+            System.out.println("Orders for " + month + ":");
+            System.out.println();
+
+            ArrayList<Order> ordersForMonth = vendor.getOrderHistoryByMonth(month);
+
+            System.out.println("----------------------------------------------");
+            System.out.println("|                ORDER HISTORY               |");
+            System.out.println("----------------------------------------------");
+            System.out.println();
+            System.out.println("Number of orders: " + ordersForMonth.size());
+            System.out.println();
+            System.out.println("==================================================================================================================================================================================================================");
+            System.out.println(String.format("%-30s", "ORDER ID") + String.format("%-30s", "CUSTOMER") + String.format("%-30s", "SERVING METHOD") + String.format("%-30s", "STATUS") + String.format("%-30s", "ITEM") + String.format("%-30s", "QUANTITY") + String.format("%-30s", "TOTAL PRICE"));
+            System.out.println("==================================================================================================================================================================================================================");
+
+            if (!ordersForMonth.isEmpty()) {
+                int counter = 1;
+                for (Order order : ordersForMonth) {
+                    for (Cart item : order.getShoppingCart()) {
+                        if (counter == 1) {
+                            if(order.getOrderType()==1)
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Dine-In") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                            else if(order.getOrderType()==2)
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Take Away") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                            else
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Delivery") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                        } else {
+                            System.out.println(String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", ""));
+                        }
+                        counter++;
+                    }
+                    counter = 1;
+                }
+            } else {
+                System.out.println("(No orders for this month.)");
+            }
+            System.out.println();
+            System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        }
+    }
+
+    private static void displayOrderHistoryYearly(Vendor vendor) {
+        Set<Integer> uniqueYears = new HashSet<>();
+        for (Order order : vendor.getOrderHistory()) {
+            LocalDate orderDate = LocalDate.parse(order.getCurrentDate()); // Parse the date string
+            uniqueYears.add(orderDate.getYear());
+        }
+
+        // Loop through each unique year and display orders for that year
+        for (int year : uniqueYears) {
+            System.out.println("Orders for Year " + year + ":");
+            System.out.println();
+
+            ArrayList<Order> ordersForYear = vendor.getOrderHistoryByYear(year);
+
+            System.out.println("----------------------------------------------");
+            System.out.println("|                ORDER HISTORY               |");
+            System.out.println("----------------------------------------------");
+            System.out.println();
+            System.out.println("Number of orders: " + ordersForYear.size());
+            System.out.println();
+            System.out.println("==================================================================================================================================================================================================================");
+            System.out.println(String.format("%-30s", "ORDER ID") + String.format("%-30s", "CUSTOMER") + String.format("%-30s", "SERVING METHOD") + String.format("%-30s", "STATUS") + String.format("%-30s", "ITEM") + String.format("%-30s", "QUANTITY") + String.format("%-30s", "TOTAL PRICE"));
+            System.out.println("==================================================================================================================================================================================================================");
+
+            if (!ordersForYear.isEmpty()) {
+                int counter = 1;
+                for (Order order : ordersForYear) {
+                    for (Cart item : order.getShoppingCart()) {
+                        if (counter == 1) {
+                            if(order.getOrderType()==1)
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Dine-In") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                            else if(order.getOrderType()==2)
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Take Away") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                            else
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Delivery") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                        } else {
+                            System.out.println(String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", ""));
+                        }
+                        counter++;
+                    }
+                    counter = 1;
+                }
+            } else {
+                System.out.println("(No orders for this year.)");
+            }
+            System.out.println();
+            System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        }
+    }
+
+    private static void checkReview(ArrayList<Order> orderHistory){
+        System.out.println("-------------------------------------------------");
+        System.out.println("|                CUSTOMER REVIEWS               |");
+        System.out.println("-------------------------------------------------");
+        System.out.println();
+
+        boolean reviewFound = false;
+        for (Order order : orderHistory) {
+            if (order.getReview(1) != null) {
+                reviewFound = true;
+                System.out.println();
+                System.out.println("Review from " + "*****"+order.getCustomer().getName().substring(order.getCustomer().getName().length()-3) + ": " + order.getReview(1));
+            }
+        }
+        if (!reviewFound) {
+            System.out.println();
+            System.out.println("No reviews found for any orders in the order history.");
+        }
     }
 
     public static void checkNotification(Vendor vendor){
@@ -564,7 +751,7 @@ public class VendorInterface extends MainInterface{
         System.out.println("|-----------------------------------------------------|");
         if(!vendor.getNotifications().isEmpty()) {
             for (VendorNotification notification : vendor.getNotifications()) {
-                System.out.println("|" + String.format("%-3s", counter) + notification.getMessage() + "|");
+                System.out.println("|" + String.format("%-3s", counter) + String.format("%-50s", notification.getMessage()) + "|");
                 counter++;
             }
             System.out.println("-------------------------------------------------------");
@@ -572,14 +759,15 @@ public class VendorInterface extends MainInterface{
             System.out.print("Enter 1 to check notification detail / Enter any other value to exit:");
             try {
                 int proceed = input.nextInt();
+                input.nextLine();
                 if(proceed == 1){
-                    input.nextLine();
                     int repeat = 1;
                     while (repeat == 1) {
                         System.out.println();
                         System.out.print("Which notification you would like to access? Enter the number:");
                         try {
                             int number = input.nextInt();
+                            input.nextLine();
                             if(number<1 || number>vendor.getNotifications().size()){
                                 System.out.print("Invalid number. Enter 1 to try again / Enter any other value to exit:");
                                 try{
@@ -596,15 +784,20 @@ public class VendorInterface extends MainInterface{
                                 Order order = new Order(notification.getObjectID());
                                 if(code == 1){
                                     int orderStatus = notification.notifyComingOrder(order);
-                                    vendor.updateOrder(order,orderStatus);
-                                    if(orderStatus==1 && order.getOrderType()==3){
-                                        order.getCustomer().allocateRunner(order);
-                                    }else if(orderStatus==2){
-                                        Credit credit = new Credit(order.getCustomer());
-                                        credit.addAmount(order.getTotalPrice(),2);
+                                    if(vendor.updateOrder(order,orderStatus)){
+                                        if (orderStatus == 1 && order.getOrderType() == 3) {
+                                            OrderTask orderTask = new OrderTask();
+                                            orderTask.allocateRunner(order);
+                                        } else if (orderStatus == 2) {
+                                            Credit credit = new Credit(order.getCustomer());
+                                            credit.addAmount(order.getTotalPrice(), 2);
+                                        }
+                                        System.out.println();
+                                        System.out.println("The order has been updated and notified the customer.");
+                                    }else{
+                                        System.out.println();
+                                        System.out.println("Unable to update the order. Customer has canceled the order.");
                                     }
-                                    System.out.println();
-                                    System.out.println("The order has been updated and notified the customer.");
                                     System.out.println();
                                     System.out.print("Enter any key to exit.");
                                     String exit = input.nextLine();
@@ -632,7 +825,6 @@ public class VendorInterface extends MainInterface{
                                 repeat=0;
                             }
                         }
-                        input.nextLine();
                     }
                 }
             }catch(InputMismatchException e){
@@ -642,7 +834,7 @@ public class VendorInterface extends MainInterface{
             System.out.println("|" + String.format("%-53s", "(No Notification.)") + "|");
             System.out.println("-------------------------------------------------------");
             System.out.println();
-            System.out.print("Press enter to exit");
+            System.out.print("(Press Enter to exit.)");
             String proceed = input.nextLine();
         }
         System.out.println();
@@ -664,77 +856,87 @@ public class VendorInterface extends MainInterface{
         System.out.println();
         System.out.println("(Enter any other key to exit.)");
         System.out.println();
-        while(true) {
-            System.out.print("Enter the number of your choice: ");
-            try {
-                int choice = input.nextInt();
-                System.out.println();
-                if(choice == 1){
-                    dashboard.countCompletedOrders();
-                    System.out.println();
-                    System.out.println("------------------------------------------------------------");
-                    System.out.println(String.format("%-30s", "ITEM")+String.format("%-30s", "QUANTITY SOLD"));
-                    System.out.println("------------------------------------------------------------");
-                    dashboard.printItemsBySales();
-                    System.out.println();
-                    System.out.print("Would you like to view another dashboard? (Enter 'yes' to continue or any other key to exit): ");
-                    input.nextLine();
-                    String continueChoice = input.nextLine().trim().toLowerCase();
-                    if (!continueChoice.equals("yes")) {
-                        break;
-                    }else {
-                        choice = 2;
-                        System.out.println();
-                    }
-                }
-                if(choice == 2){
-                    dashboard.calculateRevenue();
-                    System.out.println();
-                    System.out.println("Please choose the type of revenue report:");
-                    System.out.println("1. Daily");
-                    System.out.println("2. Monthly");
-                    System.out.println("3. Yearly");
-                    System.out.println();
-                    System.out.println("(Enter any other key to exit.)");
-                    System.out.println();
-                    System.out.print("Enter the number of your choice: ");
-                    try {
-                        int revenueChoice = input.nextInt();
-                        input.nextLine();
 
-                        switch (revenueChoice) {
-                            case 1:
-                                System.out.println("------------------------------------------------------------");
-                                System.out.println(String.format("%-30s", "DATE")+String.format("%-30s", "REVENUE (RM)"));
-                                System.out.println("------------------------------------------------------------");
-                                dashboard.printRevenueByDate();
-                                break;
-                            case 2:
-                                System.out.println("------------------------------------------------------------");
-                                System.out.println(String.format("%-30s", "MONTH")+String.format("%-30s", "REVENUE (RM)"));
-                                System.out.println("------------------------------------------------------------");
-                                dashboard.printRevenueByMonth();
-                                break;
-                            case 3:
-                                System.out.println("------------------------------------------------------------");
-                                System.out.println(String.format("%-30s", "YEAR")+String.format("%-30s", "REVENUE (RM)"));
-                                System.out.println("------------------------------------------------------------");
-                                dashboard.printRevenueByYear();
-                                break;
-                            default:
-                                System.out.println("Exiting the dashboard. Thank you!");
-                                break;
-                        }
-                    } catch (InputMismatchException e) {
-                        input.nextLine(); // Clear the invalid input
-                    }
-                }else {
-                    System.out.println("Exiting the dashboard. Thank you!");
-                    break;
+        System.out.print("Enter the number of your choice: ");
+        try {
+            int choice = input.nextInt();
+            System.out.println();
+            if(choice == 1){
+                dashboard.countCompletedOrders();
+                System.out.println();
+                System.out.println("------------------------------------------------------------");
+                System.out.println(String.format("%-30s", "ITEM")+String.format("%-30s", "QUANTITY SOLD"));
+                System.out.println("------------------------------------------------------------");
+                dashboard.printItemsBySales();
+                System.out.println();
+                System.out.print("Would you like to view another dashboard? (Enter 'yes' to continue or any other key to exit): ");
+                input.nextLine();
+                String continueChoice = input.nextLine().trim().toLowerCase();
+                if (continueChoice.equals("yes")) {
+                    choice = 2;
+                    System.out.println();
+                }else{
+                    System.out.println();
+                    System.out.print("(Press Enter to exit.)");
+                    String proceed = input.nextLine();
                 }
-            } catch (InputMismatchException e) {
-                System.out.println("Please enter an integer input.");
             }
+            if(choice == 2){
+                dashboard.calculateRevenue();
+                System.out.println();
+                System.out.println("Please choose the type of revenue report:");
+                System.out.println("1. Daily");
+                System.out.println("2. Monthly");
+                System.out.println("3. Yearly");
+                System.out.println();
+                System.out.println("(Enter any other key to exit.)");
+                System.out.println();
+                System.out.print("Enter the number of your choice: ");
+                try {
+                    int revenueChoice = input.nextInt();
+                    input.nextLine();
+                    String proceed;
+
+                    switch (revenueChoice) {
+                        case 1:
+                            System.out.println("------------------------------------------------------------");
+                            System.out.println(String.format("%-30s", "DATE")+String.format("%-30s", "REVENUE (RM)"));
+                            System.out.println("------------------------------------------------------------");
+                            dashboard.printRevenueByDate();
+                            System.out.println();
+                            System.out.print("(Press Enter to exit.)");
+                            proceed = input.nextLine();
+                            break;
+                        case 2:
+                            System.out.println("------------------------------------------------------------");
+                            System.out.println(String.format("%-30s", "MONTH")+String.format("%-30s", "REVENUE (RM)"));
+                            System.out.println("------------------------------------------------------------");
+                            dashboard.printRevenueByMonth();
+                            System.out.println();
+                            System.out.print("(Press Enter to exit.)");
+                            proceed = input.nextLine();
+                            break;
+                        case 3:
+                            System.out.println("------------------------------------------------------------");
+                            System.out.println(String.format("%-30s", "YEAR")+String.format("%-30s", "REVENUE (RM)"));
+                            System.out.println("------------------------------------------------------------");
+                            dashboard.printRevenueByYear();
+                            System.out.println();
+                            System.out.print("(Press Enter to exit.)");
+                            proceed = input.nextLine();
+                            break;
+                        default:
+                            System.out.println("Exiting the dashboard. Thank you!");
+                            break;
+                    }
+                } catch (InputMismatchException e) {
+                    input.nextLine(); // Clear the invalid input
+                }
+            }else {
+                System.out.println("Exiting the dashboard. Thank you!");
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Please enter an integer input.");
         }
         System.out.println();
         System.out.println("Proceeding to main menu......");

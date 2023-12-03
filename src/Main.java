@@ -200,6 +200,42 @@ public class Main {
                         }
                         break;
                     case 4://runner
+                        Runner runner = RunnerInterface.login();
+                        if (!(runner ==null)) {
+                            boolean returnToMainMenu = false;
+                            while(true) {
+                                int access;
+                                RunnerInterface.RunnerMain(runner);
+                                access = RunnerInterface.userInput();
+
+                                switch (access) {
+                                    case 1://View Profile
+                                        RunnerInterface.accessProfile(runner);
+                                        break;
+                                    case 2://Access Active Task
+                                        RunnerInterface.checkActiveTaskStatus(runner);
+                                        break;
+                                    case 3://Check Task History
+                                        RunnerInterface.checkTaskHistory(runner);
+                                        break;
+                                    case 4://Check Notification
+                                        RunnerInterface.checkNotification(runner);
+                                        break;
+                                    case 5://Revenue Dashboard
+                                        RunnerInterface.accessDashboard(runner);
+                                        break;
+                                    case 0:
+                                        returnToMainMenu = true;
+                                        break;
+                                    default:
+                                        System.out.println("Invalid choice. Please try again");
+                                        break;
+                                }
+                                if (returnToMainMenu) {
+                                    break; // Break the inner while loop
+                                }
+                            }
+                        }
                         break;
                     case 0://exit application
                         return;

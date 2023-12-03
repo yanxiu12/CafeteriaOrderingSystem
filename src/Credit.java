@@ -31,8 +31,7 @@ public class Credit {
     public String getTransactionType(){return transactionType;}
 
     public void addAmount(double amount,int type){//1=topUp 2=refund
-        IDGenerator generator = new IDGenerator("CustomerCredit.txt", "CT");
-        ID = generator.generateID();
+        ID = IDGenerator.generateIDForCredit();
         transaction = "+"+String.format("%.2f",amount);
         if(type==1)
             transactionType = "Top-Up";
@@ -44,11 +43,10 @@ public class Credit {
     }
 
     public void deductAmount(double amount){
-        IDGenerator generator = new IDGenerator("CustomerCredit.txt", "CT");
-        ID = generator.generateID();
+        ID = IDGenerator.generateIDForCredit();
         transaction = "-"+String.format("%.2f",amount);
-
-        customer.setWalletBalance(String.format("%.2f",customer.getWalletBalance()-amount));
+        transactionType = "Order";
+        customer.setWalletBalance(String.format("%.2f",(customer.getWalletBalance()-amount)));
         customer.modifyFile(customer);
         write2file();
     }
@@ -58,7 +56,7 @@ public class Credit {
     }
 
     public String toString(){
-        return String.format("%s,%s,%s,%s,%s", ID, customer.getID(), currentDate, transaction,transactionType);
+        return String.format("%s;%s;%s;%s;%s", ID, customer.getID(), currentDate, transaction,transactionType);
     }
 
     public void write2file(){

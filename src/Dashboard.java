@@ -24,6 +24,6 @@ public class Dashboard {
                 deliveredCount++;
             }
         }
-        System.out.println("Total Orders Completed: RM "+deliveredCount);
+        System.out.println("Total Orders Completed: "+deliveredCount);
     }
 }

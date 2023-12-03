@@ -1,0 +1,12 @@
+MI1;Grilled Chicken Salad;10.99;VA1
+MI2;Pasta Carbonara;14.99;VA1
+MI3;BBQ Bacon Burger;12.50;VA1
+MI4;Vegetable Ratatouille;11.25;VA1
+MI5;Blueberry Muffins;2.50;VA2
+MI6;Chocolate Chip Muffins;2.00;VA2
+MI7;Banana Muffins;2.50;VA2
+MI8;Chicken Noodles;12.00;VA3
+MI9;Prawns Noodles;18.00;VA3
+MI10;Chili PanMee;18.00;VA3
+MI11;Shrimp Dumplings (6pcs);12.00;VA3
+MI12;Chinese Tea;2.00;VA3

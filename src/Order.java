@@ -21,6 +21,7 @@ public class Order {
     private int orderType;// 1- Dine in,2- Take Away, 3- Delivery
     private Status status;
     private OrderReview orderReview;
+    private OrderTask orderTask;
     private ArrayList<Cart> shoppingCart;
 
     public Order(String ID, Customer customer, Vendor vendor, int type, ArrayList<Cart> shoppingCart){
@@ -50,6 +51,8 @@ public class Order {
                 shoppingCart.add(new Cart(new MenuItem(cartItem[i]),Integer.parseInt(cartItem[i+1])));
             }
             this.orderReview = new OrderReview("OrderReview.txt");
+            if (orderType==3)
+                this.orderTask = new OrderTask(this);
         }
     }
 
@@ -87,12 +90,18 @@ public class Order {
         return orderReview.getReview(this,type);
     }
 
+    public boolean getOrderTaskStatus(){return orderTask.getAcceptStatus();}
+
     public String toString(){
-        StringBuilder items = null;
-        for(Cart item:shoppingCart){
-            items.append(","+item.getItem().getItemName()).append(",").append(item.getQuantity());
+        StringBuilder items = new StringBuilder();
+        if (!shoppingCart.isEmpty()) {
+            for (Cart item : shoppingCart) {
+                items.append(item.getItem().getItemName()).append(",").append(item.getQuantity()).append(",");
+            }
+            items.setLength(items.length() - 1); // Remove the last comma
         }
-        return String.format("%s;%s;%s;%s;%s;%s", ID, currentDate, customer.getID(), vendor.getID(),orderType,status, items);
+
+        return String.format("%s;%s;%s;%s;%s;%s;%s", ID, currentDate, customer.getID(), vendor.getID(), orderType, status, items.toString());
     }
 
     public double getTotalPrice(){

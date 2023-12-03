@@ -1,4 +1,7 @@
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -25,19 +28,6 @@ public class FileOperation {
         }
     }
 
-    public boolean checkUserCredential(String userID, String password) {
-        try (Scanner scanner = new Scanner(new File(filename))) {
-            while (scanner.hasNextLine()) {
-                String[] fields = scanner.nextLine().split(",");
-                if (fields[0].equals(userID) && fields[1].equals(password))
-                    return true;
-            }
-        } catch (FileNotFoundException ex) {
-            System.out.println("Unable to read file due to " + ex.getMessage());
-        }
-        return false;
-    }
-
     public ArrayList<String> search(String key) {
         ArrayList<String> lineFound = new ArrayList<>();
         try {
@@ -48,13 +38,16 @@ public class FileOperation {
 
             String line = br.readLine();
             while (line != null) {
-                String[] wordsInLine = line.split(",");
+                String[] wordsInLine = line.split(";");
                 for (String word : wordsInLine) {
                     if (word.equals(key))
                         lineFound.add(line);
                 }
                 line = br.readLine();
             }
+            br.close();
+        } catch(FileNotFoundException ex){
+            System.out.println("File not found : " + ex.getMessage());
         } catch (IOException ex) {
             System.out.println("Unable to read file due to" + ex.getMessage());
         }
@@ -73,21 +66,27 @@ public class FileOperation {
             String line = br.readLine();
 
             while (line != null) {
-                String[] wordsInLine = line.split(",");
+                String[] wordsInLine = line.split(";");
                 if (!wordsInLine[0].equals(IDtoDelete)) {
                     pw.println(line);
                 }
                 line = br.readLine();
             }
+            pw.close();
+            br.close();
         } catch (IOException ex) {
             System.out.println("Unable to read file due to" + ex.getMessage());
         }
 
         try {
-            File tempFile = new File("Temp.txt");
-            File newFile = new File(filename);
-            if (newFile.delete()) {
-                tempFile.renameTo(newFile);
+            File originalFile = new File(filename);
+            if (originalFile.delete()) {
+                File tempFile = new File("Temp.txt");
+                if (!tempFile.renameTo(new File(filename))) {
+                    System.out.println("Error: Unable to rename the temporary file.");
+                }
+            } else {
+                System.out.println("Error: Unable to delete the original file.");
             }
         } catch (Exception ex) {
             System.out.println("Error due to " + ex.getMessage());
@@ -99,7 +98,7 @@ public class FileOperation {
             StringBuilder contents = new StringBuilder();
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                String[] fields = line.split(",");
+                String[] fields = line.split(";");
                 if (!fields[0].equals(id)) {
                     contents.append(line);
                 } else {
@@ -108,10 +107,16 @@ public class FileOperation {
                 if (scanner.hasNextLine())
                     contents.append("\n");
             }
-            writeToFile(contents.toString());
+            FileWriter fw = new FileWriter(filename, false);
+            PrintWriter pw = new PrintWriter(fw);
+            pw.println(contents);
+
+            pw.close();
 
         } catch (FileNotFoundException ex) {
             System.out.println("Unable to read file due to " + ex);
+        } catch (IOException e) {
+            System.out.println("Unable to read file due to" + e.getMessage());
         }
     }
 }

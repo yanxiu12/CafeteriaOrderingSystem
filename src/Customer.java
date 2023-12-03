@@ -6,15 +6,13 @@ public class Customer implements Serializable {
     private String ID,name,dob,contact,password,address;
     private double walletBalance;
 
-    private ArrayList<CustomerNotification> notifications;
-    private ArrayList<Order>orders;
-    private ArrayList<Cart>cartItems;
-    private static int runnerCounter;
+    private transient ArrayList<CustomerNotification> notifications;
+    private transient ArrayList<Order>orders;
+    private transient ArrayList<Cart>cartItems;
 
     public Customer(String userID){
         SerializationOperation operation = new SerializationOperation("Customer.ser");
-        ArrayList<Customer> foundCustomer = new ArrayList<>();
-        foundCustomer = operation.searchObjects(userID,Customer.class);
+        ArrayList<Customer> foundCustomer = operation.searchObjects(userID,Customer.class);
         if(foundCustomer.size()==1) {
             Customer found = foundCustomer.get(0);
             setID(found.getID());setPassword(found.getPassword());setName(found.getName());setDob(found.getDob());setContact(found.getContact());setAddress(found.getAddress());
@@ -36,6 +34,7 @@ public class Customer implements Serializable {
         setID(ID);setPassword(password);setName(name);setDob(dob);setContact(contact);setAddress(address);setWalletBalance(walletBalance);
         this.notifications = new ArrayList<>();
         this.cartItems = new ArrayList<>();
+        this.orders = new ArrayList<>();
     }//for register //obj.write2file(obj.toString());
 
     public String getID() {return ID;}
@@ -73,7 +72,7 @@ public class Customer implements Serializable {
         if(!foundOrder.isEmpty()) {
             for (String order : foundOrder) {
                 String[] part = order.split(";");
-                if (!part[5].equals(String.valueOf(Order.Status.Completed))) {
+                if (!part[5].equals(String.valueOf(Order.Status.Completed)) && !part[5].equals(String.valueOf(Order.Status.Cancelled)) && !part[5].equals(String.valueOf(Order.Status.Rejected))) {
                     orders.add(new Order(part[0]));
                 }
             }
@@ -101,18 +100,19 @@ public class Customer implements Serializable {
         FileOperation file = new FileOperation("CustomerCredit.txt");
         ArrayList<String> foundRecords = file.search(ID);
         for(String record:foundRecords){
-            String[] part = record.split(",");
+            String[] part = record.split(";");
             creditRecords.add(new Credit(part[0],this,part[2],part[3],part[4]));
         }
         return creditRecords;
     }
 
     public ArrayList<CustomerNotification> getNotifications(){
+        this.notifications = new ArrayList<>();
         FileOperation file = new FileOperation("CustomerNotification.txt");
         ArrayList<String> foundRecords = file.search(ID);
         for(String record:foundRecords){
             String[] part = record.split(";");
-            notifications.add(new CustomerNotification(part[0],this,part[2],Integer.parseInt(part[3]),part[4]));
+            notifications.add(new CustomerNotification(part[0],this,part[2],Integer.parseInt(part[3]),part[4],part[5]));
         }
         return notifications;
     }
@@ -154,7 +154,7 @@ public class Customer implements Serializable {
 
     public void modifyFile(Customer customer){
         SerializationOperation operation = new SerializationOperation("Customer.ser");
-        operation.updateObject(customer.getID(),customer);
+        operation.updateObject(customer.getID(),this);
     }
 
     public void addToCart(MenuItem item,int quantity){
@@ -171,10 +171,10 @@ public class Customer implements Serializable {
     public void removeFromCart(MenuItem item,int quantity){
         for(Cart cartItem:cartItems){
             if(cartItem.getItem().getItemID().equals(item.getItemID())){
-                if(quantity>= cartItem.getQuantity()) {
+                if(cartItem.getQuantity()+quantity<=0) {
                     cartItems.remove(cartItem);
                 }else{
-                    cartItem.setQuantity(cartItem.getQuantity()-quantity);
+                    cartItem.setQuantity(cartItem.getQuantity()+quantity);
                 }
                 return;
             }
@@ -182,16 +182,11 @@ public class Customer implements Serializable {
     }
 
     public void placeOrder(Vendor vendor, int method){
-        IDGenerator generator = new IDGenerator("CusOrder.txt","CO");
-        String orderID = generator.generateID();
+        String orderID = IDGenerator.generateIDForOrder();
         Order ord = new Order(orderID,this,vendor,method,cartItems);
         orders.add(ord);
         VendorNotification notification = new VendorNotification("You have new order!",ord.getVendor(),1,ord.getID());
         notification.saveNotification();
-        if(method == 3) {
-            runnerCounter = 0;
-            allocateRunner(ord);
-        }
         write2OrderFile(ord.toString());
     }
 
@@ -201,19 +196,19 @@ public class Customer implements Serializable {
         double deliveryFee=0;
         System.out.println("-----------------------------------------------------------------------------------------------");
         System.out.println(String.format("%-5s", "No.")+String.format("%-30s", "Item Name")+String.format("%-30s", "Price")+String.format("%-30s", "Quantity"));
-        System.out.println("------------------------------------------------------------------------------------------");
+        System.out.println("-----------------------------------------------------------------------------------------------");
         for(Cart item:cartItems){
             counter++;
             System.out.println((String.format("%-5s", counter)+String.format("%-30s", item.getItem().getItemName())+String.format("%-30s", item.getItem().getItemPrice())+String.format("%-30s", item.getQuantity())));
             totalPrice+= (item.getItem().getItemPrice()*item.getQuantity());
         }
-        System.out.println("------------------------------------------------------------------------------------------");
+        System.out.println("-----------------------------------------------------------------------------------------------");
         if(method == 3) {
             deliveryFee=5.00;
-            System.out.println("Subtotal (RM) : "+totalPrice);
-            System.out.println("Delivery Fee (RM) :"+deliveryFee);
+            System.out.println("Subtotal (RM) : "+String.format("%.2f",totalPrice));
+            System.out.println("Delivery Fee (RM) :"+String.format("%.2f",deliveryFee));
         }
-        System.out.println("Total Price (RM) : "+totalPrice+deliveryFee);
+        System.out.println("Total Price (RM) : "+String.format("%.2f",(totalPrice+deliveryFee)));
         System.out.println();
         return totalPrice+deliveryFee;
     }
@@ -226,24 +221,19 @@ public class Customer implements Serializable {
         notification.saveNotification();
     }
 
-    public void cancelOrder(Order order){
-        orders.remove(order);
-        System.out.println("Your order "+order.getID()+" has been cancelled.");
-    }
-
-    public void allocateRunner(Order order){
-        Runner runner = new Runner();
-        ArrayList<Runner> runnerList = runner.getAvailableRunner();
-        if (runnerList!=null){
-            if(runnerCounter<runnerList.size()){
-                RunnerNotification notification = new RunnerNotification("You have new task!",runnerList.get(runnerCounter),1,order.getID());
-                notification.saveNotification();
-                runnerCounter++;
-            }else {
-                CustomerNotification notification = new CustomerNotification("Failed to get runner!", this,1,order.getID());
-                notification.saveNotification();
-            }
-        }
-    }
+//    public void allocateRunner(Order order){
+//        Runner runner = new Runner();
+//        ArrayList<Runner> runnerList = runner.getAvailableRunner();
+//        if (runnerList!=null){
+//            if(runnerCounter<runnerList.size()){
+//                RunnerNotification notification = new RunnerNotification("You have new task!",runnerList.get(runnerCounter),1,order.getID());
+//                notification.saveNotification();
+//                runnerCounter++;
+//            }else {
+//                CustomerNotification notification = new CustomerNotification("Failed to get runner!", this,1,order.getID());
+//                notification.saveNotification();
+//            }
+//        }
+//    }
 
 }

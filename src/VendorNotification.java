@@ -12,8 +12,7 @@ public class VendorNotification extends Notification{
         this.vendor = vendor;
         this.code = code;
         this.objectID = objectID;
-        IDGenerator generator = new IDGenerator("VendorNotification","VN");
-        this.ID = generator.generateID();
+        this.ID = IDGenerator.generateIDForVendorNotification();
     }
 
     public VendorNotification(String ID,Vendor vendor,String message,int code,String objectID){
@@ -35,13 +34,21 @@ public class VendorNotification extends Notification{
     public int notifyComingOrder(Order order){//code 1
         Scanner input = new Scanner(System.in);
         System.out.println("There is an upcoming order by "+order.getCustomer().getName()+".");
+        System.out.println();
         System.out.println("Order item:");
         for(Cart item:order.getShoppingCart()){
             System.out.println(item.getItem().getItemName()+" x "+item.getQuantity());
         }
         System.out.println();
+        int method = order.getOrderType();
+        if(method==1)
+            System.out.println("Serving method: Dine-in");
+        else if(method==2)
+            System.out.println("Serving method: Take Away");
+        else if(method==3)
+            System.out.println("Serving method: Delivery");
+        System.out.println();
         System.out.println("Please choose 1. Accept / 2. Reject.");
-        System.out.print("Enter the number: ");
 
         int choice = 0;
         boolean validInput = false;
@@ -49,6 +56,7 @@ public class VendorNotification extends Notification{
             System.out.print("Enter the number: ");
             try {
                 choice = input.nextInt();
+                input.nextLine();
                 if (choice == 1 || choice == 2) {
                     validInput = true;
                 } else {
@@ -76,7 +84,11 @@ public class VendorNotification extends Notification{
     public void notifyOrderChange(Order order){//code 3
         System.out.println("Dear vendor,");
         System.out.println();
-        System.out.println("The serving method of order "+order.getID()+ " has been changed to "+order.getOrderType()+".");
+        if(order.getOrderType()==1)
+            System.out.println("The serving method of order "+order.getID()+ " has been changed to Dine-In.");
+        else if(order.getOrderType()==2)
+            System.out.println("The serving method of order "+order.getID()+ " has been changed to Take Away.");
+        System.out.println();
         System.out.println("Order item:");
         for(Cart item:order.getShoppingCart()){
             System.out.println(item.getItem().getItemName()+" x "+item.getQuantity());

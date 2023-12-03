@@ -74,7 +74,7 @@ public class MenuItem {
         FileOperation file = new FileOperation("MenuItem.txt");
         ArrayList<String> items = file.search(vendor.getID());
         for(String line:items) {
-            String[] itemDetail = line.split(",");
+            String[] itemDetail = line.split(";");
             MenuItem item = new MenuItem(itemDetail[0], itemDetail[1], itemDetail[2], vendor);
             vendorItems.add(item);
         }
@@ -82,10 +82,16 @@ public class MenuItem {
 
     public void printMenu(){
         System.out.println("------------------------------------------------------------------------------------------");
-        System.out.println(String.format("%-30s", "ITEM ID")+String.format("%-30s", "ITEM NAME")+String.format("%-30s", "ITEM PRICE (RM)"));
+        System.out.println(String.format("%-5s", "No.")+String.format("%-30s", "ITEM ID")+String.format("%-30s", "ITEM NAME")+String.format("%-30s", "ITEM PRICE (RM)"));
         System.out.println("------------------------------------------------------------------------------------------");
-        for(MenuItem item:vendorItems){
-            System.out.println(String.format("%-30s", item.getItemID())+String.format("%-30s", item.getItemName())+String.format("%-30s", item.getItemPrice()));
+        if(!vendorItems.isEmpty()) {
+            int counter=1;
+            for (MenuItem item : vendorItems) {
+                System.out.println(String.format("%-5s", counter)+String.format("%-30s", item.getItemID()) + String.format("%-30s", item.getItemName()) + String.format("%-30s", item.getItemPrice()));
+                counter++;
+            }
+        }else{
+            System.out.println("(There is currently no item in the menu.)");
         }
         System.out.println("------------------------------------------------------------------------------------------");
     }

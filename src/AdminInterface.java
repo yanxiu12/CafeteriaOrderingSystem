@@ -108,8 +108,7 @@ public class AdminInterface extends MainInterface {
         System.out.println("|                CREATE CUSTOMER               |");
         System.out.println("------------------------------------------------");
         System.out.println();
-        IDGenerator generator = new IDGenerator("Customer.ser","CA");
-        id = generator.generateSerializedID();
+        id = IDGenerator.generateIDForCustomer();
         System.out.println("Customer ID:"+id);
         status = true;
         while(status){
@@ -152,10 +151,10 @@ public class AdminInterface extends MainInterface {
         while(status){
             System.out.print("Customer Password:");
             password = input.nextLine();
-            if(!password.isEmpty())
+            if(password.length()>=5)
                 status = false;
             else
-                System.out.println("Please enter a valid password.");
+                System.out.println("Please enter a valid password with at least 5 characters.");
         }
         Customer newCustomer = new Customer(id,password,name,dob,contact,address,"0.00");
         newCustomer.write2file(newCustomer);
@@ -298,8 +297,8 @@ public class AdminInterface extends MainInterface {
                                     System.out.println("Customer Password:"+password);
                                     System.out.print("New Customer Password:");
                                     String newPassword = input.nextLine();
-                                    if(newPassword.isEmpty())
-                                        System.out.println("Please enter a valid password.");
+                                    if(password.length()<5)
+                                        System.out.println("Please enter a valid password with at least 5 characters.");
                                     else if (newPassword.equals(password)) {
                                         status = false;
                                         System.out.println("The update was not processed. The new value matches the existing value.");
@@ -540,8 +539,7 @@ public class AdminInterface extends MainInterface {
         System.out.println("|                 CREATE VENDOR                |");
         System.out.println("------------------------------------------------");
         System.out.println();
-        IDGenerator generator = new IDGenerator("Vendor.ser","VA");
-        id = generator.generateSerializedID();
+        id = IDGenerator.generateIDForVendor();
         System.out.println("Vendor ID:"+id);
         while(status){
             System.out.print("Vendor Name:");
@@ -574,10 +572,10 @@ public class AdminInterface extends MainInterface {
         while(status){
             System.out.print("Vendor Password:");
             password = input.nextLine();
-            if(!password.isEmpty())
+            if(password.length()>=5)
                 status = false;
             else
-                System.out.println("Please enter a valid password.");
+                System.out.println("Please enter a valid password with at least 5 characters.");
         }
         Vendor newVendor = new Vendor(id,password,name,category,address);
         newVendor.write2file(newVendor);
@@ -685,12 +683,12 @@ public class AdminInterface extends MainInterface {
                                     if (newPassword.equals(password)) {
                                         status = false;
                                         System.out.println("The update was not processed. The new value matches the existing value.");
-                                    } else if(!newPassword.isEmpty()){
+                                    } else if(password.length()>=5){
                                         status = false;
                                         password = newPassword;
                                         System.out.println("The updated information has been stored.");
                                     } else
-                                        System.out.println("Please enter a valid password.");
+                                        System.out.println("Please enter a valid password with at least 5 characters.");
                                 }
                                 break;
                             case 4:
@@ -866,8 +864,7 @@ public class AdminInterface extends MainInterface {
         System.out.println("|                 CREATE RUNNER                |");
         System.out.println("------------------------------------------------");
         System.out.println();
-        IDGenerator generator = new IDGenerator("Runner.ser","RA");
-        id = generator.generateSerializedID();
+        id = IDGenerator.generateIDForRunner();
         System.out.println("Runner ID: "+id);
         while(status){
             System.out.print("Runner Name:");
@@ -891,12 +888,12 @@ public class AdminInterface extends MainInterface {
         while(status){
             System.out.print("Runner Password:");
             password = input.nextLine();
-            if(!password.isEmpty())
+            if(password.length()>=5)
                 status = false;
             else
-                System.out.println("Please enter a valid password.");
+                System.out.println("Please enter a valid password with at least 5 character.");
         }
-        Runner newRunner = new Runner(id,password,name,contact);
+        Runner newRunner = new Runner(id,password,name,contact,true);
         newRunner.write2file();
         System.out.println();
         System.out.println("Successfully created the user.");
@@ -1003,12 +1000,12 @@ public class AdminInterface extends MainInterface {
                                     if (newPassword.equals(password)) {
                                         status = false;
                                         System.out.println("The update was not processed. The new value matches the existing value.");
-                                    }else if(!password.isEmpty()) {
+                                    }else if(password.length()>=5) {
                                         status = false;
                                         password = newPassword;
                                         System.out.println("The updated information has been stored.");
                                     }else
-                                        System.out.println("Please enter a valid password.");
+                                        System.out.println("Please enter a valid password with at least 5 characters.");
                                 }
                                 break;
                         }
@@ -1023,7 +1020,7 @@ public class AdminInterface extends MainInterface {
                         }
                         input.nextLine();//clear the scanner's buffer
                     }
-                    operation.updateObject(idToUpdate,new Runner(id,password,name,contact));
+                    operation.updateObject(idToUpdate,new Runner(id,password,name,contact,true));
                     System.out.println();
                     System.out.println("Successfully updated the user.");
                     update = false;

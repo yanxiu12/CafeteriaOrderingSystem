@@ -17,8 +17,8 @@ public class Cart {
 
     public void setQuantity(int quantity){this.quantity=quantity;}
 
-    @Override
-    public String toString() {
-        return super.toString();
+    public String toString(){
+        return String.format("%s,%d", item.getItemName(), quantity);
     }
+
 }

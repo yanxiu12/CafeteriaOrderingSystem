@@ -12,8 +12,7 @@ public class CustomerNotification extends Notification{
         this.customer = customer;
         this.code = code;
         this.objectID = objectID;
-        IDGenerator generator = new IDGenerator("CustomerNotification","CN");
-        this.ID = generator.generateID();
+        this.ID = IDGenerator.generateIDForCustomerNotification();
     }
 
     public CustomerNotification(String message, Customer customer, int code, String objectID,String runnerContact) {
@@ -22,16 +21,24 @@ public class CustomerNotification extends Notification{
         this.code = code;
         this.objectID = objectID;
         this.runnerContact = runnerContact;
-        IDGenerator generator = new IDGenerator("CustomerNotification","CN");
-        this.ID = generator.generateID();
+        this.ID = IDGenerator.generateIDForCustomerNotification();
     }
 
-    public CustomerNotification(String ID, Customer customer, String message, int code, String objectID){
+//    public CustomerNotification(String ID, Customer customer, String message, int code, String objectID){
+//        super(message);
+//        this.ID = ID;
+//        this.customer = customer;
+//        this.code = code;
+//        this.objectID = objectID;
+//    }
+
+    public CustomerNotification(String ID, Customer customer, String message, int code, String objectID,String runnerContact){
         super(message);
         this.ID = ID;
         this.customer = customer;
         this.code = code;
         this.objectID = objectID;
+        this.runnerContact = runnerContact;
     }
 
     public Customer getCustomer() {
@@ -46,6 +53,7 @@ public class CustomerNotification extends Notification{
         Scanner input = new Scanner(System.in);
         String method;
         System.out.println("Dear "+customer.getName()+", there is currently no available runner for your order: "+order.getID());
+        System.out.println();
         System.out.println("You may change your order to 'Dine-in' or 'Take Away'. ");
         System.out.println("Please proceed for the change.");
         while(true){
@@ -64,10 +72,15 @@ public class CustomerNotification extends Notification{
 
     public void notifyOrderStatusUpdate(Order order){//code 2
         System.out.println("Dear "+customer.getName()+", your order status has been updated!");
+        System.out.println();
+        System.out.println("Order ID: "+order.getID());
         System.out.println("Current status: "+order.getStatus());
     }
 
     public void transactionReceipt(Credit credit){//code 3
+        System.out.println("Dear "+customer.getName()+", ");
+        System.out.println();
+        System.out.println("Thank you for your recent transaction. Here are your transaction details:");
         System.out.println("-------------------------------------------------------------------------------");
         System.out.println("|"+String.format("%-29s", "")+"TRANSACTION RECEIPT"+String.format("%-29s", "")+"|");
         System.out.println("|"+String.format("%-29s", "")+"-------------------"+String.format("%-29s", "")+"|");
@@ -81,6 +94,11 @@ public class CustomerNotification extends Notification{
         System.out.println("|"+String.format("%-39s", "TRANSACTION ID")+String.format("%38s", credit.getID())+"|");
         System.out.println("|"+String.format("%-77s", "")+"|");
         System.out.println("-------------------------------------------------------------------------------");
+        System.out.println();
+        System.out.println("If you have any questions or concerns, feel free to contact us.");
+        System.out.println();
+        System.out.println("Sincerely,\n" +"Admin");
+        System.out.println();
     }
 
     public void notifyCancelOrder(Order order){//code 4
@@ -98,6 +116,7 @@ public class CustomerNotification extends Notification{
 
     public void notifyRunnerDetail(Order order){//code 5
         System.out.println("Dear "+customer.getName()+", we have found a runner for your delivery order!");
+        System.out.println("Order ID: "+order.getID());
         System.out.println("Current status: "+order.getStatus());
         System.out.println("Runner contact: "+runnerContact);
     }

@@ -75,9 +75,8 @@ public class OrderReview {
                 if(Integer.parseInt(reviewRecord[5])==1)
                     reviews.add(String.format("%-20s", reviewRecord[2]) +  String.format("%-10s",("| "+reviewRecord[3])) +  "| "+reviewRecord[4]);
             }
-            return reviews;
         }
-        return null;
+        return reviews;
     }
 
     private ArrayList<String> readReviewFromFile(Runner runner){
@@ -90,8 +89,7 @@ public class OrderReview {
                 if(Integer.parseInt(reviewRecord[5])==2)
                     reviews.add(String.format("%-20s", reviewRecord[2]) +  String.format("%-10s",("| "+reviewRecord[3])) +  "| "+reviewRecord[4]);
             }
-            return reviews;
         }
-        return null;
+        return reviews;
     }
 }

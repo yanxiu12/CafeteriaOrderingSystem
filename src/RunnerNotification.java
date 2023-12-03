@@ -12,11 +12,10 @@ public class RunnerNotification extends Notification{
         this.runner = runner;
         this.code = code;
         this.objectID = objectID;
-        IDGenerator generator = new IDGenerator("CustomerNotification","CN");
-        this.ID = generator.generateID();
+        this.ID = IDGenerator.generateIDForRunnerNotification();
     }
 
-    public RunnerNotification(String id,String message,Runner runner,int code,String objectID){
+    public RunnerNotification(String id,Runner runner,String message,int code,String objectID){
         super(message);
         this.runner = runner;
         this.code = code;
@@ -45,7 +44,6 @@ public class RunnerNotification extends Notification{
         System.out.println(order.getVendor().getAddress());
         System.out.println();
         System.out.println("Please choose 1. Accept / 2. Reject.");
-        System.out.print("Enter the number: ");
 
         int choice = 0;
         boolean validInput = false;

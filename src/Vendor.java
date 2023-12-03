@@ -1,12 +1,14 @@
 import jdk.jfr.Category;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 
 public class Vendor implements Serializable {
     private String ID, vendorName, category, password,address;
-    private ArrayList<Order> receivedOrders;
-    private ArrayList<VendorNotification> notifications;
+    private transient ArrayList<Order> receivedOrders;
+    private transient ArrayList<VendorNotification> notifications;
 
     public Vendor(String userID){
         SerializationOperation operation = new SerializationOperation("Vendor.ser");
@@ -33,6 +35,7 @@ public class Vendor implements Serializable {
     public Vendor(String ID,String password,String vendorName,String category,String address){
         setID(ID);setPassword(password);setVendorName(vendorName);setCategory(category);setAddress(address);
         this.receivedOrders = new ArrayList<>();
+        this.notifications = new ArrayList<>();
     }//for register //obj.write2file(obj.toString());
 
     public String getID(){return ID;}
@@ -56,6 +59,7 @@ public class Vendor implements Serializable {
     public String getAddress(){return address;}
 
     public ArrayList<VendorNotification> getNotifications(){
+        this.notifications = new ArrayList<>();
         FileOperation file = new FileOperation("VendorNotification.txt");
         ArrayList<String> foundRecords = file.search(ID);
         for(String record:foundRecords){
@@ -81,7 +85,7 @@ public class Vendor implements Serializable {
         if(!foundOrder.isEmpty()) {
             for (String order : foundOrder) {
                 String[] part = order.split(";");
-                if (!part[5].equals(String.valueOf(Order.Status.Completed))) {
+                if (!part[5].equals(String.valueOf(Order.Status.Completed)) && !part[5].equals(String.valueOf(Order.Status.Cancelled)) && !part[5].equals(String.valueOf(Order.Status.Rejected))) {
                     receivedOrders.add(new Order(part[0]));
                 }
             }
@@ -98,6 +102,60 @@ public class Vendor implements Serializable {
             orderHistory.add(new Order(part[0]));
         }
         return orderHistory;
+    }
+
+    public ArrayList<Order> getOrderHistoryByDate(LocalDate date) {
+        ArrayList<Order> ordersByDate = new ArrayList<>();
+        FileOperation file = new FileOperation("CusOrder.txt");
+        ArrayList<String> foundRecords = file.search(ID);
+
+        for (String record : foundRecords) {
+            String[] part = record.split(";");
+            Order order = new Order(part[0]); // Assuming part[0] is the order ID
+
+            // Assuming currentDate is a string representation of the date in the format "yyyy-MM-dd"
+            LocalDate orderDate = LocalDate.parse(order.getCurrentDate()); // Parse the date string
+
+            if (orderDate.equals(date)) {
+                // Add this order to the history if it matches the specified date
+                ordersByDate.add(order);
+            }
+        }
+        return ordersByDate;
+    }
+
+    public ArrayList<Order> getOrderHistoryByMonth(YearMonth month) {
+        ArrayList<Order> ordersByMonth = new ArrayList<>();
+        FileOperation file = new FileOperation("CusOrder.txt");
+        ArrayList<String> foundRecords = file.search(ID);
+
+        for (String record : foundRecords) {
+            String[] part = record.split(";");
+            Order order = new Order(part[0]);
+
+            LocalDate orderDate = LocalDate.parse(order.getCurrentDate()); // Parse the date string
+            YearMonth orderYearMonth = YearMonth.from(orderDate);
+            if (orderYearMonth.equals(month)) {
+                ordersByMonth.add(order);
+            }
+        }
+        return ordersByMonth;
+    }
+
+    public ArrayList<Order> getOrderHistoryByYear(int year) {
+        ArrayList<Order> ordersByYear = new ArrayList<>();
+        FileOperation file = new FileOperation("CusOrder.txt");
+        ArrayList<String> foundRecords = file.search(ID);
+
+        for (String record : foundRecords) {
+            String[] part = record.split(";");
+            Order order = new Order(part[0]);
+            LocalDate orderDate = LocalDate.parse(order.getCurrentDate()); // Parse the date string
+            if (orderDate.getYear() == year) {
+                ordersByYear.add(order);
+            }
+        }
+        return ordersByYear;
     }
 
 //    public void cancelOrder(Order order){
@@ -117,25 +175,39 @@ public class Vendor implements Serializable {
 //        }
 //    }
 
-    public void updateOrder(Order order,int status){
-        switch (status) {
-            case 1://accept order
-                order.setStatus(Order.Status.Accepted);
-            case 2://reject order
-                order.setStatus(Order.Status.Rejected);
-            case 3:
-                order.setStatus(Order.Status.Ready);
-            case 4://complete order
-                order.setStatus(Order.Status.Completed);
-        }
-        CustomerNotification notification;
-        if(order.getStatus()==Order.Status.Rejected){
-            notification = new CustomerNotification("Your order [" + order.getID() + "] has been rejected!", order.getCustomer(), 4, order.getID());
-        }else {
-            notification = new CustomerNotification("Order Status Updated!", order.getCustomer(), 2, order.getID());
-        }
-        notification.saveNotification();
-        FileOperation file = new FileOperation("CusOrder.txt");
-        file.modifyFile(order.getID(),order.toString());
+    public boolean updateOrder(Order order,int status){
+        if(order.getStatus()!=Order.Status.Cancelled) {
+            switch (status) {
+                case 1://accept order
+                    order.setStatus(Order.Status.Accepted);
+                    break;
+                case 2://reject order
+                    order.setStatus(Order.Status.Rejected);
+                    break;
+                case 3:
+                    if(order.getOrderType()==3){
+                        if(order.getOrderTaskStatus())
+                            order.setStatus(Order.Status.Delivering);
+                        else
+                            order.setStatus(Order.Status.PendingRunner);
+                    }else
+                        order.setStatus(Order.Status.Ready);
+                    break;
+                case 4://complete order
+                    order.setStatus(Order.Status.Completed);
+                    break;
+            }
+            CustomerNotification notification;
+            if (order.getStatus() == Order.Status.Rejected) {
+                notification = new CustomerNotification("Your order [" + order.getID() + "] has been rejected!", order.getCustomer(), 4, order.getID());
+            } else {
+                notification = new CustomerNotification("Order Status Updated!", order.getCustomer(), 2, order.getID());
+            }
+            notification.saveNotification();
+            FileOperation file = new FileOperation("CusOrder.txt");
+            file.modifyFile(order.getID(), order.toString());
+            return true;
+        }else
+            return false;
     }
 }
