@@ -121,6 +121,27 @@ public class CustomerNotification extends Notification{
         System.out.println("Runner contact: "+runnerContact);
     }
 
+    public void notifyOrderIsDelivering(Order order){//code 6
+        System.out.println("Dear "+customer.getName()+", your order status has been updated!");
+        System.out.println();
+        System.out.println("Order ID: "+order.getID());
+        System.out.println("Current status: Delivering");
+    }
+
+    public void notifyOrderPendingRunner(Order order){//code 7
+        System.out.println("Dear "+customer.getName()+", your order status has been updated!");
+        System.out.println();
+        System.out.println("Order ID: "+order.getID());
+        System.out.println("Current status: PendingRunner");
+    }
+
+    public void notifyOrderAccepted(Order order){//code 8
+        System.out.println("Dear "+customer.getName()+", your order status has been updated!");
+        System.out.println();
+        System.out.println("Order ID: "+order.getID());
+        System.out.println("Current status: VendorAccepted");
+    }
+
     @Override
     public String toString() {
         return String.format("%s;%s;%s;%s;%s;%s", ID, customer.getID(),message,code,objectID,runnerContact);

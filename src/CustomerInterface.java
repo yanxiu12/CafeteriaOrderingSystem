@@ -44,7 +44,7 @@ public class CustomerInterface extends MainInterface{
                 customer = foundCustomer.get(0);
             }
             if (customer == null) {
-                System.out.print("User ID not exist. Enter 1 to try again or proceed to admin.");
+                System.out.print("User ID not exist. Enter 1 to try again / Enter other value to exit.");
                 try {
                     repeat = input.nextInt();
                     input.nextLine();
@@ -796,7 +796,7 @@ public class CustomerInterface extends MainInterface{
                                     }else{
                                         System.out.println("Unable to retrieve the notification.");
                                     }
-                                }else if(code == 2 || code == 4 || code == 5){
+                                }else if(code == 2 || code == 4 || code == 5 || code == 6 || code == 7 || code == 8){
                                     Order order = new Order(notification.getObjectID());
                                     if(code == 2)
                                         notification.notifyOrderStatusUpdate(order);
@@ -804,6 +804,12 @@ public class CustomerInterface extends MainInterface{
                                         notification.notifyCancelOrder(order);
                                     if(code == 5)
                                         notification.notifyRunnerDetail(order);
+                                    if(code == 6)
+                                        notification.notifyOrderIsDelivering(order);
+                                    if(code == 7)
+                                        notification.notifyOrderPendingRunner(order);
+                                    if(code == 8)
+                                        notification.notifyOrderAccepted(order);
                                     System.out.println();
                                     System.out.print("(Enter any key to exit.)");
                                     String exit = input.nextLine();

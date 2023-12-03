@@ -44,7 +44,7 @@ public class RunnerInterface extends MainInterface{
                 runner = foundRunner.get(0);
             }
             if (runner == null) {
-                System.out.print("User ID not exist. Enter 1 to try again or proceed to admin.");
+                System.out.print("User ID not exist. Enter 1 to try again / Enter other value to exit.");
                 try {
                     repeat = input.nextInt();
                     input.nextLine();
@@ -226,6 +226,7 @@ public class RunnerInterface extends MainInterface{
                     }
                     counter++;
                 }
+                counter=1;
             }
             System.out.println();
             System.out.print("Would you like to take any action from your history? Enter 1 to check customer reviews / Enter any other value to exit:");

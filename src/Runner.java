@@ -88,9 +88,11 @@ public class Runner implements Serializable {
         if(!foundTask.isEmpty()) {
             for (String task : foundTask) {
                 String[] part = task.split(";");
-                Order order = new Order(part[0]);
-                if (!(order.getStatus() == Order.Status.Completed)) {
-                    receivedOrders.add(order);
+                if(part[1].equals(ID) && Boolean.parseBoolean(part[3])) {
+                    Order order = new Order(part[0]);
+                    if (!(order.getStatus() == Order.Status.Completed)) {
+                        receivedOrders.add(order);
+                    }
                 }
             }
         }
@@ -110,32 +112,33 @@ public class Runner implements Serializable {
 
 
     public void updateOrder(Order order,int status){
-        boolean statusChange = false;
         switch (status) {
             case 1://accept order
-                if(order.getStatus() == Order.Status.Ready) {
+                if(order.getStatus() == Order.Status.VendorIsReady) {
                     order.setStatus(Order.Status.Delivering);
-                    statusChange = true;
+                    CustomerNotification notification = new CustomerNotification("Order is Delivering!", order.getCustomer(), 6, order.getID());
+                    notification.saveNotification();
+                    FileOperation file = new FileOperation("CusOrder.txt");
+                    file.modifyFile(order.getID(), order.toString());
                 }
                 break;
             case 2://reject order
-                if(order.getStatus() == Order.Status.Ready) {
+                if(order.getStatus() == Order.Status.VendorIsReady) {
                     order.setStatus(Order.Status.PendingRunner);
-                    statusChange = true;
+                    CustomerNotification notification = new CustomerNotification("Order is Delivering!", order.getCustomer(), 7, order.getID());
+                    notification.saveNotification();
+                    FileOperation file = new FileOperation("CusOrder.txt");
+                    file.modifyFile(order.getID(), order.toString());
                 }
                 break;
             case 3://complete order
                 order.setStatus(Order.Status.Completed);
                 this.status=true;
-                modifyFile();
-                statusChange = true;
+                CustomerNotification notification = new CustomerNotification("Order Completed!", order.getCustomer(), 2, order.getID());
+                notification.saveNotification();
+                FileOperation file = new FileOperation("CusOrder.txt");
+                file.modifyFile(order.getID(), order.toString());
                 break;
-        }
-        if(statusChange) {
-            CustomerNotification notification = new CustomerNotification("Order Status Updated!", order.getCustomer(), 2, order.getID());
-            notification.saveNotification();
-            FileOperation file = new FileOperation("CusOrder.txt");
-            file.modifyFile(order.getID(), order.toString());
         }
     }
 

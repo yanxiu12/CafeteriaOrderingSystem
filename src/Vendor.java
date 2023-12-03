@@ -85,7 +85,7 @@ public class Vendor implements Serializable {
         if(!foundOrder.isEmpty()) {
             for (String order : foundOrder) {
                 String[] part = order.split(";");
-                if (!part[5].equals(String.valueOf(Order.Status.Completed)) && !part[5].equals(String.valueOf(Order.Status.Cancelled)) && !part[5].equals(String.valueOf(Order.Status.Rejected))) {
+                if (!part[5].equals(String.valueOf(Order.Status.Completed)) && !part[5].equals(String.valueOf(Order.Status.Cancelled)) && !part[5].equals(String.valueOf(Order.Status.VendorRejected))) {
                     receivedOrders.add(new Order(part[0]));
                 }
             }
@@ -179,10 +179,10 @@ public class Vendor implements Serializable {
         if(order.getStatus()!=Order.Status.Cancelled) {
             switch (status) {
                 case 1://accept order
-                    order.setStatus(Order.Status.Accepted);
+                    order.setStatus(Order.Status.VendorAccepted);
                     break;
                 case 2://reject order
-                    order.setStatus(Order.Status.Rejected);
+                    order.setStatus(Order.Status.VendorRejected);
                     break;
                 case 3:
                     if(order.getOrderType()==3){
@@ -191,17 +191,17 @@ public class Vendor implements Serializable {
                         else
                             order.setStatus(Order.Status.PendingRunner);
                     }else
-                        order.setStatus(Order.Status.Ready);
+                        order.setStatus(Order.Status.VendorIsReady);
                     break;
                 case 4://complete order
                     order.setStatus(Order.Status.Completed);
                     break;
             }
             CustomerNotification notification;
-            if (order.getStatus() == Order.Status.Rejected) {
+            if (order.getStatus() == Order.Status.VendorRejected) {
                 notification = new CustomerNotification("Your order [" + order.getID() + "] has been rejected!", order.getCustomer(), 4, order.getID());
             } else {
-                notification = new CustomerNotification("Order Status Updated!", order.getCustomer(), 2, order.getID());
+                notification = new CustomerNotification("Order is Accepted!", order.getCustomer(), 8, order.getID());
             }
             notification.saveNotification();
             FileOperation file = new FileOperation("CusOrder.txt");

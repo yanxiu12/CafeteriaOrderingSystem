@@ -44,7 +44,7 @@ public class VendorInterface extends MainInterface{
                 vendor = foundVendor.get(0);
             }
             if (vendor == null) {
-                System.out.print("User ID not exist. Enter 1 to try again or proceed to admin.");
+                System.out.print("User ID not exist. Enter 1 to try again / Enter other value to exit.");
                 try {
                     repeat = input.nextInt();
                     input.nextLine();
@@ -463,10 +463,12 @@ public class VendorInterface extends MainInterface{
                         if(validOrderID) {
                             System.out.println();
                             System.out.println("Current Order Status: " + order.getStatus());
-                            if (order.getStatus().equals(Order.Status.Accepted)) {
+                            if (order.getStatus().equals(Order.Status.PendingAccepted)) {
+                                System.out.println("Please proceed to notification to Accept / Reject the order.");
+                            } else if (order.getStatus().equals(Order.Status.VendorAccepted)) {
                                 System.out.println("|");
                                 System.out.println("v");
-                                System.out.println("New Order Status: " + Order.Status.Ready);
+                                System.out.println("New Order Status: " + Order.Status.VendorIsReady);
                                 System.out.println();
 
                                 System.out.print("Is the information correct? (Enter 'yes' to proceed): ");
@@ -478,7 +480,7 @@ public class VendorInterface extends MainInterface{
                                 } else {
                                     System.out.println("Update canceled. Please review the information and try again.");
                                 }
-                            } else if (order.getOrderType() != 3 && order.getStatus().equals(Order.Status.Ready)) {
+                            } else if (order.getOrderType() != 3 && order.getStatus().equals(Order.Status.VendorIsReady)) {
                                 System.out.println("|");
                                 System.out.println("v");
                                 System.out.println("New Order Status: " + Order.Status.Completed);

@@ -6,9 +6,9 @@ public class Order {
 
     enum Status{
         PendingAccepted,
-        Accepted,
-        Rejected,
-        Ready,
+        VendorAccepted,
+        VendorRejected,
+        VendorIsReady,
         Completed,
         PendingRunner,
         Delivering,

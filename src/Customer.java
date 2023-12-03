@@ -72,7 +72,7 @@ public class Customer implements Serializable {
         if(!foundOrder.isEmpty()) {
             for (String order : foundOrder) {
                 String[] part = order.split(";");
-                if (!part[5].equals(String.valueOf(Order.Status.Completed)) && !part[5].equals(String.valueOf(Order.Status.Cancelled)) && !part[5].equals(String.valueOf(Order.Status.Rejected))) {
+                if (!part[5].equals(String.valueOf(Order.Status.Completed)) && !part[5].equals(String.valueOf(Order.Status.Cancelled)) && !part[5].equals(String.valueOf(Order.Status.VendorRejected))) {
                     orders.add(new Order(part[0]));
                 }
             }
