@@ -470,13 +470,17 @@ public class AdminInterface extends MainInterface {
                         try {
                             amount = input.nextDouble();
                             System.out.println();
-                            Credit credit = new Credit(cus);
-                            credit.addAmount(amount,1);
-                            CustomerNotification notification = new CustomerNotification("Successfully top up credit!",cus,3, credit.getID());
-                            notification.saveNotification();
-                            status = false;
-                            System.out.println("Successfully top-up the amount. \nThe transaction receipt has been sent to customer account.");
-                            repeat = false;
+                            if(amount>0) {
+                                Credit credit = new Credit(cus);
+                                credit.addAmount(amount, 1);
+                                CustomerNotification notification = new CustomerNotification("Successfully top up credit!", cus, 3, credit.getID());
+                                notification.saveNotification();
+                                status = false;
+                                System.out.println("Successfully top-up the amount. \nThe transaction receipt has been sent to customer account.");
+                                repeat = false;
+                            }else{
+                                System.out.println("Please enter a valid positive input.");
+                            }
                         } catch (InputMismatchException e) {
                             System.out.println("Please enter a valid input.");
                             status = true;
