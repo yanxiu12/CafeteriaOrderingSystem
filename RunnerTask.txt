@@ -1,0 +1,3 @@
+CO1;RA1;0;true
+CO2;RA3;1;false
+CO3;RA1;0;true
