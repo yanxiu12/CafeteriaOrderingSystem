@@ -211,9 +211,9 @@ public class RunnerInterface extends MainInterface{
         System.out.println();
         System.out.println("Number of tasks: "+taskHistory.size());
         System.out.println();
-        System.out.println("====================================================================================================================================================================================");
+        System.out.println("==================================================================================================================================================================================================================");
         System.out.println(String.format("%-30s", "ORDER ID") + String.format("%-30s", "CUSTOMER") + String.format("%-30s", "VENDOR") + String.format("%-30s", "STATUS") + String.format("%-30s", "ITEM")+String.format("%-30s", "QUANTITY") + String.format("%-30s", "DELIVERY FEE"));
-        System.out.println("====================================================================================================================================================================================");
+        System.out.println("==================================================================================================================================================================================================================");
         if (!taskHistory.isEmpty()) {
             int counter = 1;
             for (Order order : taskHistory) {
@@ -222,7 +222,7 @@ public class RunnerInterface extends MainInterface{
                         System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", order.getVendor().getVendorName()) + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getDeliveryFee()));
 
                     }else{
-                        System.out.println(String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") +  String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", ""));
+                        System.out.println(String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", ""));
                     }
                     counter++;
                 }
