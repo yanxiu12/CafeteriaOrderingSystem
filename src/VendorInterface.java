@@ -412,20 +412,20 @@ public class VendorInterface extends MainInterface{
         System.out.println("-----------------------------------------------------");
         System.out.println();
         ArrayList<Order> orders = vendor.getReceivedOrders();
-        System.out.println("====================================================================================================================================================================================");
-        System.out.println(String.format("%-30s", "ORDER ID") + String.format("%-30s", "CUSTOMER") + String.format("%-30s", "SERVING METHOD") + String.format("%-30s", "STATUS") + String.format("%-30s", "ITEM") + String.format("%-30s", "QUANTITY"));
-        System.out.println("====================================================================================================================================================================================");
+        System.out.println("==================================================================================================================================================================================================================");
+        System.out.println(String.format("%-30s", "ORDER ID") + String.format("%-30s", "CUSTOMER") + String.format("%-30s", "SERVING METHOD") + String.format("%-30s", "STATUS") + String.format("%-30s", "ITEM") + String.format("%-30s", "QUANTITY") + String.format("%-30s", "TOTAL PRICE"));
+        System.out.println("==================================================================================================================================================================================================================");
         if (!orders.isEmpty()) {
             int counter = 1;
             for (Order order : orders) {
                 for (Cart item : order.getShoppingCart()) {
                     if (counter == 1) {
                         if(order.getOrderType()==1)
-                            System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Dine-In") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                            System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Dine-In") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", String.format("%.2f",order.getTotalPrice())));
                         else if(order.getOrderType()==2)
-                            System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Take Away") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                            System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Take Away") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", String.format("%.2f",order.getTotalPrice())));
                         else
-                            System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Delivery") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                            System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Delivery") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", String.format("%.2f",order.getTotalPrice())));
                     } else {
                         System.out.println(String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()));
                     }
@@ -605,11 +605,11 @@ public class VendorInterface extends MainInterface{
                     for(Cart item:order.getShoppingCart()){
                         if(counter == 1) {
                             if(order.getOrderType()==1)
-                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Dine-In") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Dine-In") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", String.format("%.2f",order.getTotalPrice())));
                             else if(order.getOrderType()==2)
-                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Take Away") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Take Away") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", String.format("%.2f",order.getTotalPrice())));
                             else
-                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Delivery") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Delivery") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", String.format("%.2f",order.getTotalPrice())));
                         }else{
                             System.out.println(String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", ""));
                         }
@@ -655,11 +655,11 @@ public class VendorInterface extends MainInterface{
                     for (Cart item : order.getShoppingCart()) {
                         if (counter == 1) {
                             if(order.getOrderType()==1)
-                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Dine-In") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Dine-In") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", String.format("%.2f",order.getTotalPrice())));
                             else if(order.getOrderType()==2)
-                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Take Away") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Take Away") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", String.format("%.2f",order.getTotalPrice())));
                             else
-                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Delivery") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Delivery") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", String.format("%.2f",order.getTotalPrice())));
                         } else {
                             System.out.println(String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", ""));
                         }
@@ -705,11 +705,11 @@ public class VendorInterface extends MainInterface{
                     for (Cart item : order.getShoppingCart()) {
                         if (counter == 1) {
                             if(order.getOrderType()==1)
-                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Dine-In") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Dine-In") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", String.format("%.2f",order.getTotalPrice())));
                             else if(order.getOrderType()==2)
-                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Take Away") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Take Away") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", String.format("%.2f",order.getTotalPrice())));
                             else
-                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Delivery") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", order.getTotalPrice()));
+                                System.out.println(String.format("%-30s", order.getID()) + String.format("%-30s", order.getCustomer().getName()) + String.format("%-30s", "Delivery") + String.format("%-30s", order.getStatus()) + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", String.format("%.2f",order.getTotalPrice())));
                         } else {
                             System.out.println(String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", "") + String.format("%-30s", item.getItem().getItemName()) + String.format("%-30s", item.getQuantity()) + String.format("%-30s", ""));
                         }
