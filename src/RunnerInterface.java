@@ -165,6 +165,21 @@ public class RunnerInterface extends MainInterface{
                         if (validOrderID) {
                             System.out.println();
                             System.out.println("Current Order Status: " + order.getStatus());
+                            if (order.getStatus().equals(Order.Status.VendorIsReady)){
+                                System.out.println("|");
+                                System.out.println("v");
+                                System.out.println("New Order Status: " + Order.Status.Delivering);
+                                System.out.println();
+
+                                System.out.print("Is the information correct? (Enter 'yes' to proceed): ");
+                                String confirmation = input.nextLine().trim().toLowerCase();
+
+                                if (confirmation.equals("yes")) {
+                                    runner.updateOrder(order,1);
+                                } else {
+                                    System.out.println("Update canceled. Please review the information and try again.");
+                                }
+                            }
                             if (order.getStatus().equals(Order.Status.Delivering)) {
                                 System.out.println("|");
                                 System.out.println("v");
