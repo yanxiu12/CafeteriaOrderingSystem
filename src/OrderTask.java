@@ -1,4 +1,3 @@
-import java.io.File;
 import java.util.ArrayList;
 
 public class OrderTask {
@@ -7,11 +6,11 @@ public class OrderTask {
     private Runner runner;
     private int runnerCounter;
     private boolean acceptStatus = false;
-    private ArrayList<Runner> availableRunners;
+    private ArrayList<Runner> runnerList;
 
     public OrderTask() {
         Runner runner = new Runner();
-        availableRunners = runner.getAvailableRunner();
+        runnerList = runner.getAvailableRunner();
     }
 
     public OrderTask(Order order, Runner runner){
@@ -44,34 +43,39 @@ public class OrderTask {
 
     public void allocateRunner(Order order) {
         this.order = order;
-        int numberOfRunners = availableRunners.size();
+        int numberOfRunners = runnerList.size();
+        runnerCounter=0;
 
-        FileOperation file = new FileOperation("RunnerTask.txt");
-        ArrayList<String> foundTask=  file.search(order.getID());
-        if(foundTask.size() == 1){
-            String[] taskPart = foundTask.get(0).split(";");
-            int counter = Integer.parseInt(taskPart[2]);
-            this.runnerCounter = counter+1;
-        }else if(foundTask.isEmpty()){
-            this.runnerCounter = 0;
-        }
+        if(numberOfRunners>0) {
+            FileOperation file = new FileOperation("RunnerTask.txt");
+            ArrayList<String> foundTask = file.search(order.getID());
+            if (!foundTask.isEmpty()) {
+                String[] taskPart = foundTask.get(0).split(";");
+                int counter = Integer.parseInt(taskPart[2]);
+                runnerCounter = counter+1;
+            }
 
-        if (runnerCounter < numberOfRunners) {
-            if(runnerCounter == 0){
-                this.runner = availableRunners.get(runnerCounter);
-                RunnerNotification notification = new RunnerNotification("You have a new delivery task!", runner, 1, order.getID());
-                notification.saveNotification();
-                write2file(this.toString());
-            }else {
-                this.runner = availableRunners.get(runnerCounter);
-                RunnerNotification notification = new RunnerNotification("You have a new delivery task!", runner, 1, order.getID());
-                notification.saveNotification();
-                modifyFile(order.getID(), this.toString());
+            Runner onHoldRunner;
+            for (; runnerCounter < numberOfRunners; runnerCounter++) {
+                onHoldRunner = runnerList.get(runnerCounter);
+                if (!onHoldRunner.getStatus()) {
+                    continue;
+                }
+                break;
             }
         }
 
-        if (runnerCounter >= numberOfRunners) {
-            CustomerNotification notification = new CustomerNotification("Failed to get runner!", order.getCustomer(),1,order.getID());
+        if (runnerCounter < numberOfRunners) {
+            this.runner = runnerList.get(runnerCounter);
+            RunnerNotification notification = new RunnerNotification("You have a new delivery task!", runner, 1, order.getID());
+            notification.saveNotification();
+            if (runnerCounter == 0) {
+                write2file(this.toString());
+            } else {
+                modifyFile(order.getID(), this.toString());
+            }
+        } else {
+            CustomerNotification notification = new CustomerNotification("Failed to get runner!", order.getCustomer(), 1, order.getID());
             notification.saveNotification();
         }
     }

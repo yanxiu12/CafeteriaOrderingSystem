@@ -912,6 +912,7 @@ public class AdminInterface extends MainInterface {
         int choice=0;
         String idToUpdate;
         String id=null,name=null,contact=null,password=null;
+        boolean runnerStatus=true;
 
         System.out.println("------------------------------------------------");
         System.out.println("|                 UPDATE RUNNER                |");
@@ -933,7 +934,7 @@ public class AdminInterface extends MainInterface {
                 if (!foundRunner.isEmpty()) {
                     for (Runner runner : foundRunner) {
                         System.out.println(String.format("%-30s", runner.getID()) + String.format("%-30s", runner.getRunnerName()) + String.format("%-30s", runner.getContact()) +  String.format("%-30s", runner.getPassword()));
-                        id= runner.getID();name=runner.getRunnerName();contact=runner.getContact();password=runner.getPassword();
+                        id= runner.getID();name=runner.getRunnerName();contact=runner.getContact();password=runner.getPassword();runnerStatus = runner.getStatus();
                     }
                     System.out.println();
                     repeat = true;
@@ -1024,7 +1025,7 @@ public class AdminInterface extends MainInterface {
                         }
                         input.nextLine();//clear the scanner's buffer
                     }
-                    operation.updateObject(idToUpdate,new Runner(id,password,name,contact,true));
+                    operation.updateObject(idToUpdate,new Runner(id,password,name,contact,runnerStatus));
                     System.out.println();
                     System.out.println("Successfully updated the user.");
                     update = false;

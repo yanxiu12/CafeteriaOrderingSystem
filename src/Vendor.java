@@ -200,9 +200,16 @@ public class Vendor implements Serializable {
             CustomerNotification notification;
             if (order.getStatus() == Order.Status.VendorRejected) {
                 notification = new CustomerNotification("Your order [" + order.getID() + "] has been rejected!", order.getCustomer(), 4, order.getID());
-            } else {
+            } else if(order.getStatus() == Order.Status.VendorAccepted){
                 notification = new CustomerNotification("Order is Accepted!", order.getCustomer(), 8, order.getID());
-            }
+            } else if(order.getStatus() == Order.Status.Delivering) {
+                notification = new CustomerNotification("Order is Delivering!", order.getCustomer(), 6, order.getID());
+            }else if(order.getStatus() == Order.Status.VendorIsReady){
+                notification = new CustomerNotification("Order is Ready!", order.getCustomer(), 2, order.getID());
+            }else if(order.getStatus() == Order.Status.PendingRunner){
+                notification = new CustomerNotification("Order is Pending Runner!", order.getCustomer(), 7, order.getID());
+            }else
+                notification = new CustomerNotification("Order is Completed!", order.getCustomer(), 9, order.getID());
             notification.saveNotification();
             FileOperation file = new FileOperation("CusOrder.txt");
             file.modifyFile(order.getID(), order.toString());

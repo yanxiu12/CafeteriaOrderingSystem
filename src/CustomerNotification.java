@@ -70,11 +70,11 @@ public class CustomerNotification extends Notification{
         }
     }
 
-    public void notifyOrderStatusUpdate(Order order){//code 2
+    public void notifyOrderReady(Order order){//code 2
         System.out.println("Dear "+customer.getName()+", your order status has been updated!");
         System.out.println();
         System.out.println("Order ID: "+order.getID());
-        System.out.println("Current status: "+order.getStatus());
+        System.out.println("Current status: VendorIsReady");
     }
 
     public void transactionReceipt(Credit credit){//code 3
@@ -140,6 +140,13 @@ public class CustomerNotification extends Notification{
         System.out.println();
         System.out.println("Order ID: "+order.getID());
         System.out.println("Current status: VendorAccepted");
+    }
+
+    public void notifyOrderCompleted(Order order){//code 9
+        System.out.println("Dear "+customer.getName()+", your order status has been updated!");
+        System.out.println();
+        System.out.println("Order ID: "+order.getID());
+        System.out.println("Current status: Completed");
     }
 
     @Override

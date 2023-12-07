@@ -11,14 +11,6 @@ public class Runner implements Serializable {
 
     public Runner(){availableRunners = new ArrayList<>();}//for task usage
 
-//    public Runner(String userID, String password){
-//        FileOperation file = new FileOperation("Customer.txt");
-//        if(file.checkUserCredential(userID,password)){
-//            setDetails(userID);
-//            status=true;
-//        }
-//        this.receivedOrders = new ArrayList<>();
-//    }//for login
 
     public Runner(String ID,String password,String runnerName,String contact,boolean status){
         setID(ID);setPassword(password);setRunnerName(runnerName);setContact(contact);setStatus(status);
@@ -61,10 +53,7 @@ public class Runner implements Serializable {
         SerializationOperation operation = new SerializationOperation("Runner.ser");
         ArrayList<Runner> allRunner = operation.readAllObjects(Runner.class);
         if(!allRunner.isEmpty()) {
-            for (Runner runner : allRunner) {
-                if (runner.getStatus())
-                    availableRunners.add(runner);
-            }
+            availableRunners.addAll(allRunner);
         }
         return availableRunners;
     }
@@ -76,7 +65,6 @@ public class Runner implements Serializable {
         task.modifyFile(order.getID(),task.toString());
         status=false;
         modifyFile();
-        System.out.println("Contact:"+contact);
         CustomerNotification notification = new CustomerNotification("We have found you a runner!",order.getCustomer(),5,order.getID(),contact);
         notification.saveNotification();
     }
@@ -125,7 +113,7 @@ public class Runner implements Serializable {
             case 2://reject order
                 if(order.getStatus() == Order.Status.VendorIsReady) {
                     order.setStatus(Order.Status.PendingRunner);
-                    CustomerNotification notification = new CustomerNotification("Order is Delivering!", order.getCustomer(), 7, order.getID());
+                    CustomerNotification notification = new CustomerNotification("Order is Pending Runner!", order.getCustomer(), 7, order.getID());
                     notification.saveNotification();
                     FileOperation file = new FileOperation("CusOrder.txt");
                     file.modifyFile(order.getID(), order.toString());
@@ -134,7 +122,8 @@ public class Runner implements Serializable {
             case 3://complete order
                 order.setStatus(Order.Status.Completed);
                 this.status=true;
-                CustomerNotification notification = new CustomerNotification("Order Completed!", order.getCustomer(), 2, order.getID());
+                modifyFile();
+                CustomerNotification notification = new CustomerNotification("Order Completed!", order.getCustomer(), 9, order.getID());
                 notification.saveNotification();
                 FileOperation file = new FileOperation("CusOrder.txt");
                 file.modifyFile(order.getID(), order.toString());
