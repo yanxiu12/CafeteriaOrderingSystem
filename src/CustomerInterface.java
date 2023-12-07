@@ -837,6 +837,7 @@ public class CustomerInterface extends MainInterface{
                                     Order order = new Order(notification.getObjectID());
                                     int method = notification.notifyRunnerNotAvailable(order);
                                     order.setOrderType(method);
+                                    order.setStatus(Order.Status.VendorAccepted);
                                     customer.modifyOrderFile(order.getID(),order.toString());
                                     VendorNotification vendorNotification = new VendorNotification("Serving method has been changed!",order.getVendor(),3,order.getID());
                                     vendorNotification.saveNotification();
