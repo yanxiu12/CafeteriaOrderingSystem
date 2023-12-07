@@ -1,1 +1,2 @@
-VN5;VA1;You have new order!;1;CO4
+VN17;VA2;Serving method has been changed!;3;CO11
+VN18;VA2;Serving method has been changed!;3;CO12

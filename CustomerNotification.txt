@@ -1,6 +1,3 @@
 CN10;CA3;Successfully top up credit!;3;CT4;null
-CN15;CA1;Successfully top up credit!;3;CT6;null
-CN16;CA1;Successfully top up credit!;3;CT7;null
-CN17;CA5;Successfully top up credit!;3;CT8;null
-CN18;CA1;Successfully top up credit!;3;CT9;null
 CN19;CA4;Successfully top up credit!;3;CT10;null
+CN20;CA4;Your order [CO4] has been rejected!;4;CO4;null

@@ -1,4 +1,12 @@
 CO1;2023-12-02;CA1;VA1;3;Completed;BBQ Bacon Burger,1,Pasta Carbonara,1
 CO2;2023-12-02;CA1;VA3;1;Completed;Shrimp Dumplings (6pcs),1,Chinese Tea,1
 CO3;2023-12-03;CA1;VA1;3;Completed;Pasta Carbonara,1
-CO4;2023-12-05;CA4;VA1;1;PendingAccepted;Grilled Chicken Salad,1
+CO4;2023-12-05;CA4;VA1;1;VendorRejected;Grilled Chicken Salad,1
+CO5;2023-12-07;CA1;VA1;3;Completed;Grilled Chicken Salad,1
+CO7;2023-12-07;CA5;VA3;3;Completed;Chinese Tea,1
+CO8;2023-12-07;CA5;VA3;3;Completed;Chinese Tea,1,Chicken Noodles,1
+CO10;2023-12-07;CA5;VA3;1;Completed;Chicken Noodles,1
+CO11;2023-12-07;CA5;VA2;2;VendorAccepted;Blueberry Muffins,1
+CO12;2023-12-07;CA5;VA2;1;VendorAccepted;Chocolate Chip Muffins,1
+CO13;2023-12-07;CA5;VA3;3;Completed;Chicken Noodles,1
+CO14;2023-12-07;CA5;VA3;3;Completed;Chinese Tea,1

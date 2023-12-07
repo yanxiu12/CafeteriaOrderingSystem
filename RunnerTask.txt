@@ -1,3 +1,9 @@
 CO1;RA1;0;true
 CO2;RA3;1;false
 CO3;RA1;0;true
+CO5;RA1;0;true
+CO7;RA2;0;true
+CO8;RA3;0;true
+CO10;RA1;0;false
+CO13;RA1;0;true
+CO14;RA3;2;true
