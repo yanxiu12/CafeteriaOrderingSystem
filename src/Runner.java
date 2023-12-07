@@ -102,7 +102,7 @@ public class Runner implements Serializable {
     public void updateOrder(Order order,int status){
         switch (status) {
             case 1://accept order
-                if(order.getStatus() == Order.Status.VendorIsReady) {
+                if(order.getStatus() == Order.Status.VendorIsReady || order.getStatus() == Order.Status.PendingRunner) {
                     order.setStatus(Order.Status.Delivering);
                     CustomerNotification notification = new CustomerNotification("Order is Delivering!", order.getCustomer(), 6, order.getID());
                     notification.saveNotification();
