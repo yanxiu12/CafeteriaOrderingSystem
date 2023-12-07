@@ -388,7 +388,7 @@ public class RunnerInterface extends MainInterface{
                 int choice = input.nextInt();
                 System.out.println();
                 if(choice == 1){
-                    dashboard.calculateRevenue();
+                    dashboard.calculateRevenue(2);
                     System.out.println();
                     System.out.println("Please choose the type of revenue report:");
                     System.out.println("1. Daily");

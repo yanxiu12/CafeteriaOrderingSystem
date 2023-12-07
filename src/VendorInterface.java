@@ -884,7 +884,7 @@ public class VendorInterface extends MainInterface{
                 }
             }
             if(choice == 2){
-                dashboard.calculateRevenue();
+                dashboard.calculateRevenue(1);
                 System.out.println();
                 System.out.println("Please choose the type of revenue report:");
                 System.out.println("1. Daily");

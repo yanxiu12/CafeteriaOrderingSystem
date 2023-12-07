@@ -7,11 +7,16 @@ public class Dashboard {
         this.orders = orders;
     }
 
-    public void calculateRevenue() {
+    public void calculateRevenue(int user) {
         double totalRevenue = 0;
         for (Order order : orders) {
             if (order.getStatus() == Order.Status.Completed) {
-                totalRevenue += order.getTotalPrice();
+                if(user==1){
+                    totalRevenue += order.getTotalPrice();
+                }else{
+                    totalRevenue+=order.getDeliveryFee();
+                }
+
             }
         }
         System.out.println("Total Revenue : RM "+String.format("%.2f", totalRevenue));
