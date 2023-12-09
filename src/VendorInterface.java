@@ -476,7 +476,7 @@ public class VendorInterface extends MainInterface{
 
                                 if (confirmation.equals("yes")) {
                                     vendor.updateOrder(order, 3);
-                                    System.out.println("Successfully updated the order. We have notify the customer for lastest status.");
+                                    System.out.println("Successfully updated the order. We have notify the customer for latest status.");
                                 } else {
                                     System.out.println("Update canceled. Please review the information and try again.");
                                 }
@@ -491,7 +491,7 @@ public class VendorInterface extends MainInterface{
 
                                 if (confirmation.equals("yes")) {
                                     vendor.updateOrder(order, 4);
-                                    System.out.println("Successfully updated the order. We have notify the customer for lastest status.");
+                                    System.out.println("Successfully updated the order. We have notify the customer for latest status.");
                                 } else {
                                     System.out.println("Update canceled. Please review the information and try again.");
                                 }

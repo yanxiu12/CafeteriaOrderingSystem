@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 abstract public class Notification {
     protected String message;
 
@@ -9,10 +7,6 @@ abstract public class Notification {
 
     public String getMessage() {
         return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 
     public abstract void saveNotification();

@@ -29,10 +29,6 @@ public class OrderReview {
         return readReviewFromFile(vendor);
     }
 
-    public ArrayList<String> getReviewByRunner(Runner runner){
-        return readReviewFromFile(runner);
-    }
-
     private void writeReviewToFile(Order order, String review) {
         FileOperation file = new FileOperation(reviewFileName);
         file.writeToFile(this.toString());
@@ -79,17 +75,4 @@ public class OrderReview {
         return reviews;
     }
 
-    private ArrayList<String> readReviewFromFile(Runner runner){
-        ArrayList<String> reviews= new ArrayList<>();
-        FileOperation file = new FileOperation(reviewFileName);
-        ArrayList<String> foundReview = file.search(runner.getID());
-        if(!foundReview.isEmpty()){
-            for(String review:foundReview){
-                String[] reviewRecord = review.split(";");
-                if(Integer.parseInt(reviewRecord[5])==2)
-                    reviews.add(String.format("%-20s", reviewRecord[2]) +  String.format("%-10s",("| "+reviewRecord[3])) +  "| "+reviewRecord[4]);
-            }
-        }
-        return reviews;
-    }
 }

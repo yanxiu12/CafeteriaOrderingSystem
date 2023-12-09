@@ -63,7 +63,7 @@ public class SerializationOperation implements java.io.Serializable{
 
         for (T obj : deserializedObjects) {
             if (objectType.isInstance(obj)) {
-                // Implement search logic based on your object structure
+
                 String id;
                 if (obj instanceof Customer) {
                     id = ((Customer) obj).getID();
@@ -76,7 +76,6 @@ public class SerializationOperation implements java.io.Serializable{
                     continue; // Skip if not the expected type
                 }
 
-                // Perform the search based on the provided search key
                 if (id.contains(searchKey)) {
                     foundObjects.add(obj);
                 }
@@ -90,7 +89,7 @@ public class SerializationOperation implements java.io.Serializable{
         ArrayList<T> existingData = (ArrayList<T>) readAllObjects(updatedObj.getClass());
         for (int i = 0; i < existingData.size(); i++) {
             T obj = existingData.get(i);
-            // Replace this condition with your object identification logic
+
             if (obj.toString().contains(idToUpdate)) {
                 existingData.set(i, updatedObj);
                 break;
@@ -99,7 +98,7 @@ public class SerializationOperation implements java.io.Serializable{
         serializeObject(existingData);
     }
 
-    // Delete an object based on ID or other identification logic
+    // Delete an object
     public <T> void deleteObject(String idToDelete, Class<T> objectType) {
         ArrayList<T> existingData = readAllObjects(objectType);
         existingData.removeIf(obj -> obj.toString().contains(idToDelete));

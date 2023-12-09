@@ -24,14 +24,6 @@ public class CustomerNotification extends Notification{
         this.ID = IDGenerator.generateIDForCustomerNotification();
     }
 
-//    public CustomerNotification(String ID, Customer customer, String message, int code, String objectID){
-//        super(message);
-//        this.ID = ID;
-//        this.customer = customer;
-//        this.code = code;
-//        this.objectID = objectID;
-//    }
-
     public CustomerNotification(String ID, Customer customer, String message, int code, String objectID,String runnerContact){
         super(message);
         this.ID = ID;

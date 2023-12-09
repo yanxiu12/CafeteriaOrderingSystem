@@ -1,4 +1,3 @@
-import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -20,22 +19,12 @@ public class Customer implements Serializable {
         }
     }
 
-//    public Customer(String userID,String password){
-//        FileOperation file = new FileOperation("Customer.txt");
-//        if(file.checkUserCredential(userID,password)){
-//            setDetails(userID);
-//        }
-//        this.orders = new ArrayList<>();
-//        this.cartItems = new ArrayList<>();
-//        this.notifications = new ArrayList<>();
-//    }//for login
-
     public Customer(String ID,String password,String name,String dob,String contact,String address,String walletBalance){
         setID(ID);setPassword(password);setName(name);setDob(dob);setContact(contact);setAddress(address);setWalletBalance(walletBalance);
         this.notifications = new ArrayList<>();
         this.cartItems = new ArrayList<>();
         this.orders = new ArrayList<>();
-    }//for register //obj.write2file(obj.toString());
+    }
 
     public String getID() {return ID;}
 
@@ -117,24 +106,8 @@ public class Customer implements Serializable {
         return notifications;
     }
 
-   /* public void setDetails(String userID){
-        FileOperation file = new FileOperation("Customer.txt");
-        ArrayList<String> userData = file.search(userID);
-        if (userData.size() == 1) {
-            String[] item = userData.get(0).split(";");
-            setID(item[0]);
-            setPassword(item[1]);
-            setName(item[2]);
-            setDob(item[3]);
-            setContact(item[4]);
-            setAddress(item[5]);
-            setWalletBalance(item[6]);
-        }else
-            System.out.println("User not found!");
-    }*/
-
     public String toString(){
-        return String.format("%s;%s;%s;%s;%s;%s", ID, password, name, dob, contact,address,walletBalance);
+        return String.format("%s;%s;%s;%s;%s;%s;%s", ID, password, name, dob, contact,address,walletBalance);
     }
 
     public void write2file(Customer customer){
@@ -220,20 +193,5 @@ public class Customer implements Serializable {
         VendorNotification notification = new VendorNotification("An order has been canceled! ", order.getVendor(),2,order.getID());
         notification.saveNotification();
     }
-
-//    public void allocateRunner(Order order){
-//        Runner runner = new Runner();
-//        ArrayList<Runner> runnerList = runner.getAvailableRunner();
-//        if (runnerList!=null){
-//            if(runnerCounter<runnerList.size()){
-//                RunnerNotification notification = new RunnerNotification("You have new task!",runnerList.get(runnerCounter),1,order.getID());
-//                notification.saveNotification();
-//                runnerCounter++;
-//            }else {
-//                CustomerNotification notification = new CustomerNotification("Failed to get runner!", this,1,order.getID());
-//                notification.saveNotification();
-//            }
-//        }
-//    }
 
 }

@@ -93,7 +93,9 @@ public class Runner implements Serializable {
         ArrayList<String> foundTask = file.search(ID);
         for(String task:foundTask){
             String[] part = task.split(";");
-            taskHistory.add(new Order(part[0]));
+            if(part[1].equals(ID) && Boolean.parseBoolean(part[3])) {
+                taskHistory.add(new Order(part[0]));
+            }
         }
         return taskHistory;
     }

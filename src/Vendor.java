@@ -1,5 +1,3 @@
-import jdk.jfr.Category;
-
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -24,19 +22,11 @@ public class Vendor implements Serializable {
             System.out.println("User not found!");
     }
 
-//    public Vendor(String userID, String password){
-//        FileOperation file = new FileOperation("Vendor.txt");
-//        if(file.checkUserCredential(userID,password)){
-//            setDetails(userID);
-//            this.receivedOrders = new ArrayList<Order>();
-//        }
-//    }//for login
-
     public Vendor(String ID,String password,String vendorName,String category,String address){
         setID(ID);setPassword(password);setVendorName(vendorName);setCategory(category);setAddress(address);
         this.receivedOrders = new ArrayList<>();
         this.notifications = new ArrayList<>();
-    }//for register //obj.write2file(obj.toString());
+    }
 
     public String getID(){return ID;}
 
@@ -111,13 +101,11 @@ public class Vendor implements Serializable {
 
         for (String record : foundRecords) {
             String[] part = record.split(";");
-            Order order = new Order(part[0]); // Assuming part[0] is the order ID
+            Order order = new Order(part[0]);
 
-            // Assuming currentDate is a string representation of the date in the format "yyyy-MM-dd"
             LocalDate orderDate = LocalDate.parse(order.getCurrentDate()); // Parse the date string
 
             if (orderDate.equals(date)) {
-                // Add this order to the history if it matches the specified date
                 ordersByDate.add(order);
             }
         }
@@ -158,23 +146,6 @@ public class Vendor implements Serializable {
         return ordersByYear;
     }
 
-//    public void cancelOrder(Order order){
-//        receivedOrders.remove(order);
-//        System.out.println("Order "+order.getID()+" ordered by "+order.getCustomer().getName()+" has been canceled.");
-//    }
-
-//    public void cancelCustomerOrder(Customer customer) {
-//        ArrayList<Order> customerOrders = customer.getOrders();
-//
-//        for (Order customerOrder : customerOrders) {
-//            if (receivedOrders.contains(customerOrder)) {
-//                receivedOrders.remove(customerOrder);
-//                customer.cancelOrder(customerOrder);
-//                System.out.println("Customer's order canceled successfully.");
-//            }
-//        }
-//    }
-
     public boolean updateOrder(Order order,int status){
         if(order.getStatus()!=Order.Status.Cancelled) {
             switch (status) {
@@ -207,7 +178,7 @@ public class Vendor implements Serializable {
             }else if(order.getStatus() == Order.Status.VendorIsReady){
                 notification = new CustomerNotification("Order is Ready!", order.getCustomer(), 2, order.getID());
             }else if(order.getStatus() == Order.Status.PendingRunner){
-                notification = new CustomerNotification("Order is Pending Runner!", order.getCustomer(), 7, order.getID());
+                notification = new  CustomerNotification("Order is Pending Runner!", order.getCustomer(), 7, order.getID());
             }else
                 notification = new CustomerNotification("Order is Completed!", order.getCustomer(), 9, order.getID());
             notification.saveNotification();
